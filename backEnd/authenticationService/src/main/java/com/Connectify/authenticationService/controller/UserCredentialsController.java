@@ -1,5 +1,6 @@
 package com.Connectify.authenticationService.controller;
 
+import com.Connectify.authenticationService.dto.UserLogin;
 import com.Connectify.authenticationService.entity.UserCredentialsEntity;
 import com.Connectify.authenticationService.service.UserCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +33,14 @@ public class UserCredentialsController {
 
             if (userCredService.userExists(user.getEmail())) {
                 response.put("message", "User already exists");
-                response.put("status", "error");
+
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             UserCredentialsEntity createdUser = userCredService.register(user);
             response.put("message", "User registered successfully");
-            response.put("status", "success");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            response.put("message", "Registration failed");
-            response.put("status", "error");
-            response.put("error", e.getMessage());
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -55,7 +53,7 @@ public class UserCredentialsController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserCredentialsEntity user) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserLogin user) {
         Map<String, Object> response = new HashMap<>();
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -64,18 +62,14 @@ public class UserCredentialsController {
             if (authentication.isAuthenticated()) {
                 String token = userCredService.generateToken(user.getEmail());
                 response.put("message", "Login successful");
-                response.put("status", "success");
                 response.put("token", token);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Invalid credentials");
-                response.put("status", "error");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            response.put("message", "Login failed");
-            response.put("status", "error");
-            response.put("error", e.getMessage());
+            response.put("message",e.getMessage()) ;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

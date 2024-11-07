@@ -14,8 +14,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(MissingAuthorizationHeaderException.class)
     public ResponseEntity<Map<String, Object>> handleMissingAuthorizationHeader(MissingAuthorizationHeaderException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", "Authorization header is missing. Please provide a valid token.");
-        response.put("message", ex.getMessage());
+        response.put("message", "Authorization header is missing. Please provide a valid token.");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
@@ -23,8 +22,8 @@ public class CustomExceptionHandler {
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidToken(InvalidTokenException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("message", ex.getMessage());
-        response.put("error", "Invalid Access");
+        response.put("message", "Invalid Access");
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 }
