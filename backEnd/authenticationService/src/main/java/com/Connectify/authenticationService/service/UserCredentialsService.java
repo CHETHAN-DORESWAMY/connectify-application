@@ -30,6 +30,11 @@ public class UserCredentialsService {
         return user.isPresent();
     }
 
+    public boolean userExistsById(String id) {
+        Optional<UserCredentialsEntity> user = userCredentialsDao.findById(id);
+        return user.isPresent();
+    }
+
     public String generateToken(String name){
         return jwtService.generateToken(name);
     }

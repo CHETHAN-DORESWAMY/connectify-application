@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import "../App.css"; // Assuming the CSS from Register page is already set up
 
 function SignIn() {
@@ -37,10 +37,9 @@ function SignIn() {
         if (response.ok) {
           const data = await response.json();
           // Store token in localStorage for subsequent requests
-          localStorage.setItem("authToken", data.token);
-          // Redirect to the dashboard
-          //   navigate("/dashboard");
-          console.log(localStorage.getItem("authToken"));
+          sessionStorage.setItem("authToken", data.token);
+          console.log(sessionStorage.getItem("authToken"));
+          navigate("/home", { state: { userEmail: formData.email } });
 
           alert(data.message);
         } else {

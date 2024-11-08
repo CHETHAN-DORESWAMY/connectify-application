@@ -31,12 +31,13 @@ public class UserCredentialsController {
         Map<String, Object> response = new HashMap<>();
         try {
 
-            if (userCredService.userExists(user.getEmail())) {
+            if (userCredService.userExists(user.getEmail()) || userCredService.userExistsById(user.getId())) {
                 response.put("message", "User already exists");
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             UserCredentialsEntity createdUser = userCredService.register(user);
+            response.put("data", user);
             response.put("message", "User registered successfully");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {

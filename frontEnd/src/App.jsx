@@ -5,6 +5,7 @@ import Register from "./components/Register";
 import Signin from "./components/Signin";
 
 import "./App.css";
+import Home from "./components/Home";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/signin" element={<Signin />} />
 
-          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+          <Route path="/home" element={<Home />} />
         </Routes>
       </div>
     </Router>

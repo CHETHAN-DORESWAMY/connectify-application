@@ -44,14 +44,13 @@ function Register() {
           body: JSON.stringify(formData),
         });
 
-        const data = await response.json();
+        const userData = await response.json();
 
         if (response.ok) {
-          setServerMessage(data.message);
-          // Redirect to the sign-in page after a short delay
+          setServerMessage(userData.message);
           navigate("/signin");
         } else {
-          setServerMessage(data.message);
+          setServerMessage(userData.message);
         }
       } catch (error) {
         console.error("Error during registration:", error);

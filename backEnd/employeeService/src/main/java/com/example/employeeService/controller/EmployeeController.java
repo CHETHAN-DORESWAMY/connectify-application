@@ -71,6 +71,32 @@ public class EmployeeController {
         }
     }
 
+    @GetMapping("/get-by-email/{email}")
+    public ResponseEntity<HashMap<String, Object>> getEmployeeByEmail(@PathVariable String email) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            Optional<EmployeeEntity> employee = employeeService.getEmployeeByEmail(email);
+            if (employee.isPresent()) {
+                response.put("message", "Employee found");
+                response.put("employee", employee.get());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("message", "Employee not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            response.put("message", "Error fetching employee");
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-window-time")
+    public void getWindowTime(@RequestBody List<String> employees){
+        employeeService.computeWindowTime(employees);
+    }
+
+
     // Update employee by ID
     @PutMapping("/update/{empId}")
     public ResponseEntity<HashMap<String, Object>> updateEmployee(@PathVariable String empId, @RequestBody EmployeeEntity updatedEmployee) {

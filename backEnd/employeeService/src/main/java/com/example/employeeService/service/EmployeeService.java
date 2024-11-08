@@ -51,5 +51,13 @@ public class EmployeeService {
     public void deleteEmployee(String empId) {
         employeeDao.deleteById(empId);
     }
+
+    public Optional<EmployeeEntity> getEmployeeByEmail(String email) {
+        return employeeDao.findByEmpEmail(email);
+    }
+
+    public void computeWindowTime(List<String> employees) {
+        List<List<>>
+    }
 }
 
