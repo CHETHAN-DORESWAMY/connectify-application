@@ -3,6 +3,7 @@ package com.example.employeeService.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Document(collection = "employee_details")
@@ -16,13 +17,13 @@ public class EmployeeEntity {
     String empPhone;
     String empCity;
     String empTimezone;
-    LocalTime empStartTime;
-    LocalTime empEndTime;
+    LocalDateTime empStartTime;
+    LocalDateTime empEndTime;
 
     public EmployeeEntity() {
     }
 
-    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalTime empStartTime, LocalTime empEndTime) {
+    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalDateTime empStartTime, LocalDateTime empEndTime) {
         this.empId = empId;
         this.empName = empName;
         this.empDesignation = empDesignation;
@@ -90,19 +91,19 @@ public class EmployeeEntity {
         this.empTimezone = empTimezone;
     }
 
-    public LocalTime getEmpStartTime() {
+    public LocalDateTime getEmpStartTime() {
         return empStartTime;
     }
 
-    public void setEmpStartTime(LocalTime empStartTime) {
+    public void setEmpStartTime(LocalDateTime empStartTime) {
         this.empStartTime = empStartTime;
     }
 
-    public LocalTime getEmpEndTime() {
+    public LocalDateTime getEmpEndTime() {
         return empEndTime;
     }
 
-    public void setEmpEndTime(LocalTime empEndTime) {
+    public void setEmpEndTime(LocalDateTime empEndTime) {
         this.empEndTime = empEndTime;
     }
 }

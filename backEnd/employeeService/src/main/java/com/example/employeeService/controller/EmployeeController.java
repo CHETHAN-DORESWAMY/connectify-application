@@ -91,9 +91,12 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("/get-window-time")
-    public void getWindowTime(@RequestBody List<String> employees){
-        employeeService.computeWindowTime(employees);
+    @PostMapping("/get-window-time")
+    public ResponseEntity<EmployeeService.TimeInterval> getWindowTime(@RequestBody List<String> employees){
+        Optional<EmployeeService.TimeInterval> timeInterval = employeeService.computeWindowTime(employees);
+        if(timeInterval.isPresent())
+        return new ResponseEntity<>(timeInterval.get(), HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
 
