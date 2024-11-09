@@ -17,13 +17,13 @@ public class EmployeeEntity {
     String empPhone;
     String empCity;
     String empTimezone;
-    LocalDateTime empStartTime;
-    LocalDateTime empEndTime;
+    LocalTime empStartTime;
+    LocalTime empEndTime;
 
     public EmployeeEntity() {
     }
 
-    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalDateTime empStartTime, LocalDateTime empEndTime) {
+    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalTime empStartTime, LocalTime empEndTime) {
         this.empId = empId;
         this.empName = empName;
         this.empDesignation = empDesignation;
@@ -91,19 +91,19 @@ public class EmployeeEntity {
         this.empTimezone = empTimezone;
     }
 
-    public LocalDateTime getEmpStartTime() {
+    public LocalTime getEmpStartTime() {
         return empStartTime;
     }
 
-    public void setEmpStartTime(LocalDateTime empStartTime) {
+    public void setEmpStartTime(LocalTime empStartTime) {
         this.empStartTime = empStartTime;
     }
 
-    public LocalDateTime getEmpEndTime() {
+    public LocalTime getEmpEndTime() {
         return empEndTime;
     }
 
-    public void setEmpEndTime(LocalDateTime empEndTime) {
+    public void setEmpEndTime(LocalTime empEndTime) {
         this.empEndTime = empEndTime;
     }
 }
