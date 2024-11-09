@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import Navbar from "./Navbar";
 
 function Home() {
   const location = useLocation();
@@ -59,6 +60,7 @@ function Home() {
         </div>
       ) : (
         <div>
+          <Navbar></Navbar>
           <h1>Welcome, {email}!</h1>
           {/* Display other user details as needed */}
         </div>

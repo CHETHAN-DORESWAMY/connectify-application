@@ -24,13 +24,28 @@ public class OverLappingWindowClass {
         List<EmployeeEntity> employees = employeeDao.findByEmpIdIn(employeeListDto.getListOfEmployeeId());
         Map<String, Object> response = new HashMap<>();
 
-        OverlapWindow overlap = findOverlap(employees);
-        response.put("Green", adjustWindowDate(overlap, meetingDate));
+        Map<String, Object> greenTime = new HashMap<>();
+        Map<String, Object> amberTime = new HashMap<>();
+
+
+        OverlapWindow overlap = adjustWindowDate(findOverlap(employees), meetingDate);
+
+        greenTime.put("startTime",overlap != null ? overlap.getOverlapStart().toString():"No window");
+        greenTime.put("EndTime",overlap != null ? overlap.getOverlapEnd().toString(): "No window");
+
+        response.put("Green", greenTime);
 
 
         employees = extendWorkTimes(employees, 3); // Extend by ±3 hours
-        OverlapWindow overlap1 = findOverlap(employees);
-        response.put("amber", adjustWindowDate(overlap1, meetingDate));
+        OverlapWindow overlap1 = adjustWindowDate(findOverlap(employees), meetingDate);
+
+        amberTime.put("startTime",overlap1 !=null ?overlap1.getOverlapStart().toString():"No window");
+        amberTime.put("EndTime",overlap1 !=null ?overlap1.getOverlapEnd().toString():"No window");
+
+        response.put("amber", amberTime);
+
+
+
 
         return response;
 

@@ -101,7 +101,8 @@ public class EmployeeController {
     @PostMapping("/get-window-time")
     public ResponseEntity<Map<String, Object>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
 
-        Map<String, Object> window = overLappingWindowClass.computeWindow(employeeListDto);
+        Map<String, Object> window = new HashMap<>();
+        window.put("window", overLappingWindowClass.computeWindow(employeeListDto));
 
 
         return new ResponseEntity<>(window, HttpStatus.OK);
