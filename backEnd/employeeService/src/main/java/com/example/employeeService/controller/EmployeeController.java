@@ -91,11 +91,6 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("/get-window-time")
-    public void getWindowTime(@RequestBody List<String> employees){
-        employeeService.computeWindowTime(employees);
-    }
-
 
     // Update employee by ID
     @PutMapping("/update/{empId}")
