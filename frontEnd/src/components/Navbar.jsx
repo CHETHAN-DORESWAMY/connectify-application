@@ -1,73 +1,113 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 
 function Navbar() {
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <nav className="bg-gray-800 p-4 shadow-md">
-      {/* Logo and App Name */}
-      <div className="flex items-center">
-        <img src="./Preview.png" alt="App Icon" className="h-8 mr-3" />
-        <h1 className="text-white text-2xl font-bold">Connectify</h1>
-      </div>
+    <nav className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 shadow-lg">
+      <div className="container mx-auto flex items-center justify-between">
+        {/* Logo and App Name */}
+        <div className="flex items-center space-x-3">
+          <img src="./Preview.png" alt="App Icon" className="h-10 w-10 rounded-full shadow-md" />
+          <h1 className="text-white text-3xl font-bold tracking-tight">Connectify</h1>
+        </div>
 
-      {/* Navbar Links */}
-      <div className="hidden md:flex ml-auto space-x-6">
-        <ul className="flex items-center space-x-6">
-          <li>
-            <Link
-              className="text-white hover:text-blue-400 transition duration-300"
-              to="/schedule-meeting"
-            >
-              Schedule Meeting
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-white hover:text-blue-400 transition duration-300"
-              to="/calendar"
-            >
-              Calendar
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-white hover:text-blue-400 transition duration-300"
-              to="/search"
-            >
-              Search People
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="text-white hover:text-blue-400 transition duration-300"
-              to="/register"
-            >
-              Register
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      {/* Mobile View Toggle */}
-      <div className="md:hidden flex items-center ml-auto">
-        <button className="text-white">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-6 h-6"
+        {/* Navbar Links - Desktop */}
+        <div className="hidden md:flex space-x-6">
+          <Link
+            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            to="/create-meeting"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
+            Schedule Meeting
+          </Link>
+          <Link
+            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            to="/calendar"
+          >
+            Calendar
+          </Link>
+          <Link
+            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            to="/search"
+          >
+            Search People
+          </Link>
+        </div>
+
+        {/* Profile Icon and Mobile Menu Toggle */}
+        <div className="flex items-center space-x-4">
+          <button onClick={handleProfileClick} className="text-white hover:text-blue-200 transition duration-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-8 h-8"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z"
+              />
+            </svg>
+          </button>
+          <button onClick={toggleMenu} className="md:hidden text-white focus:outline-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden mt-4 bg-blue-700 rounded-lg shadow-lg p-4">
+          <Link
+            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            to="/schedule-meeting"
+            onClick={toggleMenu}
+          >
+            Schedule Meeting
+          </Link>
+          <Link
+            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            to="/calendar"
+            onClick={toggleMenu}
+          >
+            Calendar
+          </Link>
+          <Link
+            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            to="/search"
+            onClick={toggleMenu}
+          >
+            Search People
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }
