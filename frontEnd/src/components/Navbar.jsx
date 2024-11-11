@@ -27,7 +27,7 @@ function Navbar() {
         <div className="hidden md:flex space-x-6">
           <Link
             className="text-white hover:text-blue-200 transition duration-300 font-medium"
-            to="/schedule-meeting"
+            to="/create-meeting"
           >
             Schedule Meeting
           </Link>

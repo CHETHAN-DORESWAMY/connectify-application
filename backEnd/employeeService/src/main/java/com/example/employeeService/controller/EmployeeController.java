@@ -1,7 +1,10 @@
 package com.example.employeeService.controller;
 
+import com.example.employeeService.dto.EmployeeListDto;
 import com.example.employeeService.entity.EmployeeEntity;
+import com.example.employeeService.entity.OverlapWindow;
 import com.example.employeeService.service.EmployeeService;
+import com.example.employeeService.service.OverLappingWindowClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +21,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private OverLappingWindowClass overLappingWindowClass;
 
     // Create a new employee
     @PostMapping("/add")
@@ -89,6 +96,16 @@ public class EmployeeController {
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/get-window-time")
+    public ResponseEntity<Map<String, Object>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
+
+        Map<String, Object> window = new HashMap<>();
+        window.put("window", overLappingWindowClass.computeWindow(employeeListDto));
+
+
+        return new ResponseEntity<>(window, HttpStatus.OK);
     }
 
 

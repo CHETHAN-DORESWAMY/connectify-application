@@ -38,7 +38,7 @@ function SignIn() {
         if (response.ok) {
           const data = await response.json();
           sessionStorage.setItem("authToken", data.token);
-          navigate("/home", { state: { userEmail: formData.email } });
+          navigate("/welcome", { state: { userEmail: formData.email } });
           alert(data.message);
         } else {
           const errorData = await response.json();
