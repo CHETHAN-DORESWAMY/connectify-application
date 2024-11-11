@@ -1,6 +1,7 @@
 package com.example.employeeService.controller;
 
 import com.example.employeeService.dto.EmployeeListDto;
+import com.example.employeeService.dto.TimeClass;
 import com.example.employeeService.entity.EmployeeEntity;
 import com.example.employeeService.entity.OverlapWindow;
 import com.example.employeeService.service.EmployeeService;
@@ -99,13 +100,11 @@ public class EmployeeController {
     }
 
     @PostMapping("/get-window-time")
-    public ResponseEntity<Map<String, Object>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
-
-        Map<String, Object> window = new HashMap<>();
-        window.put("window", overLappingWindowClass.computeWindow(employeeListDto));
+    public ResponseEntity<List<TimeClass>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
 
 
-        return new ResponseEntity<>(window, HttpStatus.OK);
+
+        return new ResponseEntity<>(overLappingWindowClass.computeWindow(employeeListDto), HttpStatus.OK);
     }
 
 

@@ -2,12 +2,15 @@ package com.example.employeeService.service;
 
 import com.example.employeeService.dao.EmployeeDao;
 import com.example.employeeService.dto.EmployeeListDto;
+import com.example.employeeService.dto.TimeClass;
 import com.example.employeeService.entity.EmployeeEntity;
 import com.example.employeeService.entity.OverlapWindow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.time.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,41 +21,37 @@ public class OverLappingWindowClass {
     @Autowired
     private EmployeeDao employeeDao;
 
-    public Map<String, Object> computeWindow(EmployeeListDto employeeListDto){
+    public List<TimeClass> computeWindow(EmployeeListDto employeeListDto){
 //        it will find the list of selected employee form the database
         LocalDate meetingDate = employeeListDto.getMeetingDate();
         List<EmployeeEntity> employees = employeeDao.findByEmpIdIn(employeeListDto.getListOfEmployeeId());
-        Map<String, Object> response = new HashMap<>();
-
-        Map<String, Object> greenTime = new HashMap<>();
-        Map<String, Object> amberTime = new HashMap<>();
-
 
         OverlapWindow overlap = adjustWindowDate(findOverlap(employees), meetingDate);
+        TimeClass greenTime = new TimeClass();
+        greenTime.setType("green");
+        greenTime.setStartTime(overlap != null ? overlap.getOverlapStart().toString():"No window");
+        greenTime.setEndTime(overlap != null ? overlap.getOverlapEnd().toString(): "No window");
 
-        greenTime.put("startTime",overlap != null ? overlap.getOverlapStart().toString():"No window");
-        greenTime.put("EndTime",overlap != null ? overlap.getOverlapEnd().toString(): "No window");
 
-        response.put("Green", greenTime);
 
 
         employees = extendWorkTimes(employees, 3); // Extend by ±3 hours
         OverlapWindow overlap1 = adjustWindowDate(findOverlap(employees), meetingDate);
-
-        amberTime.put("startTime",overlap1 !=null ?overlap1.getOverlapStart().toString():"No window");
-        amberTime.put("EndTime",overlap1 !=null ?overlap1.getOverlapEnd().toString():"No window");
-
-        response.put("amber", amberTime);
-
-
-
-
-        return response;
+        TimeClass amberTime = new TimeClass();
+        amberTime.setType("amber");
+        amberTime.setStartTime(overlap != null ? overlap1.getOverlapStart().toString():"No window");
+        amberTime.setEndTime(overlap != null ? overlap1.getOverlapEnd().toString(): "No window");
 
 
 
 
 
+
+        List<TimeClass> result = new ArrayList<>();
+        result.add(greenTime);
+        result.add(amberTime);
+
+        return result;
 
     }
     public OverlapWindow adjustWindowDate(OverlapWindow overlap, LocalDate meetingDate){
