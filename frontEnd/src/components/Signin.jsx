@@ -38,7 +38,7 @@ function SignIn() {
           const data = await response.json();
           // Store token in localStorage for subsequent requests
           sessionStorage.setItem("authToken", data.token);
-          console.log(sessionStorage.getItem("authToken"));
+          // console.log(sessionStorage.getItem("authToken"));
           navigate("/home", { state: { userEmail: formData.email } });
 
           alert(data.message);
