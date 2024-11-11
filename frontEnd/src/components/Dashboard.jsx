@@ -40,7 +40,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <Navbar />
+      <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 mt-8">
