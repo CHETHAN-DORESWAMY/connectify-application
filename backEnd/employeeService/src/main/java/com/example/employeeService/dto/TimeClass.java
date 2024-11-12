@@ -1,5 +1,7 @@
 package com.example.employeeService.dto;
 
+import java.time.LocalDateTime;
+
 public class TimeClass {
     private String type;
     private String startTime;

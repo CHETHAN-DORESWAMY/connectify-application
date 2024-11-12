@@ -15,30 +15,30 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 shadow-lg">
+    <nav className="bg-gradient-to-r from-gray-900 to-black p-4 shadow-lg">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo and App Name */}
         <div className="flex items-center space-x-3">
-          <img src="./Preview.png" alt="App Icon" className="h-10 w-10 rounded-full shadow-md" />
+          <img src="https://th.bing.com/th?id=OIP.OQPmorjMA98lRVYZXXHJYAHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" alt="App Icon" className="h-10 w-10 rounded-full shadow-md" />
           <h1 className="text-white text-3xl font-bold tracking-tight">Connectify</h1>
         </div>
 
         {/* Navbar Links - Desktop */}
         <div className="hidden md:flex space-x-6">
           <Link
-            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            className="text-white hover:text-gray-300 transition duration-300 font-medium"
             to="/create-meeting"
           >
             Schedule Meeting
           </Link>
           <Link
-            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            className="text-white hover:text-gray-300 transition duration-300 font-medium"
             to="/calendar"
           >
             Calendar
           </Link>
           <Link
-            className="text-white hover:text-blue-200 transition duration-300 font-medium"
+            className="text-white hover:text-gray-300 transition duration-300 font-medium"
             to="/search"
           >
             Search People
@@ -47,7 +47,7 @@ function Navbar() {
 
         {/* Profile Icon and Mobile Menu Toggle */}
         <div className="flex items-center space-x-4">
-          <button onClick={handleProfileClick} className="text-white hover:text-blue-200 transition duration-300">
+          <button onClick={handleProfileClick} className="text-white hover:text-gray-300 transition duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -84,23 +84,23 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden mt-4 bg-blue-700 rounded-lg shadow-lg p-4">
+        <div className="md:hidden mt-4 bg-gray-800 rounded-lg shadow-lg p-4">
           <Link
-            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            className="block text-white hover:text-gray-300 transition duration-300 py-2"
             to="/schedule-meeting"
             onClick={toggleMenu}
           >
             Schedule Meeting
           </Link>
           <Link
-            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            className="block text-white hover:text-gray-300 transition duration-300 py-2"
             to="/calendar"
             onClick={toggleMenu}
           >
             Calendar
           </Link>
           <Link
-            className="block text-white hover:text-blue-200 transition duration-300 py-2"
+            className="block text-white hover:text-gray-300 transition duration-300 py-2"
             to="/search"
             onClick={toggleMenu}
           >

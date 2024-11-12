@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
 
 @Service
 public class OverLappingWindowClass {
@@ -29,8 +32,8 @@ public class OverLappingWindowClass {
         OverlapWindow overlap = adjustWindowDate(findOverlap(employees), meetingDate);
         TimeClass greenTime = new TimeClass();
         greenTime.setType("green");
-        greenTime.setStartTime(overlap != null ? overlap.getOverlapStart().toString():"No window");
-        greenTime.setEndTime(overlap != null ? overlap.getOverlapEnd().toString(): "No window");
+        greenTime.setStartTime(overlap != null ? overlap.getOverlapStart().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME):null);
+        greenTime.setEndTime(overlap != null ? overlap.getOverlapEnd().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME): null);
 
 
 
@@ -39,8 +42,8 @@ public class OverLappingWindowClass {
         OverlapWindow overlap1 = adjustWindowDate(findOverlap(employees), meetingDate);
         TimeClass amberTime = new TimeClass();
         amberTime.setType("amber");
-        amberTime.setStartTime(overlap != null ? overlap1.getOverlapStart().toString():"No window");
-        amberTime.setEndTime(overlap != null ? overlap1.getOverlapEnd().toString(): "No window");
+        amberTime.setStartTime(overlap != null ? overlap1.getOverlapStart().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME):null);
+        amberTime.setEndTime(overlap != null ? overlap1.getOverlapEnd().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME): null);
 
 
 

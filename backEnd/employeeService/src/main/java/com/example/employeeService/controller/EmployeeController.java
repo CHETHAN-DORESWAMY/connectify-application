@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,10 +102,15 @@ public class EmployeeController {
 
     @PostMapping("/get-window-time")
     public ResponseEntity<List<TimeClass>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
+        System.out.println(employeeListDto.getListOfEmployeeId());
+        System.out.println(employeeListDto.getMeetingDate());
+
+        List<TimeClass> list = overLappingWindowClass.computeWindow(employeeListDto);
+        System.out.println("Start Time" + list.get(0).getStartTime());
+        System.out.println("end Time" + list.get(0).getEndTime());
 
 
-
-        return new ResponseEntity<>(overLappingWindowClass.computeWindow(employeeListDto), HttpStatus.OK);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 
