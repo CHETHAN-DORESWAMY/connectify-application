@@ -6,6 +6,7 @@ import com.example.meetingService.entity.MeetingEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class MeetingService {
     // CREATE: Save a new meeting
     public MeetingEntity createMeeting(MeetingDto meeting) {
         MeetingEntity meetingData = new MeetingEntity();
+        meetingData.setMeetId(meeting.getMeetId());
         meetingData.setMeetName(meeting.getMeetName());
         meetingData.setMeetDescription(meeting.getMeetDescription());
         meetingData.setMeetHostId(meeting.getMeetHostId());
@@ -30,9 +32,14 @@ public class MeetingService {
         LocalDateTime endDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetEndTime());
         meetingData.setMeetEndDateTime(endDateTime);
         meetingData.setMeetDuration(meeting.getMeetDuration());
-        meetingData.setMeetStatus(meeting.getMeetStatus());
-        meetingData.setMeetNoOfParticipants(meeting.getMeetNoOfParticipants());
+        meetingData.setMeetNoOfParticipants(meeting.getNoParticipants());
+        meetingData.setMeetingDate(meeting.getMeetDate());
+        meetingData.setMeetStatus("Pending");
         return meetingDao.save(meetingData);
+    }
+
+    public List<MeetingEntity> getMeetingsByDateAndIds(LocalDate date, List<String> ids) {
+        return meetingDao.findByMeetingDateAndMeetIdIn(date, ids);
     }
 
     // READ: Get all meetings
@@ -60,8 +67,7 @@ public class MeetingService {
 
             meetingData.setMeetHostId(meeting.getMeetHostId());
             meetingData.setMeetDuration(meeting.getMeetDuration());
-            meetingData.setMeetStatus(meeting.getMeetStatus());
-            meetingData.setMeetNoOfParticipants(meeting.getMeetNoOfParticipants());
+
             return meetingDao.save(meetingData);
         }
         return null;

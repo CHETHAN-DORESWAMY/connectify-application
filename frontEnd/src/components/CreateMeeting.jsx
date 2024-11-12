@@ -146,7 +146,7 @@ const CreateMeeting = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            meetingName:,
+            meetingName,
             description,
             meetHostId,
             startTime,

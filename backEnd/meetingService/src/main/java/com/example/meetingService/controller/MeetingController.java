@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +51,24 @@ public class MeetingController {
             response.put("message", "Error fetching meetings");
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/scheduled")
+    public ResponseEntity<List<MeetingEntity>> getMeetingsByDateAndIds(@RequestParam String date, @RequestParam List<String> ids) {
+        try {
+            // Define the expected date format (e.g., "yyyy-MM-dd")
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate parsedDate = LocalDate.parse(date, formatter);
+
+            List<MeetingEntity> meetings = meetingService.getMeetingsByDateAndIds(parsedDate, ids);
+            if (meetings.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(meetings);
+        } catch (DateTimeParseException e) {
+            // Handle invalid date format
+            return ResponseEntity.badRequest().body(null);
         }
     }
 

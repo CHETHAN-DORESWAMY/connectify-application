@@ -3,6 +3,7 @@ package com.example.meetingService.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -14,6 +15,7 @@ public class MeetingEntity {
     String meetName;
     String meetDescription;
     String meetHostId;
+    LocalDate meetingDate;
     LocalDateTime meetStartDateTime;
     LocalDateTime meetEndDateTime;
     String meetDuration;
@@ -105,5 +107,13 @@ public class MeetingEntity {
 
     public void setMeetEndDateTime(LocalDateTime meetEndDateTime) {
         this.meetEndDateTime = meetEndDateTime;
+    }
+
+    public LocalDate getMeetingDate() {
+        return meetingDate;
+    }
+
+    public void setMeetingDate(LocalDate meetingDate) {
+        this.meetingDate = meetingDate;
     }
 }
