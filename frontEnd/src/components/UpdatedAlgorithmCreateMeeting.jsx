@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import { DateTime } from "luxon";
 
-const CreateMeeting = () => {
+const UpdatedAlgorithmCreateMeeting = () => {
   const [meetingName, setMeetingName] = useState("");
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("");
@@ -143,7 +143,7 @@ const CreateMeeting = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(API_END_POINT + "/get-window-time", {
+      const response = await fetch(API_END_POINT + "/get-red-window", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the header
@@ -165,6 +165,7 @@ const CreateMeeting = () => {
 
         // console.log(new Date(result[1].startTime));
         // console.log(new Date(result[1].endTime));
+        console.log(result);
 
         const localTimeResult = result.map((item) => ({
           ...item,
@@ -290,9 +291,15 @@ const CreateMeeting = () => {
           {/* Display the overlap result */}
           {overlapResult && (
             <div className="mt-4 text-green-500 font-semibold">
+              {console.log(overlapResult)}
               {overlapResult.map((result, index) => (
                 <div key={index}>
-                  <p> window : {result.type}</p>
+                  <ul>
+                    List:{" "}
+                    {result.employeeIds.map((ids, index) => (
+                      <li key={ids}>{ids}</li>
+                    ))}
+                  </ul>
                   <p>Meeting Start Time: {result.startTime}</p>
                   <p>Meeting End Time: {result.endTime}</p>
                 </div>
@@ -313,4 +320,4 @@ const CreateMeeting = () => {
   );
 };
 
-export default CreateMeeting;
+export default UpdatedAlgorithmCreateMeeting;

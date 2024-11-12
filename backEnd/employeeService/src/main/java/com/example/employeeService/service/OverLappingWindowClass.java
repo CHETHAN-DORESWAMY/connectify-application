@@ -24,12 +24,15 @@ public class OverLappingWindowClass {
     @Autowired
     private EmployeeDao employeeDao;
 
+    @Autowired
+    private LocalToUtcConvertor localToUtcConvertor;
+
     public List<TimeClass> computeWindow(EmployeeListDto employeeListDto){
 //        it will find the list of selected employee form the database
         LocalDate meetingDate = employeeListDto.getMeetingDate();
         List<EmployeeEntity> employees = employeeDao.findByEmpIdIn(employeeListDto.getListOfEmployeeId());
 
-        OverlapWindow overlap = adjustWindowDate(findOverlap(employees), meetingDate);
+        OverlapWindow overlap = adjustWindowDate(findOverlap(employees, meetingDate), meetingDate);
         TimeClass greenTime = new TimeClass();
         greenTime.setType("green");
         greenTime.setStartTime(overlap != null ? overlap.getOverlapStart().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME):null);
@@ -39,7 +42,7 @@ public class OverLappingWindowClass {
 
 
         employees = extendWorkTimes(employees, 3); // Extend by ±3 hours
-        OverlapWindow overlap1 = adjustWindowDate(findOverlap(employees), meetingDate);
+        OverlapWindow overlap1 = adjustWindowDate(findOverlap(employees, meetingDate), meetingDate);
         TimeClass amberTime = new TimeClass();
         amberTime.setType("amber");
         amberTime.setStartTime(overlap != null ? overlap1.getOverlapStart().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME):null);
@@ -69,21 +72,16 @@ public class OverLappingWindowClass {
     }
 
     //logic to find the overlapping window
-    private OverlapWindow findOverlap(List<EmployeeEntity> employees) {
+    private OverlapWindow findOverlap(List<EmployeeEntity> employees, LocalDate meetingDate) {
         ZonedDateTime maxStartTime = ZonedDateTime.of(LocalDate.now(), LocalTime.MIN, ZoneOffset.UTC);
         ZonedDateTime minEndTime = ZonedDateTime.of(LocalDate.now(), LocalTime.MAX, ZoneOffset.UTC);
         boolean extendsToNextDay = false;
 
         for (EmployeeEntity emp : employees) {
-            ZoneId zone = ZoneId.of(emp.getEmpTimezone());
 
-            // Convert LocalTime to LocalDateTime by combining with today's date and then into ZonedDateTime
-            ZonedDateTime start = ZonedDateTime.of(LocalDateTime.of(LocalDate.now(), emp.getEmpStartTime()), zone);
-            ZonedDateTime end = ZonedDateTime.of(LocalDateTime.of(LocalDate.now(), emp.getEmpEndTime()), zone);
-
-            //convert zonedDateTime to UTC time
-            ZonedDateTime startUtc = start.withZoneSameInstant(ZoneOffset.UTC);
-            ZonedDateTime endUtc = end.withZoneSameInstant(ZoneOffset.UTC);
+            List<ZonedDateTime> zonedDateTimeList = localToUtcConvertor.convert(emp, meetingDate );
+            ZonedDateTime startUtc = zonedDateTimeList.get(0);
+            ZonedDateTime endUtc = zonedDateTimeList.get(1);
 
             // Adjust maxStartTime and minEndTime based on UTC times
             if (startUtc.isAfter(maxStartTime)) {

@@ -1,10 +1,12 @@
 package com.example.employeeService.controller;
 
 import com.example.employeeService.dto.EmployeeListDto;
+import com.example.employeeService.dto.Interval;
 import com.example.employeeService.dto.TimeClass;
 import com.example.employeeService.entity.EmployeeEntity;
 import com.example.employeeService.entity.OverlapWindow;
 import com.example.employeeService.service.EmployeeService;
+import com.example.employeeService.service.OverLappingWindowAlgorithm;
 import com.example.employeeService.service.OverLappingWindowClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,9 @@ public class EmployeeController {
 
     @Autowired
     private OverLappingWindowClass overLappingWindowClass;
+
+    @Autowired
+    private OverLappingWindowAlgorithm overLappingWindowAlgorithm;
 
     // Create a new employee
     @PostMapping("/add")
@@ -112,6 +117,22 @@ public class EmployeeController {
 
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+
+    @PostMapping("/get-red-window")
+    public ResponseEntity<List<Interval>>  computeRedWindowTime(@RequestBody EmployeeListDto employeeListDto){
+        System.out.println(employeeListDto.getListOfEmployeeId());
+        System.out.println(employeeListDto.getMeetingDate());
+
+        List<Interval> list = overLappingWindowAlgorithm.computeWindow(employeeListDto);
+        System.out.println("Start Time" + list.get(0).getStartTime());
+        System.out.println("end Time" + list.get(0).getEndTime());
+
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+
+
 
 
     // Update employee by ID

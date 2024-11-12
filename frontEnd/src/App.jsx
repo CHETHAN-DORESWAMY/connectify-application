@@ -12,6 +12,7 @@ import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import ParticipantSearch from "./components/ParticipantSearch";
 import CreateMeeting from "./components/CreateMeeting";
+import UpdatedAlgorithmCreateMeeting from "./components/UpdatedAlgorithmCreateMeeting";
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-meeting" element={<CreateMeeting />} />
+          <Route path="/create-meeting-1" element={<UpdatedAlgorithmCreateMeeting />} />
+
           <Route path="/search" element={<ParticipantSearch />} />
         </Routes>
       </div>
