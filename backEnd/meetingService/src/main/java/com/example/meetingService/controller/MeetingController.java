@@ -1,5 +1,6 @@
 package com.example.meetingService.controller;
 
+import com.example.meetingService.dto.MeetingDto;
 import com.example.meetingService.entity.MeetingEntity;
 import com.example.meetingService.service.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,10 @@ public class MeetingController {
 
     // Create a new meeting
     @PostMapping("/add")
-    public ResponseEntity<HashMap<String, Object>> createMeeting(@RequestBody MeetingEntity meetingEntity) {
+    public ResponseEntity<HashMap<String, Object>> createMeeting(@RequestBody MeetingDto meetingDto) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            MeetingEntity createdMeeting = meetingService.createMeeting(meetingEntity);
+            MeetingEntity createdMeeting = meetingService.createMeeting(meetingDto);
             response.put("message", "Meeting created successfully");
             response.put("meeting", createdMeeting);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -73,7 +74,7 @@ public class MeetingController {
 
     // Update meeting by ID
     @PutMapping("/update/{id}")
-    public ResponseEntity<HashMap<String, Object>> updateMeeting(@PathVariable String id, @RequestBody MeetingEntity updatedMeeting) {
+    public ResponseEntity<HashMap<String, Object>> updateMeeting(@PathVariable String id, @RequestBody MeetingDto updatedMeeting) {
         HashMap<String, Object> response = new HashMap<>();
         try {
             MeetingEntity meeting = meetingService.updateMeeting(id, updatedMeeting);

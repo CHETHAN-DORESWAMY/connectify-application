@@ -11,11 +11,16 @@ const CreateMeeting = () => {
   const [selectedParticipantsName, setSelectedParticipantsName] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // For filtering participants
   const [meetingDate, setMeetingDate] = useState("");
+  const [startTime, setStartTime] = useState(""); // Start time field
+  const [endTime, setEndTime] = useState(""); // End time field
   const [dropdownVisible, setDropdownVisible] = useState(false); // Toggle dropdown visibility
   const [overlapResult, setOverlapResult] = useState([]); // State for the result of overlapping window
+  const [buttonText, setButtonText] = useState("Find Overlapping Interval"); // Dynamic button text
   const API_END_POINT = "http://localhost:8222/api/employees";
+  const MEETING_API_ENDPOINT = "http://localhost:8222/api/meetings/add";
   const token = sessionStorage.getItem("authToken");
   const creatorEmail = sessionStorage.getItem("email");
+  const meetHostId = sessionStorage.getItem("creatorId");
 
   // Fetch participants
   useEffect(() => {
@@ -31,12 +36,11 @@ const CreateMeeting = () => {
         if (response.ok) {
           const data = await response.json();
           setParticipants(data.employees);
-          // console.log(participants);
-          // Find creator after fetching participants and set selectedParticipants
           const creator = data.employees.find(
             (participant) => participant.empEmail === creatorEmail
           );
           if (creator) {
+            sessionStorage.setItem("creatorId", creator.empId);
             setSelectedParticipants([creator.empId]);
           }
         } else {
@@ -49,60 +53,17 @@ const CreateMeeting = () => {
     fetchParticipants();
   }, [API_END_POINT, token, creatorEmail]);
 
-  // function showWindow() {
-  //   if (overlapResult && overlapResult.length > 0) {
-  //     console.log(overlapResult[0]);
-  //     const overlapData = overlapResult.map((item) => ({
-  //       ...item,
-  //       startTime: convertToLocalTime(item.startTime),
-  //       endTime: convertToLocalTime(item.endTime),
-  //     }));
-  //     setOverlapResult(overlapData);
-  //   } else {
-  //     console.warn("No Green overlap result found.");
-  //   }
-  // }
-  // function convertToLocalTime(utcTime) {
-  //   // Meeting creator's timezone
-  //   const creatorTimeZone = participants.find(
-  //     (participant) => participant.empEmail === creatorEmail
-  //   )?.empTimezone;
-  //   console.log(creatorTimeZone);
-
-  //   if (creatorTimeZone) {
-  //     // Convert to creator's local time
-  //     const startTimeLocal = new Intl.DateTimeFormat("en-US", {
-  //       timeZone: creatorTimeZone,
-  //       dateStyle: "short",
-  //       timeStyle: "short",
-  //     }).format(new Date(utcTime));
-
-  //     console.log("Meeting Start Time:", startTimeLocal);
-  //     return startTimeLocal;
-  //   } else {
-  //     console.warn("Creator timezone not found.");
-  //     return null;
-  //   }
-  // }
-
   const convertToLocalTime = (utcTime) => {
     const creatorTimeZone = participants.find(
       (participant) => participant.empEmail === creatorEmail
     )?.empTimezone;
-
-    // console.log(creatorTimeZone);
-    // console.log(utcTime);
-    if (creatorTimeZone) {
-      return DateTime.fromISO(utcTime, { zone: "utc" })
-        .setZone(creatorTimeZone)
-        .toLocaleString(DateTime.DATETIME_MED); // Format to 'MM/DD/YY, hh:mm AM/PM'
-    } else {
-      console.warn("Creator timezone not found.");
-      return utcTime;
-    }
+    return creatorTimeZone
+      ? DateTime.fromISO(utcTime, { zone: "utc" })
+          .setZone(creatorTimeZone)
+          .toLocaleString(DateTime.DATETIME_MED)
+      : utcTime;
   };
 
-  // Filter participants based on search query
   const filteredParticipants = searchQuery
     ? participants.filter(
         (p) =>
@@ -112,18 +73,15 @@ const CreateMeeting = () => {
       )
     : participants;
 
-  // Handle participant selection
   const handleSelectParticipant = (participant) => {
-    if (!selectedParticipants.some((p) => p == participant.empId)) {
+    if (!selectedParticipants.includes(participant.empId)) {
       setSelectedParticipants([...selectedParticipants, participant.empId]);
       setSelectedParticipantsName([...selectedParticipantsName, participant]);
     }
-    setSearchQuery(""); // Clear search query after selection
-    console.log(selectedParticipants);
-    setDropdownVisible(false); // Hide the dropdown after selection
+    setSearchQuery("");
+    setDropdownVisible(false);
   };
 
-  // Remove selected participant
   const handleRemoveParticipant = (participant) => {
     setSelectedParticipants(
       selectedParticipants.filter((p) => p !== participant.empId)
@@ -133,53 +91,73 @@ const CreateMeeting = () => {
     );
   };
 
-  // Handle search box focus
   const handleSearchFocus = () => {
-    setDropdownVisible(true); // Show dropdown when the search box is focused
+    setDropdownVisible(true);
   };
 
-  // Handle form submission (Find Overlapping Interval)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch(API_END_POINT + "/get-window-time", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the header
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          meetingDate: meetingDate,
-          listOfEmployeeId: selectedParticipants, // Only send empId
-        }),
-      });
-      if (response.ok) {
-        const result = await response.json();
-        // console.log(result);
-        // console.log(new Date(result[0].startTime));
-        // console.log(new Date(result[0].endTime));
-
-        // const d = new Date(result[0].startTime);
-        // console.log(d.toISOString());
-
-        // console.log(new Date(result[1].startTime));
-        // console.log(new Date(result[1].endTime));
-
-        const localTimeResult = result.map((item) => ({
-          ...item,
-          startTime: item.startTime
-            ? convertToLocalTime(item.startTime)
-            : "No window found",
-          endTime: item.endTime
-            ? convertToLocalTime(item.endTime)
-            : "No window found",
-        }));
-        setOverlapResult(localTimeResult);
-      } else {
-        console.error("Failed to find overlap");
+    if (buttonText === "Find Overlapping Interval") {
+      try {
+        const response = await fetch(API_END_POINT + "/get-window-time", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            meetingDate: meetingDate,
+            listOfEmployeeId: selectedParticipants,
+          }),
+        });
+        if (response.ok) {
+          const result = await response.json();
+          const localTimeResult = result.map((item) => ({
+            ...item,
+            startTime: item.startTime
+              ? convertToLocalTime(item.startTime)
+              : "No window found",
+            endTime: item.endTime
+              ? convertToLocalTime(item.endTime)
+              : "No window found",
+          }));
+          setOverlapResult(localTimeResult);
+          setButtonText("Schedule Meeting"); // Update button text
+        } else {
+          console.error("Failed to find overlap");
+        }
+      } catch (error) {
+        console.error("Error:", error);
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } else {
+      // Schedule Meeting
+      try {
+        const response = await fetch(MEETING_API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            meetingName:,
+            description,
+            meetHostId,
+            startTime,
+            endTime,
+            meetingDate,
+            duration,
+            listOfEmployeeId: selectedParticipants,
+          }),
+        });
+        if (response.ok) {
+          console.log("Meeting scheduled successfully");
+          // Reset form or navigate to another page
+        } else {
+          console.error("Failed to schedule meeting");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -238,6 +216,30 @@ const CreateMeeting = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Start Time:
+            </label>
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              End Time:
+            </label>
+            <input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
           <div className="mb-4 relative">
             <label className="block text-gray-700 font-medium mb-2">
               Select Participants:
@@ -246,65 +248,57 @@ const CreateMeeting = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={handleSearchFocus} // Show dropdown on focus
+              onFocus={handleSearchFocus}
               placeholder="Search participants"
               className="w-full p-2 border border-gray-300 rounded"
             />
             {dropdownVisible && (
-              <div className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow-lg max-h-48 overflow-y-auto">
-                {filteredParticipants.length === 0 ? (
-                  <div className="p-2 text-gray-500">No participants found</div>
-                ) : (
-                  filteredParticipants.map((participant) => (
-                    <div
-                      key={participant.empId}
-                      onClick={() => handleSelectParticipant(participant)}
-                      className="p-2 hover:bg-sky-100 cursor-pointer"
-                    >
-                      {participant.empName} - {participant.empId}
-                      {/* Display participant name */}
-                    </div>
-                  ))
-                )}
+              <div className="absolute w-full bg-white border border-gray-300 rounded shadow-lg mt-2 max-h-40 overflow-y-auto z-10">
+                {filteredParticipants.map((participant) => (
+                  <div
+                    key={participant.empId}
+                    onClick={() => handleSelectParticipant(participant)}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                  >
+                    {participant.empName}
+                  </div>
+                ))}
               </div>
             )}
-          </div>
-          <div className="flex flex-wrap mt-2">
-            {selectedParticipantsName.map((participant) => (
-              <div
-                key={participant.empId}
-                className="bg-sky-200 text-sky-800 px-3 py-1 m-1 rounded-full flex items-center"
-              >
-                <span className="mr-2">{participant.empName}</span>
-                <button
-                  onClick={() => handleRemoveParticipant(participant)}
-                  className="text-red-500 hover:text-red-700"
+            <div className="mt-2">
+              {selectedParticipantsName.map((participant) => (
+                <span
+                  key={participant.empId}
+                  className="inline-block bg-gray-200 text-gray-700 rounded-full px-4 py-1 text-sm font-medium mr-2"
                 >
-                  &times;
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Display the overlap result */}
-          {overlapResult && (
-            <div className="mt-4 text-green-500 font-semibold">
-              {overlapResult.map((result, index) => (
-                <div key={index}>
-                  <p> window : {result.type}</p>
-                  <p>Meeting Start Time: {result.startTime}</p>
-                  <p>Meeting End Time: {result.endTime}</p>
-                </div>
+                  {participant.empName}
+                  <button
+                    onClick={() => handleRemoveParticipant(participant)}
+                    className="ml-2 text-gray-500 hover:text-gray-700"
+                  >
+                    &times;
+                  </button>
+                </span>
               ))}
-              {/* {console.log(overlapResult)} */}
             </div>
-          )}
-
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Available Time Windows:
+            </label>
+            <ul className="list-disc pl-6">
+              {overlapResult.map((item, index) => (
+                <li key={index}>
+                  {item.startTime} - {item.endTime}
+                </li>
+              ))}
+            </ul>
+          </div>
           <button
             type="submit"
-            className="mt-4 bg-sky-800 text-white px-4 py-2 rounded hover:bg-sky-900 transition duration-200"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-colors"
           >
-            Find Overlapping Interval
+            {buttonText}
           </button>
         </form>
       </div>

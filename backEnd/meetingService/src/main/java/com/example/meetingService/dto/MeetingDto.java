@@ -1,46 +1,35 @@
-package com.example.meetingService.entity;
+package com.example.meetingService.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
-@Document(collection = "meeting_details")
-public class MeetingEntity {
+public class MeetingDto {
 
-    @Id
-    String meetId;
     String meetName;
     String meetDescription;
     String meetHostId;
-    LocalDateTime meetStartDateTime;
-    LocalDateTime meetEndDateTime;
+    LocalTime meetStartTime;
+    LocalTime meetEndTime;
+    LocalDate meetDate;
     String meetDuration;
     String meetStatus;
-    int meetNoOfParticipants;
+    List<String> participantsId;
 
-    public MeetingEntity() {
+    public MeetingDto() {
     }
 
-    public MeetingEntity(String meetId,String meetName, String meetDescription, String meetHostId, LocalDateTime meetStartDateTime, LocalDateTime meetEndDateTime, String meetDuration, String meetStatus, int meetNoOfParticipants) {
-        this.meetId = meetId;
+    public MeetingDto(String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, LocalDate meetDate, String meetDuration, String meetStatus, int meetNoOfParticipants, List<String> participantsId) {
         this.meetName = meetName;
         this.meetDescription = meetDescription;
         this.meetHostId = meetHostId;
-        this.meetStartDateTime = meetStartDateTime;
-        this.meetEndDateTime = meetEndDateTime;
+        this.meetStartTime = meetStartTime;
+        this.meetEndTime = meetEndTime;
+        this.meetDate = meetDate;
         this.meetDuration = meetDuration;
         this.meetStatus = meetStatus;
-        this.meetNoOfParticipants = meetNoOfParticipants;
-    }
-
-    public String getMeetId() {
-        return meetId;
-    }
-
-    public void setMeetId(String meetId) {
-        this.meetId = meetId;
+        this.participantsId = participantsId;
     }
 
     public String getMeetName() {
@@ -67,6 +56,30 @@ public class MeetingEntity {
         this.meetHostId = meetHostId;
     }
 
+    public LocalTime getMeetEndTime() {
+        return meetEndTime;
+    }
+
+    public void setMeetEndTime(LocalTime meetEndTime) {
+        this.meetEndTime = meetEndTime;
+    }
+
+    public LocalTime getMeetStartTime() {
+        return meetStartTime;
+    }
+
+    public void setMeetStartTime(LocalTime meetStartTime) {
+        this.meetStartTime = meetStartTime;
+    }
+
+    public LocalDate getMeetDate() {
+        return meetDate;
+    }
+
+    public void setMeetDate(LocalDate meetDate) {
+        this.meetDate = meetDate;
+    }
+
     public String getMeetDuration() {
         return meetDuration;
     }
@@ -91,19 +104,11 @@ public class MeetingEntity {
         this.meetNoOfParticipants = meetNoOfParticipants;
     }
 
-    public LocalDateTime getMeetStartDateTime() {
-        return meetStartDateTime;
+    public List<String> getParticipantsId() {
+        return participantsId;
     }
 
-    public void setMeetStartDateTime(LocalDateTime meetStartDateTime) {
-        this.meetStartDateTime = meetStartDateTime;
-    }
-
-    public LocalDateTime getMeetEndDateTime() {
-        return meetEndDateTime;
-    }
-
-    public void setMeetEndDateTime(LocalDateTime meetEndDateTime) {
-        this.meetEndDateTime = meetEndDateTime;
+    public void setParticipantsId(List<String> participantsId) {
+        this.participantsId = participantsId;
     }
 }

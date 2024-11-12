@@ -26,6 +26,7 @@ function SignIn() {
       if (response.ok) {
         const data = await response.json();
         sessionStorage.setItem("authToken", data.token);
+        sessionStorage.setItem("email", formData.email);
         setIsLoggedIn(true);
         navigate("/welcome", { state: { userEmail: formData.email, userName: data.employeeName } });
       } else {
