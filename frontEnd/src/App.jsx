@@ -11,7 +11,6 @@ import "./index.css"
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import ParticipantSearch from "./components/ParticipantSearch";
-import CreateMeeting from "./components/CreateMeeting";
 import UpdatedAlgorithmCreateMeeting from "./components/UpdatedAlgorithmCreateMeeting";
 
 function App() {
@@ -24,8 +23,7 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create-meeting" element={<CreateMeeting />} />
-          <Route path="/create-meeting-1" element={<UpdatedAlgorithmCreateMeeting />} />
+          <Route path="/create-meeting" element={<UpdatedAlgorithmCreateMeeting />} />
 
           <Route path="/search" element={<ParticipantSearch />} />
         </Routes>

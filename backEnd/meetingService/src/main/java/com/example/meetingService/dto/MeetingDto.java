@@ -14,7 +14,6 @@ public class MeetingDto {
     LocalTime meetEndTime;
     LocalDate meetDate;
     String meetDuration;
-    String meetStatus;
     List<String> participantsId;
 
     public MeetingDto() {
@@ -28,7 +27,6 @@ public class MeetingDto {
         this.meetEndTime = meetEndTime;
         this.meetDate = meetDate;
         this.meetDuration = meetDuration;
-        this.meetStatus = meetStatus;
         this.participantsId = participantsId;
     }
 
@@ -86,22 +84,6 @@ public class MeetingDto {
 
     public void setMeetDuration(String meetDuration) {
         this.meetDuration = meetDuration;
-    }
-
-    public String getMeetStatus() {
-        return meetStatus;
-    }
-
-    public void setMeetStatus(String meetStatus) {
-        this.meetStatus = meetStatus;
-    }
-
-    public int getMeetNoOfParticipants() {
-        return meetNoOfParticipants;
-    }
-
-    public void setMeetNoOfParticipants(int meetNoOfParticipants) {
-        this.meetNoOfParticipants = meetNoOfParticipants;
     }
 
     public List<String> getParticipantsId() {

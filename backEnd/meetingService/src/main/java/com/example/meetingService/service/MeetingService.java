@@ -30,8 +30,6 @@ public class MeetingService {
         LocalDateTime endDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetEndTime());
         meetingData.setMeetEndDateTime(endDateTime);
         meetingData.setMeetDuration(meeting.getMeetDuration());
-        meetingData.setMeetStatus(meeting.getMeetStatus());
-        meetingData.setMeetNoOfParticipants(meeting.getMeetNoOfParticipants());
         return meetingDao.save(meetingData);
     }
 
@@ -60,8 +58,6 @@ public class MeetingService {
 
             meetingData.setMeetHostId(meeting.getMeetHostId());
             meetingData.setMeetDuration(meeting.getMeetDuration());
-            meetingData.setMeetStatus(meeting.getMeetStatus());
-            meetingData.setMeetNoOfParticipants(meeting.getMeetNoOfParticipants());
             return meetingDao.save(meetingData);
         }
         return null;
