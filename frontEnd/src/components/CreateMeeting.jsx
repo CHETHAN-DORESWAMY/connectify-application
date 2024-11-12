@@ -185,7 +185,7 @@ const CreateMeeting = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
       <div className="container mx-auto p-6">
         <h2 className="text-2xl font-bold mb-4">Create Meeting</h2>
         <form
@@ -259,7 +259,7 @@ const CreateMeeting = () => {
                     <div
                       key={participant.empId}
                       onClick={() => handleSelectParticipant(participant)}
-                      className="p-2 hover:bg-blue-100 cursor-pointer"
+                      className="p-2 hover:bg-sky-100 cursor-pointer"
                     >
                       {participant.empName} - {participant.empId}
                       {/* Display participant name */}
@@ -273,7 +273,7 @@ const CreateMeeting = () => {
             {selectedParticipantsName.map((participant) => (
               <div
                 key={participant.empId}
-                className="bg-blue-200 text-blue-700 px-3 py-1 m-1 rounded-full flex items-center"
+                className="bg-sky-200 text-sky-800 px-3 py-1 m-1 rounded-full flex items-center"
               >
                 <span className="mr-2">{participant.empName}</span>
                 <button
@@ -302,7 +302,7 @@ const CreateMeeting = () => {
 
           <button
             type="submit"
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+            className="mt-4 bg-sky-800 text-white px-4 py-2 rounded hover:bg-sky-900 transition duration-200"
           >
             Find Overlapping Interval
           </button>

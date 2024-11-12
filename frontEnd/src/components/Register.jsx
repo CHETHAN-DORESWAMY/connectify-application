@@ -94,7 +94,7 @@ function Register() {
               name="id"
               value={formData.id}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
             />
             {errors.id && (
               <p className="text-red-600 text-xs mt-1">{errors.id}</p>
@@ -111,7 +111,7 @@ function Register() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
             />
             {errors.email && (
               <p className="text-red-600 text-xs mt-1">{errors.email}</p>
@@ -128,7 +128,7 @@ function Register() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
             />
             {errors.password && (
               <p className="text-red-600 text-xs mt-1">{errors.password}</p>
@@ -138,7 +138,7 @@ function Register() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
+            className="w-full bg-sky-800 text-white py-2 rounded-md hover:bg-sky-900 transition duration-300"
           >
             Register
           </button>
@@ -146,7 +146,7 @@ function Register() {
           {/* Sign In Link */}
           <p className="text-center text-sm mt-3">
             Already have an account?{" "}
-            <Link to="/signin" className="text-blue-500 hover:underline">
+            <Link to="/signin" className="text-sky-800 hover:underline">
               Sign In
             </Link>
           </p>

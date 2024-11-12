@@ -8,7 +8,7 @@ function MeetingList({ meetings }) {
         Today's Meetings
       </h3>
       <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
-        <thead className="bg-blue-600 text-white">
+        <thead className="bg-sky-800 text-white">
           <tr>
             <th className="py-3 px-4 text-left">Time</th>
             <th className="py-3 px-4 text-left">Meeting</th>
