@@ -21,6 +21,13 @@ public class ParticipantsEntity {
         this.status = status;
     }
 
+    public ParticipantsEntity(String empId, String meetId,  String status) {
+
+        this.meetId = meetId;
+        this.empId = empId;
+        this.status = status;
+    }
+
     public String getParticipantId() {
         return participantId;
     }

@@ -1,5 +1,7 @@
 package com.example.meetingParticipantsService.controller;
 
+import com.example.meetingParticipantsService.client.Meeting;
+import com.example.meetingParticipantsService.dto.ParticipantsDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
 import com.example.meetingParticipantsService.service.ParticipantsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,11 @@ public class ParticipantsController {
 
     // Create a new participant
     @PostMapping("/add")
-    public ResponseEntity<HashMap<String, Object>> createParticipant(@RequestBody ParticipantsEntity participantsEntity) {
+    public ResponseEntity<HashMap<String, Object>> createParticipant(@RequestBody ParticipantsDto participants) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            ParticipantsEntity createdParticipant = participantsService.createParticipant(participantsEntity);
+            participantsService.createParticipant(participants);
             response.put("message", "Participant added successfully");
-            response.put("participant", createdParticipant);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             response.put("message", "Error adding participant");
@@ -49,6 +50,18 @@ public class ParticipantsController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/{participantId}/meetings")
+    public ResponseEntity<List<Meeting>> getMeetingsForParticipantOnDate(
+            @PathVariable String participantId,
+            @RequestParam String date) {
+        List<Meeting> meetings = participantsService.getMeetingsForParticipantOnDate(participantId, date);
+        if (meetings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(meetings);
+    }
+
 
     // Get participant by ID
     @GetMapping("/get/{id}")

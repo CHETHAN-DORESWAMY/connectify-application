@@ -7,6 +7,7 @@ import java.util.List;
 
 public class MeetingDto {
 
+    String meetId;
     String meetName;
     String meetDescription;
     String meetHostId;
@@ -14,12 +15,14 @@ public class MeetingDto {
     LocalTime meetEndTime;
     LocalDate meetDate;
     String meetDuration;
-    List<String> participantsId;
+
+    int noParticipants;
 
     public MeetingDto() {
     }
 
-    public MeetingDto(String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, LocalDate meetDate, String meetDuration, String meetStatus, int meetNoOfParticipants, List<String> participantsId) {
+    public MeetingDto(String meetId, String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, LocalDate meetDate, String meetDuration, int noParticipants) {
+        this.meetId = meetId;
         this.meetName = meetName;
         this.meetDescription = meetDescription;
         this.meetHostId = meetHostId;
@@ -27,7 +30,24 @@ public class MeetingDto {
         this.meetEndTime = meetEndTime;
         this.meetDate = meetDate;
         this.meetDuration = meetDuration;
-        this.participantsId = participantsId;
+        this.noParticipants = noParticipants;
+
+    }
+
+    public String getMeetId() {
+        return meetId;
+    }
+
+    public void setMeetId(String meetId) {
+        this.meetId = meetId;
+    }
+
+    public int getNoParticipants() {
+        return noParticipants;
+    }
+
+    public void setNoParticipants(int noParticipants) {
+        this.noParticipants = noParticipants;
     }
 
     public String getMeetName() {
@@ -86,11 +106,12 @@ public class MeetingDto {
         this.meetDuration = meetDuration;
     }
 
-    public List<String> getParticipantsId() {
-        return participantsId;
-    }
 
-    public void setParticipantsId(List<String> participantsId) {
-        this.participantsId = participantsId;
-    }
+
+
+
+
+
+
+
 }

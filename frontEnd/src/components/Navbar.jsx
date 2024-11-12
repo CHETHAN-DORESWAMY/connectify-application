@@ -37,7 +37,7 @@ function Navbar({ isLoggedIn, employeeName }) {
     fetchEmployees();
   }, []);
 
-  // Filter employees based on search query while typing
+  // Filter employees based on search query
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredEmployees([]);

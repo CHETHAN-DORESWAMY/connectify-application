@@ -1,7 +1,10 @@
 package com.example.meetingParticipantsService.service;
 
+import com.example.meetingParticipantsService.client.Meeting;
 import com.example.meetingParticipantsService.dao.ParticipantsDao;
+import com.example.meetingParticipantsService.dto.ParticipantsDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
+import com.example.meetingParticipantsService.feign.MeetingClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +17,25 @@ public class ParticipantsService {
     @Autowired
     private ParticipantsDao participantsRepository;
 
+    @Autowired
+    private MeetingClient meetingClient;
+
     // Create a new participant
-    public ParticipantsEntity createParticipant(ParticipantsEntity participantsEntity) {
-        return participantsRepository.save(participantsEntity);
+    public void createParticipant(ParticipantsDto participants) {
+        int n = participants.getParticipantsIds().size();
+        for(int i = 0; i < n; i++){
+            ParticipantsEntity participantsEntity = new ParticipantsEntity(participants.getParticipantsIds().get(i), participants.getMeetingId(), "pending");
+            participantsRepository.save(participantsEntity);
+        }
     }
 
+    public List<Meeting> getMeetingsForParticipantOnDate(String participantId, String date) {
+        // Retrieve all meeting IDs associated with the participant
+        List<String> meetingIds = participantsRepository.findMeetIdByEmpId(participantId);
+
+        // Fetch meetings for the specific date and meeting IDs using Feign client
+        return meetingClient.getMeetingsByDateAndIds(date, meetingIds);
+    }
     // Get all participants
     public List<ParticipantsEntity> getAllParticipants() {
         return participantsRepository.findAll();
