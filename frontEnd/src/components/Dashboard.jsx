@@ -4,38 +4,50 @@ import MeetingList from "./MeetingList";
 import Navbar from "./Navbar";
 
 function Dashboard() {
-  // Dummy data for today's meetings
   const [meetings, setMeetings] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const token = sessionStorage.getItem("authToken");
+
+  const empId = sessionStorage.getItem("empId");
+  const API_END_POINT = `http://localhost:8222/api/participants`;
+
 
   useEffect(() => {
-    // Simulating an API call to fetch today's meetings
     const fetchMeetings = async () => {
-      const meetingData = [
-        {
-          time: "10:00 AM",
-          title: "Project Sync",
-          location: "Room 101",
-          participants: ["John Doe", "Jane Smith", "Bob Lee"],
-        },
-        {
-          time: "1:00 PM",
-          title: "Team Standup",
-          location: "Room 202",
-          participants: ["Alice Johnson", "Sarah Lee"],
-        },
-        {
-          time: "3:30 PM",
-          title: "Client Presentation",
-          location: "Zoom",
-          participants: ["Tom Hanks", "Emma Watson", "Robert Downey"],
-        },
-      ];
+      try {
+        
 
-      setMeetings(meetingData);
+        const response = await fetch(API_END_POINT + "/" + empId + "/meetings?date=" + selectedDate, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch meetings");
+        }
+
+        if(response.status === 200){
+        const data = await response.json();
+        // console.log(empId);
+        // console.log(data);
+        setMeetings(data.meetings);
+        }
+      } catch (error) {
+        console.error("Error fetching meetings:", error);
+        setMeetings([]);
+      }
     };
 
     fetchMeetings();
   }, []);
+
+  const filteredMeetings = meetings.filter(meeting => {
+    const meetingDate = new Date(meeting.meetStartDateTime).toISOString().split('T')[0];
+    return meetingDate === selectedDate;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +56,17 @@ function Dashboard() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 mt-8">
-        <MeetingList meetings={meetings} />
+        <div className="mb-4">
+          <label htmlFor="date-select" className="block text-sm font-medium text-gray-700">Select Date:</label>
+          <input
+            type="date"
+            id="date-select"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <MeetingList meetings={filteredMeetings} />
       </div>
     </div>
   );

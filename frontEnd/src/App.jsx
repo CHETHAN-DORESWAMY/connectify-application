@@ -13,7 +13,8 @@ import Home from "./components/Home";
 import ParticipantSearch from "./components/ParticipantSearch";
 import UpdatedAlgorithmCreateMeeting from "./components/UpdatedAlgorithmCreateMeeting";
 import Profile from "./components/Profile";
-
+import ResetPassword from "./components/ResetPassword";
+import Calendar from "./components/Calendar";
 function App() {
   return (
     <Router>
@@ -27,6 +28,8 @@ function App() {
           <Route path="/create-meeting" element={<UpdatedAlgorithmCreateMeeting />} />
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/calendar" element={<Calendar />} />
         </Routes>
       </div>
     </Router>

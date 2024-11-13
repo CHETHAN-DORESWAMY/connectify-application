@@ -92,7 +92,7 @@ function SignIn() {
 
           <p className="text-center text-sm mt-4">
             <Link
-              to="/forgot-password"
+              to="/reset-password"
               className="text-sky-800 hover:underline"
             >
               Forgot Password?

@@ -42,6 +42,7 @@ function Welcome() {
         })
         .then((data) => {
           if (data) setUserData(data.employee);
+          sessionStorage.setItem("empId", data.employee.empId);
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -85,13 +86,13 @@ function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
       <div className="container mx-auto p-6">
         {showForm ? (
-          <div className="bg-white shadow-xl rounded-lg max-w-xl mx-auto p-8">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">Complete Your Profile</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white shadow-md rounded-lg max-w-xl mx-auto p-8">
+            <h2 className="text-2xl font-semibold mb-6 text-sky-800">Complete Your Profile</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
               {Object.entries(formData).map(([key, value]) => (
                 <div key={key}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -102,7 +103,7 @@ function Welcome() {
                       name={key}
                       value={value}
                       onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-sky-800 transition-all duration-300"
                       required
                     >
                       <option value="">Select Timezone</option>
@@ -118,7 +119,7 @@ function Welcome() {
                       name={key}
                       value={value}
                       onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-sky-800 transition-all duration-300"
                       required={['empId', 'empName', 'empEmail', 'empTimezone', 'empStartTime', 'empEndTime'].includes(key)}
                     />
                   )}
@@ -126,30 +127,44 @@ function Welcome() {
               ))}
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+                className="w-full bg-sky-800 text-white py-2 px-4 rounded-md hover:bg-sky-900 transition-all duration-300"
               >
                 Save Profile
               </button>
             </form>
           </div>
         ) : (
-          <div className="bg-white shadow-xl rounded-lg max-w-2xl mx-auto p-8">
-            <h1 className="text-4xl font-bold mb-6 text-gray-800">Welcome, {userData?.empName || email}!</h1>
+          <div className="bg-white shadow-md rounded-lg max-w-2xl mx-auto p-8">
+            <h1 className="text-3xl font-semibold mb-6 text-sky-800">Welcome, {userData?.empName || email}</h1>
             <div className="bg-gray-50 rounded-lg p-6">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-700">Employee Information</h2>
+              <h2 className="text-xl font-semibold mb-4 text-sky-800">Your Profile</h2>
               {userData && (
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(userData).map(([key, value]) => (
-                    <div key={key} className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-500">
-                        {key.replace('emp', '').replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <span className="text-lg text-gray-800">{value}</span>
-                    </div>
-                  ))}
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-600">Name</span>
+                    <span className="text-lg text-gray-800">{userData.empName}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-600">Designation</span>
+                    <span className="text-lg text-gray-800">{userData.empDesignation}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-600">Email</span>
+                    <span className="text-lg text-gray-800">{userData.empEmail}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-600">City</span>
+                    <span className="text-lg text-gray-800">{userData.empCity}</span>
+                  </div>
                 </div>
               )}
             </div>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="mt-6 w-full bg-sky-800 text-white py-2 px-4 rounded-md hover:bg-sky-900 transition-all duration-300"
+            >
+              Go to Dashboard
+            </button>
           </div>
         )}
       </div>
