@@ -77,9 +77,9 @@ function Navbar({ isLoggedIn, employeeName }) {
           {/* Navbar Links */}
           {isLoggedIn && (
             <div className="hidden md:flex space-x-6 items-center">
-              <Link to="/dashboard" className="text-white hover:text-sky-800 transition-colors duration-200 text-lg">Dashboard</Link>
-              <Link to="/create-meeting" className="text-white hover:text-sky-800 transition-colors duration-200 text-lg">Schedule Meeting</Link>
-              <Link to="/calendar" className="text-white hover:text-sky-800 transition-colors duration-200 text-lg">Calendar</Link>
+              <Link to="/dashboard" className="text-white font-bold hover:text-sky-800 transition-colors duration-200 text-lg transform hover:scale-110">Dashboard</Link>
+              <Link to="/create-meeting" className="text-white font-bold hover:text-sky-800 transition-colors duration-200 text-lg transform hover:scale-110">Schedule Meeting</Link>
+              <Link to="/calendar" className="text-white font-bold hover:text-sky-800 transition-colors duration-200 text-lg transform hover:scale-110">Calendar</Link>
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
@@ -99,7 +99,7 @@ function Navbar({ isLoggedIn, employeeName }) {
                     {filteredEmployees.map((emp) => (
                       <li
                         key={emp.empId}
-                        onClick={() => navigate(`/profile/${emp.empId}`)}
+                        onClick={() => navigate(`/profile/${emp.empId}` )}
                         className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                       >
                         {emp.empId} - {emp.empName} ({emp.empEmail})
@@ -123,7 +123,7 @@ function Navbar({ isLoggedIn, employeeName }) {
               {showDropdown && isLoggedIn && (
                 <div className="absolute right-0 mt-2 bg-gray-800 rounded-lg shadow-lg p-2 w-40 z-50">
                   <div className="block text-white px-4 py-2 border-b border-gray-600">{employeeName}</div>
-                  <Link to="/welcome" className="block text-white hover:text-gray-300 px-4 py-2">View Profile</Link>
+                  <Link to={`/profile/${sessionStorage.getItem("creatorId")}`} className="block text-white hover:text-gray-300 px-4 py-2">View Profile</Link>
                   <button
                     onClick={() => {
                       sessionStorage.removeItem("authToken");
@@ -147,10 +147,10 @@ function Navbar({ isLoggedIn, employeeName }) {
         {/* Mobile Dropdown */}
         {isMenuOpen && isLoggedIn && (
           <div className="md:hidden mt-4 bg-gray-800 rounded-lg shadow-lg p-4">
-            <Link to="/dashboard" onClick={toggleMenu} className="block text-white hover:text-gray-300 py-2">Dashboard</Link>
-            <Link to="/create-meeting" onClick={toggleMenu} className="block text-white hover:text-gray-300 py-2">Schedule Meeting</Link>
-            <Link to="/calendar" onClick={toggleMenu} className="block text-white hover:text-gray-300 py-2">Calendar</Link>
-            <Link to="/search" onClick={toggleMenu} className="block text-white hover:text-gray-300 py-2">Search People</Link>
+            <Link to="/dashboard" onClick={toggleMenu} className="block text-white font-bold hover:text-gray-300 py-2 transform hover:scale-105">Dashboard</Link>
+            <Link to="/create-meeting" onClick={toggleMenu} className="block text-white font-bold hover:text-gray-300 py-2 transform hover:scale-105">Schedule Meeting</Link>
+            <Link to="/calendar" onClick={toggleMenu} className="block text-white font-bold hover:text-gray-300 py-2 transform hover:scale-105">Calendar</Link>
+            <Link to="/search" onClick={toggleMenu} className="block text-white font-bold hover:text-gray-300 py-2 transform hover:scale-105">Search People</Link>
           </div>
         )}
       </nav>

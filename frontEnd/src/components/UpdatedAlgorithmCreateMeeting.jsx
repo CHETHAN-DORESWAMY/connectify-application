@@ -20,6 +20,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
 
   const API_END_POINT = "http://localhost:8222/api/employees";
   const MEETING_API_END_POINT = "http://localhost:8222/api/meetings/add";
+  const PARTICIPANTS_API_END_POINT = "http://localhost:8222/api/participants/add";
   const token = sessionStorage.getItem("authToken");
   const creatorEmail = sessionStorage.getItem("email");
 
@@ -164,8 +165,31 @@ const UpdatedAlgorithmCreateMeeting = () => {
           participantsId: selectedParticipants,
         }),
       });
-      if (response.ok) {
+      const responseParticipants = await fetch(PARTICIPANTS_API_END_POINT, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          meetingId: meetingId,
+          participantsIds: selectedParticipants,
+        }),
+      });
+      if (response.ok && responseParticipants.ok) {
         alert("Meeting successfully scheduled!");
+        // Clear the form data
+        setMeetingName("");
+        setDescription("");
+        setDuration("");
+        setMeetingDate("");
+        setStartTime("");
+        setEndTime("");
+        setSelectedParticipants([]);
+        setSelectedParticipantsName([]);
+        setOverlapResult([]);
+        setShowTimeFields(false);
+        setMeetingId(`MEET-${Date.now()}-${Math.floor(Math.random() * 1000)}`);
       } else {
         console.error("Failed to schedule meeting");
       }
