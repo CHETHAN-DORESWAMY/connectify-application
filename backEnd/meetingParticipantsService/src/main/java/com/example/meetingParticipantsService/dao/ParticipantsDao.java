@@ -12,7 +12,8 @@ import java.util.List;
 @Repository
 public interface ParticipantsDao extends MongoRepository<ParticipantsEntity, String> {
 
-    @Query("SELECT p.meetId FROM ParticipantsEntity p WHERE p.empId = :participantId")
-    List<String> findMeetIdByEmpId(@Param("participantId") String participantId);
+//    @Query("SELECT p.meetId FROM ParticipantsEntity p WHERE p.empId = :participantId")
+//    List<String> findMeetIdByEmpId(@Param("participantId") String participantId);
 
+    List<ParticipantsEntity> findByEmpId(String participantId);
 }

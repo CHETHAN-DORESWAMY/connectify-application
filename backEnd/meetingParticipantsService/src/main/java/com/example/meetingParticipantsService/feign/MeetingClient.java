@@ -1,17 +1,19 @@
 package com.example.meetingParticipantsService.feign;
 
 import com.example.meetingParticipantsService.client.Meeting;
+import com.example.meetingParticipantsService.dto.MeetingDateDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.util.List;
 
-@FeignClient(name = "meetingService", url = "http://localhost:8092/meetings")  // Update the URL and port as necessary
+@FeignClient(name = "meetingService", url = "http://localhost:8092/api/meetings")  // Update the URL and port as necessary
 public interface MeetingClient {
 
-    @GetMapping("/scheduled")
-    List<Meeting> getMeetingsByDateAndIds(@RequestParam("date") String date,
-                                          @RequestParam("ids") List<String> ids);
+    @PostMapping("/scheduled")
+    ResponseEntity<List<Meeting>> getMeetingsByDateAndIds(@RequestBody MeetingDateDto meetingDateDto);
 }
 

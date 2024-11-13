@@ -15,7 +15,7 @@ public class MeetingEntity {
     String meetName;
     String meetDescription;
     String meetHostId;
-    LocalDate meetingDate;
+    String meetingDate;
     LocalDateTime meetStartDateTime;
     LocalDateTime meetEndDateTime;
     String meetDuration;
@@ -25,11 +25,12 @@ public class MeetingEntity {
     public MeetingEntity() {
     }
 
-    public MeetingEntity(String meetId,String meetName, String meetDescription, String meetHostId, LocalDateTime meetStartDateTime, LocalDateTime meetEndDateTime, String meetDuration, String meetStatus, int meetNoOfParticipants) {
+    public MeetingEntity(String meetId,String meetName, String meetDescription, String meetHostId, String meetingDate, LocalDateTime meetStartDateTime, LocalDateTime meetEndDateTime, String meetDuration, String meetStatus, int meetNoOfParticipants) {
         this.meetId = meetId;
         this.meetName = meetName;
         this.meetDescription = meetDescription;
         this.meetHostId = meetHostId;
+        this.meetingDate = meetingDate;
         this.meetStartDateTime = meetStartDateTime;
         this.meetEndDateTime = meetEndDateTime;
         this.meetDuration = meetDuration;
@@ -109,11 +110,11 @@ public class MeetingEntity {
         this.meetEndDateTime = meetEndDateTime;
     }
 
-    public LocalDate getMeetingDate() {
+    public String getMeetingDate() {
         return meetingDate;
     }
 
-    public void setMeetingDate(LocalDate meetingDate) {
+    public void setMeetingDate(String meetingDate) {
         this.meetingDate = meetingDate;
     }
 }
