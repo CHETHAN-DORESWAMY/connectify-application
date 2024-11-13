@@ -2,6 +2,9 @@ package com.Connectify.authenticationService.controller;
 
 import com.Connectify.authenticationService.dto.UserLogin;
 import com.Connectify.authenticationService.entity.UserCredentialsEntity;
+import com.Connectify.authenticationService.service.OTPService;
+import com.Connectify.authenticationService.service.OTPValidationService;
+import com.Connectify.authenticationService.service.PasswordService;
 import com.Connectify.authenticationService.service.UserCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,40 @@ public class UserCredentialsController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private OTPService otpService;
+
+    @Autowired
+    private OTPValidationService otpValidationService;
+
+    @Autowired
+    private PasswordService passwordService;
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOtp(@RequestParam String email) {
+        return new ResponseEntity<>(otpService.generateAndSendOTP(email), HttpStatus.OK);
+
+    }
+
+    @PostMapping("/validate-otp")
+    public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp) {
+        boolean isValid = otpValidationService.validateOTP(email, otp);
+        if (isValid) {
+            return new ResponseEntity<>("OTP is valid", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Invalid OTP", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+
+        passwordService.changePassword(email, newPassword);
+        return new ResponseEntity<>("password changed successfully", HttpStatus.OK);
+
+
+    }
 
 
     @PostMapping("/register")

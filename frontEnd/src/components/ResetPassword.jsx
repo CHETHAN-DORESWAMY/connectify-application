@@ -13,6 +13,8 @@ function ResetPassword() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+//   const API_END_URL = process.env.REACT_APP_API_END_URL;
+const API_END_URL = "http://localhost:8222/api/auth";
 
   useEffect(() => {
     let interval;
@@ -37,7 +39,7 @@ function ResetPassword() {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8222/api/auth/send-otp", {
+      const response = await fetch(API_END_URL + "/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -60,7 +62,7 @@ function ResetPassword() {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8222/api/auth/verify-otp", {
+      const response = await fetch(API_END_URL + "/validate-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -88,7 +90,7 @@ function ResetPassword() {
     }
 
     try {
-      const response = await fetch("http://localhost:8222/api/auth/reset-password", {
+      const response = await fetch(API_END_URL + "/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, newPassword }),
