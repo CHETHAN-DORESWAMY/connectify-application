@@ -2,6 +2,7 @@ package com.example.meetingParticipantsService.controller;
 
 import com.example.meetingParticipantsService.client.Meeting;
 import com.example.meetingParticipantsService.dto.ParticipantsDto;
+import com.example.meetingParticipantsService.dto.ParticipantsStatusDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
 import com.example.meetingParticipantsService.service.ParticipantsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,19 @@ public class ParticipantsController {
         response.put("meetings", meetings);
         response.put("message", "the meeting of the day");
         return ResponseEntity.ok(response);
+    }
+
+
+//    it is used to get the list of participants of a specific meeting id with their status
+    @GetMapping("/meeting-participants-details/{meeId}")
+    public ResponseEntity<List<ParticipantsStatusDto>> getParticipantsStatus(@PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.getParticipantsStatus(meetId), HttpStatus.OK);
+    }
+
+//    update the status of the meeting of particular person
+    @PutMapping("/update-status/{empId}/{meetId}/{status}")
+    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId, @PathVariable String status){
+        return new ResponseEntity<>(participantsService.updateParticipantStatus(empId, meetId, status), HttpStatus.OK);
     }
 
 

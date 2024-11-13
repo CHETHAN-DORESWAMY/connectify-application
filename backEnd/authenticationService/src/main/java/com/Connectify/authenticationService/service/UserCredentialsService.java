@@ -42,5 +42,7 @@ public class UserCredentialsService {
     public boolean verifyToken(String token){
         return jwtService.validateToken(token);
     }
+
+
 }
 
