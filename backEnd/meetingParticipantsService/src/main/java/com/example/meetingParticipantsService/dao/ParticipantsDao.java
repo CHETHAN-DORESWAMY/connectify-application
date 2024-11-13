@@ -16,4 +16,8 @@ public interface ParticipantsDao extends MongoRepository<ParticipantsEntity, Str
 //    List<String> findMeetIdByEmpId(@Param("participantId") String participantId);
 
     List<ParticipantsEntity> findByEmpId(String participantId);
+
+    List<ParticipantsEntity> findByMeetId(String meetId);
+
+    ParticipantsEntity findByEmpIdAndMeetId(String empId, String meetId);
 }

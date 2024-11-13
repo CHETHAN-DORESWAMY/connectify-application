@@ -4,9 +4,11 @@ import com.example.meetingParticipantsService.client.Meeting;
 import com.example.meetingParticipantsService.dao.ParticipantsDao;
 import com.example.meetingParticipantsService.dto.MeetingDateDto;
 import com.example.meetingParticipantsService.dto.ParticipantsDto;
+import com.example.meetingParticipantsService.dto.ParticipantsStatusDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
 import com.example.meetingParticipantsService.feign.MeetingClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,6 +67,25 @@ public class ParticipantsService {
     // Delete participant by ID
     public void deleteParticipant(String id) {
         participantsRepository.deleteById(id);
+    }
+
+    public List<ParticipantsStatusDto> getParticipantsStatus(String meetId) {
+        List<ParticipantsStatusDto> participantsStatusDtoList = participantsRepository.findByMeetId(meetId).stream()
+                .map(participantsEntity -> new ParticipantsStatusDto(participantsEntity.getParticipantId(), participantsEntity.getStatus()))
+                .collect(Collectors.toList());
+
+        return participantsStatusDtoList;
+    }
+
+    public ParticipantsEntity updateParticipantStatus(String empId, String meetId, String status) {
+        ParticipantsEntity participantsEntity = participantsRepository.findByEmpIdAndMeetId(empId, meetId);
+        if(status.equalsIgnoreCase("pending")){
+            participantsEntity.setStatus("confirmed");
+        }
+        else if(status.equalsIgnoreCase("confirmed")){
+            participantsEntity.setStatus("pending");
+        }
+        return participantsRepository.save(participantsEntity);
     }
 }
 
