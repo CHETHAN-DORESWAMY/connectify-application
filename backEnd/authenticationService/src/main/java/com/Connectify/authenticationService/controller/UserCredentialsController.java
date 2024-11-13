@@ -37,13 +37,13 @@ public class UserCredentialsController {
     @Autowired
     private PasswordService passwordService;
 
-    @PostMapping("/send-otp")
+    @GetMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestParam String email) {
         return new ResponseEntity<>(otpService.generateAndSendOTP(email), HttpStatus.OK);
 
     }
 
-    @PostMapping("/validate-otp")
+    @GetMapping("/validate-otp")
     public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp) {
         boolean isValid = otpValidationService.validateOTP(email, otp);
         if (isValid) {
@@ -53,7 +53,7 @@ public class UserCredentialsController {
         }
     }
 
-    @PostMapping("/reset-password")
+    @GetMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
 
         passwordService.changePassword(email, newPassword);

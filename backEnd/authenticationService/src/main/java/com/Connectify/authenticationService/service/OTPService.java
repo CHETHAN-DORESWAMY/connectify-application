@@ -26,6 +26,7 @@ public class OTPService {
 
         // Save OTP in the database
         OTP otpRecord = new OTP(email, otp, expirationTime);
+        System.out.println(otpRecord);
         otpRepository.save(otpRecord);
 
         // Send OTP to email

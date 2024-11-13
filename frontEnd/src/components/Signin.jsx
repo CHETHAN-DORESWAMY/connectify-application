@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 
 function SignIn() {
   const API_END_POINT = "http://localhost:8222/api/auth";
+  // console.log(process.env.REACT_APP_API_END_POINT_AUTH);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -91,10 +92,7 @@ function SignIn() {
           </button>
 
           <p className="text-center text-sm mt-4">
-            <Link
-              to="/reset-password"
-              className="text-sky-800 hover:underline"
-            >
+            <Link to="/reset-password" className="text-sky-800 hover:underline">
               Forgot Password?
             </Link>
           </p>

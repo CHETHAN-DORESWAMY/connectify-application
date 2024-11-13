@@ -13,8 +13,8 @@ function ResetPassword() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-//   const API_END_URL = process.env.REACT_APP_API_END_URL;
-const API_END_URL = "http://localhost:8222/api/auth";
+  //   const API_END_URL = process.env.REACT_APP_API_END_URL;
+  const API_END_URL = "http://localhost:8222/api/auth";
 
   useEffect(() => {
     let interval;
@@ -39,10 +39,9 @@ const API_END_URL = "http://localhost:8222/api/auth";
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(API_END_URL + "/send-otp", {
-        method: "POST",
+      const response = await fetch(`${API_END_URL}/send-otp?email=${email}`, {
+        method: "GET",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
       });
 
       if (response.ok) {
@@ -62,11 +61,13 @@ const API_END_URL = "http://localhost:8222/api/auth";
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(API_END_URL + "/validate-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
+      const response = await fetch(
+        `${API_END_URL}/validate-otp?email=${email}&otp=${otp}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.ok) {
         setShowOtpField(false);
@@ -90,11 +91,13 @@ const API_END_URL = "http://localhost:8222/api/auth";
     }
 
     try {
-      const response = await fetch(API_END_URL + "/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword }),
-      });
+      const response = await fetch(
+        `${API_END_URL}/reset-password?email=${email}&newPassword=${newPassword}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.ok) {
         navigate("/signin");
@@ -112,7 +115,9 @@ const API_END_URL = "http://localhost:8222/api/auth";
       <Navbar />
       <div className="flex items-center justify-center pt-16">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-          <h2 className="text-2xl font-semibold text-center mb-6">Reset Password</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            Reset Password
+          </h2>
 
           {errorMessage && (
             <p className="text-red-600 text-center p-2 mb-4 rounded-md bg-red-100">
