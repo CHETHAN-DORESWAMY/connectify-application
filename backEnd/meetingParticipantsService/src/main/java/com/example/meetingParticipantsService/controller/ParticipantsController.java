@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -52,14 +53,19 @@ public class ParticipantsController {
     }
 
     @GetMapping("/{participantId}/meetings")
-    public ResponseEntity<List<Meeting>> getMeetingsForParticipantOnDate(
+    public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(
             @PathVariable String participantId,
             @RequestParam String date) {
+
+        Map<String, Object> response = new HashMap<>();
         List<Meeting> meetings = participantsService.getMeetingsForParticipantOnDate(participantId, date);
-        if (meetings.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        if (meetings == null) {
+            response.put("message", "No meeting scheduled for that date");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return ResponseEntity.ok(meetings);
+        response.put("meetings", meetings);
+        response.put("message", "the meeting of the day");
+        return ResponseEntity.ok(response);
     }
 
 

@@ -25,11 +25,11 @@ public class MeetingService {
         meetingData.setMeetDescription(meeting.getMeetDescription());
         meetingData.setMeetHostId(meeting.getMeetHostId());
         // Combine meetDate and meetStartTime to set meetStartDateTime
-        LocalDateTime startDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetStartTime());
+        LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime());
         meetingData.setMeetStartDateTime(startDateTime);
 
         // Combine meetDate and meetEndTime to set meetEndDateTime
-        LocalDateTime endDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetEndTime());
+        LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime());
         meetingData.setMeetEndDateTime(endDateTime);
         meetingData.setMeetDuration(meeting.getMeetDuration());
         meetingData.setMeetNoOfParticipants(meeting.getNoParticipants());
@@ -38,8 +38,10 @@ public class MeetingService {
         return meetingDao.save(meetingData);
     }
 
-    public List<MeetingEntity> getMeetingsByDateAndIds(LocalDate date, List<String> ids) {
+    public List<MeetingEntity> getMeetingsByDateAndIds(String date, List<String> ids) {
+//        meetingDao.findByMeetIdIn(ids).get(0)
         return meetingDao.findByMeetingDateAndMeetIdIn(date, ids);
+
     }
 
     // READ: Get all meetings
@@ -60,9 +62,9 @@ public class MeetingService {
             meetingData.setMeetName(meeting.getMeetName());
             meetingData.setMeetDescription(meeting.getMeetDescription());
 
-            LocalDateTime startDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetStartTime());
+            LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime());
             meetingData.setMeetStartDateTime(startDateTime);
-            LocalDateTime endDateTime = LocalDateTime.of(meeting.getMeetDate(), meeting.getMeetEndTime());
+            LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime());
             meetingData.setMeetEndDateTime(endDateTime);
 
             meetingData.setMeetHostId(meeting.getMeetHostId());

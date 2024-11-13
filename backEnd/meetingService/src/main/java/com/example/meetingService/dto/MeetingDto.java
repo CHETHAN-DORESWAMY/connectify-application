@@ -1,9 +1,7 @@
 package com.example.meetingService.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 public class MeetingDto {
 
@@ -13,7 +11,7 @@ public class MeetingDto {
     String meetHostId;
     LocalTime meetStartTime;
     LocalTime meetEndTime;
-    LocalDate meetDate;
+    String meetDate;
     String meetDuration;
 
     int noParticipants;
@@ -21,7 +19,7 @@ public class MeetingDto {
     public MeetingDto() {
     }
 
-    public MeetingDto(String meetId, String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, LocalDate meetDate, String meetDuration, int noParticipants) {
+    public MeetingDto(String meetId, String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, String meetDate, String meetDuration, int noParticipants) {
         this.meetId = meetId;
         this.meetName = meetName;
         this.meetDescription = meetDescription;
@@ -90,11 +88,11 @@ public class MeetingDto {
         this.meetStartTime = meetStartTime;
     }
 
-    public LocalDate getMeetDate() {
+    public String getMeetDate() {
         return meetDate;
     }
 
-    public void setMeetDate(LocalDate meetDate) {
+    public void setMeetDate(String meetDate) {
         this.meetDate = meetDate;
     }
 

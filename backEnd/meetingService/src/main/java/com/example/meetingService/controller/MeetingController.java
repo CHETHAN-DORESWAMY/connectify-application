@@ -1,5 +1,6 @@
 package com.example.meetingService.controller;
 
+import com.example.meetingService.dto.MeetingDateDto;
 import com.example.meetingService.dto.MeetingDto;
 import com.example.meetingService.entity.MeetingEntity;
 import com.example.meetingService.service.MeetingService;
@@ -54,21 +55,21 @@ public class MeetingController {
         }
     }
 
-    @GetMapping("/scheduled")
-    public ResponseEntity<List<MeetingEntity>> getMeetingsByDateAndIds(@RequestParam String date, @RequestParam List<String> ids) {
+    @PostMapping("/scheduled")
+    public ResponseEntity<List<MeetingEntity>> getMeetingsByDateAndIds(@RequestBody MeetingDateDto meetingDateDto) {
         try {
             // Define the expected date format (e.g., "yyyy-MM-dd")
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate parsedDate = LocalDate.parse(date, formatter);
+            LocalDate parsedDate = LocalDate.parse(meetingDateDto.getDate(), formatter);
 
-            List<MeetingEntity> meetings = meetingService.getMeetingsByDateAndIds(parsedDate, ids);
+            List<MeetingEntity> meetings = meetingService.getMeetingsByDateAndIds(parsedDate.toString(), meetingDateDto.getIds());
             if (meetings.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(meetings);
         } catch (DateTimeParseException e) {
             // Handle invalid date format
-            return ResponseEntity.badRequest().body(null);
+            return null;
         }
     }
 
