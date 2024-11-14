@@ -42,7 +42,7 @@ function Welcome() {
         })
         .then((data) => {
           if (data) setUserData(data.employee);
-          sessionStorage.setItem("empId", data.employee.empId);
+          sessionStorage.setItem("userId", data.employee.empId);
         })
         .catch((error) => {
           console.error("Error:", error);

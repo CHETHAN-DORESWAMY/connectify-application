@@ -170,7 +170,7 @@ function Navbar({ isLoggedIn, employeeName }) {
                   {employeeName}
                 </div>
                 <Link
-                  to={`/profile/${sessionStorage.getItem("creatorId")}`}
+                  to={`/profile/${sessionStorage.getItem("userId")}`}
                   className="block text-gray-700 hover:bg-blue-100 px-3 py-1 rounded transition-colors duration-200 text-sm"
                 >
                   View Profile
