@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,12 +35,15 @@ public class MeetingService {
         meetingData.setMeetDescription(meeting.getMeetDescription());
         meetingData.setMeetHostId(meeting.getMeetHostId());
         // Combine meetDate and meetStartTime to set meetStartDateTime
-        LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime());
-        meetingData.setMeetStartDateTime(startDateTime);
+//        ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.parse(meeting.getMeetDate()),
 
-        // Combine meetDate and meetEndTime to set meetEndDateTime
-        LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime());
-        meetingData.setMeetEndDateTime(endDateTime);
+        ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime(), ZoneId.of(meeting.getMeetTimeZone()) );
+        meetingData.setMeetStartDateTime(startDateTime.toInstant());
+
+        ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime(), ZoneId.of(meeting.getMeetTimeZone()));
+        meetingData.setMeetEndDateTime(endDateTime.toInstant());
+
+
         meetingData.setMeetDuration(meeting.getMeetDuration());
         meetingData.setMeetNoOfParticipants(meeting.getNoParticipants());
         meetingData.setMeetingDate(meeting.getMeetDate());
@@ -74,10 +79,13 @@ public class MeetingService {
             meetingData.setMeetName(meeting.getMeetName());
             meetingData.setMeetDescription(meeting.getMeetDescription());
 
-            LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime());
-            meetingData.setMeetStartDateTime(startDateTime);
-            LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime());
-            meetingData.setMeetEndDateTime(endDateTime);
+            ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetStartTime(), ZoneId.of(meeting.getMeetTimeZone()) );
+            meetingData.setMeetStartDateTime(startDateTime.toInstant());
+
+            ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.parse(meeting.getMeetDate()), meeting.getMeetEndTime(), ZoneId.of(meeting.getMeetTimeZone()));
+            meetingData.setMeetEndDateTime(endDateTime.toInstant());
+
+
 
             meetingData.setMeetHostId(meeting.getMeetHostId());
             meetingData.setMeetDuration(meeting.getMeetDuration());

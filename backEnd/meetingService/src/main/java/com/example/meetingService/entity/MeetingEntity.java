@@ -3,6 +3,7 @@ package com.example.meetingService.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,8 +17,8 @@ public class MeetingEntity {
     String meetDescription;
     String meetHostId;
     String meetingDate;
-    LocalDateTime meetStartDateTime;
-    LocalDateTime meetEndDateTime;
+    Instant meetStartDateTime;
+    Instant meetEndDateTime;
     String meetDuration;
     String meetStatus;
     int meetNoOfParticipants;
@@ -25,7 +26,7 @@ public class MeetingEntity {
     public MeetingEntity() {
     }
 
-    public MeetingEntity(String meetId,String meetName, String meetDescription, String meetHostId, String meetingDate, LocalDateTime meetStartDateTime, LocalDateTime meetEndDateTime, String meetDuration, String meetStatus, int meetNoOfParticipants) {
+    public MeetingEntity(String meetId,String meetName, String meetDescription, String meetHostId, String meetingDate, Instant meetStartDateTime, Instant meetEndDateTime, String meetDuration, String meetStatus, int meetNoOfParticipants) {
         this.meetId = meetId;
         this.meetName = meetName;
         this.meetDescription = meetDescription;
@@ -94,19 +95,19 @@ public class MeetingEntity {
         this.meetNoOfParticipants = meetNoOfParticipants;
     }
 
-    public LocalDateTime getMeetStartDateTime() {
+    public Instant getMeetStartDateTime() {
         return meetStartDateTime;
     }
 
-    public void setMeetStartDateTime(LocalDateTime meetStartDateTime) {
+    public void setMeetStartDateTime(Instant meetStartDateTime) {
         this.meetStartDateTime = meetStartDateTime;
     }
 
-    public LocalDateTime getMeetEndDateTime() {
+    public Instant getMeetEndDateTime() {
         return meetEndDateTime;
     }
 
-    public void setMeetEndDateTime(LocalDateTime meetEndDateTime) {
+    public void setMeetEndDateTime(Instant meetEndDateTime) {
         this.meetEndDateTime = meetEndDateTime;
     }
 
