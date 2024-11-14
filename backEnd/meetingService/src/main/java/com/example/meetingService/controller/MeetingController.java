@@ -122,7 +122,7 @@ public class MeetingController {
         try {
             meetingService.deleteMeeting(id);
             response.put("message", "Meeting deleted successfully");
-            return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.put("message", "Error deleting meeting");
             response.put("error", e.getMessage());

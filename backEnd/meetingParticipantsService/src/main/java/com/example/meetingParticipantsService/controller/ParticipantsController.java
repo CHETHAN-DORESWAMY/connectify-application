@@ -104,39 +104,19 @@ public class ParticipantsController {
         }
     }
 
-    // Update participant by ID
-    @PutMapping("/update/{id}")
-    public ResponseEntity<HashMap<String, Object>> updateParticipant(@PathVariable String id, @RequestBody ParticipantsEntity updatedParticipant) {
-        HashMap<String, Object> response = new HashMap<>();
-        try {
-            ParticipantsEntity participant = participantsService.updateParticipant(id, updatedParticipant);
-            if (participant != null) {
-                response.put("message", "Participant updated successfully");
-                response.put("participant", participant);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                response.put("message", "Participant not found");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            response.put("message", "Error updating participant");
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    @DeleteMapping("/delete-by-meetingId/{meetId}")
+    public ResponseEntity<String> deleteByMeetId(@PathVariable String meetId){
+        try{
+            participantsService.deleteParticiantsByMeetId(meetId);
+            return new ResponseEntity<>("delete success", HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Delete participant by ID
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<HashMap<String, Object>> deleteParticipant(@PathVariable String id) {
-        HashMap<String, Object> response = new HashMap<>();
-        try {
-            participantsService.deleteParticipant(id);
-            response.put("message", "Participant deleted successfully");
-            return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            response.put("message", "Error deleting participant");
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
+
+
+
 }

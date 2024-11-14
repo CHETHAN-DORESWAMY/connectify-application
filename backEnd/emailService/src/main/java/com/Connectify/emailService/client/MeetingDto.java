@@ -1,6 +1,5 @@
-package com.example.meetingService.dto;
+package com.Connectify.emailService.client;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -14,9 +13,8 @@ public class MeetingDto {
     LocalTime meetEndTime;
     String meetDate;
     String meetDuration;
-
+    List<String> meetParticipants;
     int noParticipants;
-    private List<String> meetParticipants;
 
     public MeetingDto() {
     }
@@ -114,11 +112,4 @@ public class MeetingDto {
     public void setMeetParticipants(List<String> meetParticipants) {
         this.meetParticipants = meetParticipants;
     }
-
-
-
-
-
-
-
 }

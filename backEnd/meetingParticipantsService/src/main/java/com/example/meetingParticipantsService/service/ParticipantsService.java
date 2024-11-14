@@ -64,10 +64,18 @@ public class ParticipantsService {
         }
     }
 
-    // Delete participant by ID
-    public void deleteParticipant(String id) {
-        participantsRepository.deleteById(id);
+    // Delete participant by meetId
+    public void deleteParticiantsByMeetId(String meetId) throws Exception {
+        List<ParticipantsEntity> participantsEntities = participantsRepository.findByMeetId(meetId);
+        if(participantsEntities.size() == 0){
+            throw new Exception("No participants");
+        }
+
+        for(int i = 0; i < participantsEntities.size();i++){
+            participantsRepository.deleteById(participantsEntities.get(0).getParticipantId());
+        }
     }
+
 
     public List<ParticipantsStatusDto> getParticipantsStatus(String meetId) {
         List<ParticipantsStatusDto> participantsStatusDtoList = participantsRepository.findByMeetId(meetId).stream()
