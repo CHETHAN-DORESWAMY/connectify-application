@@ -14,6 +14,7 @@ public class MeetingDto {
     LocalTime meetEndTime;
     String meetDate;
     String meetDuration;
+    String meetTimeZone;
 
     int noParticipants;
     private List<String> meetParticipants;
@@ -21,7 +22,7 @@ public class MeetingDto {
     public MeetingDto() {
     }
 
-    public MeetingDto(String meetId, String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, String meetDate, String meetDuration, List<String> meetParticipants, int noParticipants) {
+    public MeetingDto(String meetId, String meetName, String meetDescription, String meetHostId, LocalTime meetStartTime, LocalTime meetEndTime, String meetDate, String meetDuration, List<String> meetParticipants, int noParticipants, String meetTimeZone) {
         this.meetId = meetId;
         this.meetName = meetName;
         this.meetDescription = meetDescription;
@@ -32,6 +33,7 @@ public class MeetingDto {
         this.meetDuration = meetDuration;
         this.noParticipants = noParticipants;
         this.meetParticipants = meetParticipants;
+        this.meetTimeZone = meetTimeZone;
 
     }
 
@@ -115,10 +117,12 @@ public class MeetingDto {
         this.meetParticipants = meetParticipants;
     }
 
+    public String getMeetTimeZone() {
+        return meetTimeZone;
+    }
 
-
-
-
-
+    public void setMeetTimeZone(String meetTimeZone) {
+        this.meetTimeZone = meetTimeZone;
+    }
 
 }
