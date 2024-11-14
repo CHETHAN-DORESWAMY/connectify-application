@@ -1,4 +1,3 @@
-// Dashboard.js
 import React, { useState, useEffect } from "react";
 import MeetingList from "./MeetingList";
 import Navbar from "./Navbar";
@@ -7,17 +6,13 @@ function Dashboard() {
   const [meetings, setMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const token = sessionStorage.getItem("authToken");
-
   const empId = sessionStorage.getItem("empId");
   const API_END_POINT = `http://localhost:8222/api/participants`;
-
 
   useEffect(() => {
     const fetchMeetings = async () => {
       try {
-        
-
-        const response = await fetch(API_END_POINT + "/" + empId + "/meetings?date=" + selectedDate, {
+        const response = await fetch(`${API_END_POINT}/${empId}/meetings?date=${selectedDate}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -29,22 +24,21 @@ function Dashboard() {
           throw new Error("Failed to fetch meetings");
         }
 
-        if(response.status === 200){
-        const data = await response.json();
-        // console.log(empId);
-        // console.log(data);
-        setMeetings(data.meetings);
+        if (response.status === 200) {
+          const data = await response.json();
+          console.log(data);
+          setMeetings(data.meetings || []); // Ensure meetings is always an array
         }
       } catch (error) {
         console.error("Error fetching meetings:", error);
-        setMeetings([]);
+        setMeetings([]); // Set meetings to an empty array in case of error
       }
     };
 
     fetchMeetings();
-  }, []);
+  }, [API_END_POINT, empId, selectedDate, token]);
 
-  const filteredMeetings = meetings.filter(meeting => {
+  const filteredMeetings = meetings?.filter(meeting => {
     const meetingDate = new Date(meeting.meetStartDateTime).toISOString().split('T')[0];
     return meetingDate === selectedDate;
   });
@@ -52,7 +46,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
+      <Navbar isLoggedIn={!!token} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 mt-8">

@@ -18,7 +18,7 @@ function MeetingList({ meetings }) {
           },
         });
         const data = await response.json();
-        // console.log(data.employee.empTimezone);
+        console.log(data.employee.empTimezone);
         setEmployeeTimezone(data.employee.empTimezone);
       } catch (error) {
         console.error("Error fetching employee timezone:", error);
@@ -28,6 +28,8 @@ function MeetingList({ meetings }) {
   }, []);
 
   const convertToLocalTime = (utcTime) => {
+    console.log(employeeTimezone);
+    console.log(utcTime);
     if (employeeTimezone) {
       return DateTime.fromISO(utcTime, { zone: "utc" })
         .setZone(employeeTimezone)
@@ -37,6 +39,22 @@ function MeetingList({ meetings }) {
       return utcTime;
     }
   };
+  // const convertToLocalTime = (utcTime) => {
+  //   const employeeTimezone = "Asia/Singapore"; // Set this explicitly if it's constant
+  
+  //   console.log("Employee Timezone:", employeeTimezone);
+  //   console.log("UTC Time:", utcTime);
+  //   utcTime = "2024-11-15T05:30:00";
+  
+  //   if (employeeTimezone) {
+  //     return DateTime.fromISO(utcTime, { zone: "utc" })
+  //       .setZone(employeeTimezone)
+  //       .toFormat("yyyy-MM-dd'T'HH:mm:ss"); // Adjusted to ISO-like format
+  //   } else {
+  //     console.warn("Employee timezone not found.");
+  //     return utcTime;
+  //   }
+  // };
 
   return (
     <div className="container mx-auto p-4">
