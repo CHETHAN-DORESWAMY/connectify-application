@@ -11,4 +11,6 @@ import java.util.List;
 public interface MeetingDao extends MongoRepository<MeetingEntity, String> {
     List<MeetingEntity> findByMeetingDateAndMeetIdIn(String date, List<String> ids);
     List<MeetingEntity> findByMeetIdIn(List<String> ids);
+    void deleteByMeetId(String id);
+
 }

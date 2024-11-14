@@ -49,6 +49,8 @@ public class EmployeeService {
         return null;
     }
 
+
+
     // Delete an employee by ID
     public void deleteEmployee(String empId) {
         employeeDao.deleteById(empId);
@@ -59,6 +61,8 @@ public class EmployeeService {
     }
 
 
-
+    public List<EmployeeEntity> getAllEmployeesByIds(List<String> ids) {
+        return employeeDao.findByEmpIdIn(ids);
+    }
 }
 

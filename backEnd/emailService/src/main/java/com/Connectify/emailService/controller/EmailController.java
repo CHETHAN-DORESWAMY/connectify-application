@@ -1,6 +1,7 @@
 package com.Connectify.emailService.controller;
 
 
+import com.Connectify.emailService.client.MeetingDto;
 import com.Connectify.emailService.service.EmailService;
 import com.Connectify.emailService.service.EmailServiceImpl;
 import com.netflix.discovery.converters.Auto;
@@ -25,6 +26,17 @@ public class EmailController {
            return new ResponseEntity<>("Can't send the OTP right now", HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>("Otp sent successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/send-meeting-mail")
+    public ResponseEntity<String> sendMeetingMail(@RequestBody MeetingDto meetingDto){
+        try{
+            emailService.sendEmail(meetingDto);
+
+        } catch (MessagingException e) {
+            return new ResponseEntity<>("error in sending mail", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>("Email sent successfully", HttpStatus.OK);
     }
 
 }

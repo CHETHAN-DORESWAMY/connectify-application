@@ -3,6 +3,8 @@ package com.example.meetingService.service;
 import com.example.meetingService.dao.MeetingDao;
 import com.example.meetingService.dto.MeetingDto;
 import com.example.meetingService.entity.MeetingEntity;
+import com.example.meetingService.feign.EmailClient;
+import com.example.meetingService.feign.ParticipantsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,12 @@ public class MeetingService {
 
     @Autowired
     private MeetingDao meetingDao;
+
+    @Autowired
+    private ParticipantsClient participantsClient;
+
+    @Autowired
+    private EmailClient emailClient;
 
     // CREATE: Save a new meeting
     public MeetingEntity createMeeting(MeetingDto meeting) {
@@ -35,6 +43,10 @@ public class MeetingService {
         meetingData.setMeetNoOfParticipants(meeting.getNoParticipants());
         meetingData.setMeetingDate(meeting.getMeetDate());
         meetingData.setMeetStatus("Pending");
+
+        emailClient.sendMeetingMail(meeting);
+
+
         return meetingDao.save(meetingData);
     }
 
@@ -75,7 +87,11 @@ public class MeetingService {
     }
 
     // DELETE: Delete a meeting by its ID
-    public void deleteMeeting(String id) {
-        meetingDao.deleteById(id);
+    public String deleteMeeting(String id) {
+//        System.out.println(meetingDao.deleteById(id));
+        meetingDao.deleteByMeetId(id);
+        return participantsClient.deleteByMeetId(id).getBody();
+
+
     }
 }
