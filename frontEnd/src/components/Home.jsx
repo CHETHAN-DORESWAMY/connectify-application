@@ -18,12 +18,12 @@ function Home() {
         
         <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-12">
           <Link to="/register" className="w-full sm:w-auto">
-            <button className="w-full px-6 py-2 bg-sky-800 text-white rounded-md hover:bg-sky-900 transition duration-300 text-sm font-medium shadow-md hover:shadow-lg">
+            <button className="w-full px-8 py-3 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition duration-300 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-sky-300 animate-pulse">
               Get Started
             </button>
           </Link>
           <Link to="/signin" className="w-full sm:w-auto">
-            <button className="w-full px-6 py-2 bg-white text-sky-800 border border-sky-800 rounded-md hover:bg-sky-50 transition duration-300 text-sm font-medium shadow-md hover:shadow-lg">
+            <button className="w-full px-8 py-3 bg-white text-sky-800 border-2 border-sky-600 rounded-md hover:bg-sky-50 transition duration-300 text-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-sky-200">
               Sign In
             </button>
           </Link>

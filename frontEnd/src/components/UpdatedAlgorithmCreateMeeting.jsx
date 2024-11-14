@@ -47,6 +47,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
           );
           if (creator) {
             sessionStorage.setItem("creatorId", creator.empId);
+            sessionStorage.setItem("creatorTimezone", creator.empTimezone);
             setSelectedParticipants([creator.empId]);
             setSelectedParticipantsName([creator]);
           }
@@ -161,8 +162,9 @@ const UpdatedAlgorithmCreateMeeting = () => {
           meetDate: meetingDate,
           meetStartTime: startTime,
           meetEndTime: endTime,
+          meetParticipants: selectedParticipants,
           noParticipants: selectedParticipants.length,
-          participantsId: selectedParticipants,
+          meetTimeZone: sessionStorage.getItem("creatorTimezone"),
         }),
       });
       const responseParticipants = await fetch(PARTICIPANTS_API_END_POINT, {
