@@ -131,7 +131,7 @@ public class EmployeeController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/get-employee-by-ids")
+    @PostMapping("/get-employee-by-ids")
     public ResponseEntity<List<EmployeeEntity>> getEmployeeByIds(@RequestBody List<String> ids){
         return new ResponseEntity<>(employeeService.getAllEmployeesByIds(ids), HttpStatus.OK);
     }
