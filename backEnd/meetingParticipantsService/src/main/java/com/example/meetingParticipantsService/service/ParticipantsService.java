@@ -95,5 +95,12 @@ public class ParticipantsService {
         }
         return participantsRepository.save(participantsEntity);
     }
+
+    public List<Meeting> getMeetingsForParticipant(String participantId) {
+        List<String> meetingIds = participantsRepository.findByEmpId(participantId).stream()
+                .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
+
+        return meetingClient.getMeetingsByIds(meetingIds).getBody();
+    }
 }
 

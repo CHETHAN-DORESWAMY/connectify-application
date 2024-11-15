@@ -102,4 +102,8 @@ public class MeetingService {
 
 
     }
+
+    public List<MeetingEntity> getMeetingsByIds(List<String> ids) {
+        return meetingDao.findByMeetIdIn(ids);
+    }
 }
