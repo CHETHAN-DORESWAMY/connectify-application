@@ -94,6 +94,12 @@ function Navbar({ isLoggedIn, employeeName }) {
             >
               Calendar
             </Link>
+            <Link
+              to="/chat-with-other"
+              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+            >
+              chat
+            </Link>
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"

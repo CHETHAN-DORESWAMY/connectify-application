@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { DateTime } from "luxon";
 
-function MeetingList({ meetings }) {
+function MeetingList({ meet, selectDate }) {
   const [employeeTimezone, setEmployeeTimezone] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(selectDate);
   const [viewMode, setViewMode] = useState("scheduled"); // "scheduled" or "toAttend"
   const token = sessionStorage.getItem("authToken");
   const userId = sessionStorage.getItem("userId");
+  const [confirmedMeetings, setConfirmedMeetings] = useState([]);
+  const [meetings, setMeetings] = useState(null); // Initialize as null
+
+  useEffect(() => {
+    // Wait for `meet` to be defined and then set it to `meetings`
+    if (meet) {
+      setMeetings([...meet]);
+    }
+  }, [meet]);
 
   useEffect(() => {
     const fetchEmployeeTimezone = async () => {
@@ -38,27 +47,81 @@ function MeetingList({ meetings }) {
     }
   };
 
-  const filteredMeetings = meetings.filter((meeting) => {
-    if (selectedDate) {
-      // Filter by selected date
-      return DateTime.fromISO(meeting.meetStartDateTime).hasSame(
-        DateTime.fromISO(selectedDate),
-        "day"
-      );
-    } else {
-      // Show all meetings based on viewMode
-      if (viewMode === "scheduled") {
-        return meeting.meetHostId === userId; // Hosted by user
-      } else if (viewMode === "toAttend") {
-        return meeting.meetHostId !== userId; // User is a participant
-      }
-    }
-    return false;
-  });
+  // Filter the meetings only if `meetings` is defined
+  const filteredMeetings = meetings
+    ? meetings.filter((meeting) => {
+        if (selectedDate) {
+          // Filter by selected date
+          return DateTime.fromISO(meeting.meetStartDateTime).hasSame(
+            DateTime.fromISO(selectedDate),
+            "day"
+          );
+        } else {
+          // Show all meetings based on viewMode
+          if (viewMode === "scheduled") {
+            return meeting.meetHostId === userId; // Hosted by user
+          } else if (viewMode === "toAttend") {
+            return meeting.meetHostId !== userId; // User is a participant
+          }
+        }
+        return false;
+      })
+    : [];
 
   const handleClearDate = () => {
     setSelectedDate(null);
   };
+
+  const handleDeleteMeeting = async (meetingId) => {
+    try {
+      const response = await fetch(`http://localhost:8222/api/meetings/delete/${meetingId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        // Remove the deleted meeting from the list
+        const updatedMeetings = meetings.filter((meeting) => meeting.meetId !== meetingId);
+        setMeetings(updatedMeetings);
+        console.log("Meeting deleted successfully");
+      } else {
+        console.error("Failed to delete meeting");
+      }
+    } catch (error) {
+      console.error("Error deleting meeting:", error);
+    }
+  };
+
+  const handleConfirmMeeting = async (meetingId) => {
+    try {
+      const status = "confirmed";
+      const response = await fetch(
+        `http://localhost:8222/api/participants/update-status/${userId}/${meetingId}/${status}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        console.log("Meeting confirmed successfully");
+        setConfirmedMeetings([...confirmedMeetings, meetingId]);
+      } else {
+        console.error("Failed to confirm meeting");
+      }
+    } catch (error) {
+      console.error("Error confirming meeting:", error);
+    }
+  };
+
+  if (!meetings) {
+    // Render a loading message while `meetings` is not set
+    return <p>Loading meetings...</p>;
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -110,6 +173,7 @@ function MeetingList({ meetings }) {
               <th className="py-3 px-4 text-left">Host ID</th>
               <th className="py-3 px-4 text-left">Start Time</th>
               <th className="py-3 px-4 text-left">End Time</th>
+              <th className="py-3 px-4 text-left">Action</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
@@ -125,6 +189,25 @@ function MeetingList({ meetings }) {
                 <td className="py-3 px-4">{meeting.meetHostId}</td>
                 <td className="py-3 px-4">{convertToLocalTime(meeting.meetStartDateTime)}</td>
                 <td className="py-3 px-4">{convertToLocalTime(meeting.meetEndDateTime)}</td>
+                <td className="py-3 px-4">
+                  {viewMode === "scheduled" ? (
+                    <button
+                      onClick={() => handleDeleteMeeting(meeting.meetId)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  ) : confirmedMeetings.includes(meeting.meetId) ? (
+                    <span className="text-green-500 font-semibold">Confirmed</span>
+                  ) : (
+                    <button
+                      onClick={() => handleConfirmMeeting(meeting.meetId)}
+                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

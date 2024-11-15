@@ -50,7 +50,7 @@ public class ParticipantsService {
 
     // Get participant by ID
     public Optional<ParticipantsEntity> getParticipantByEmpId(String id) {
-        return participantsRepository.findByEmpId(id);
+        return participantsRepository.findById(id);
     }
 
     // Update participant
@@ -93,6 +93,13 @@ public class ParticipantsService {
             participantsEntity.setStatus("pending");
         }
         return participantsRepository.save(participantsEntity);
+    }
+
+    public List<Meeting> getMeetingsForParticipant(String participantId) {
+        List<String> meetingIds = participantsRepository.findByEmpId(participantId).stream()
+                .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
+
+        return meetingClient.getMeetingsByIds(meetingIds).getBody();
     }
 }
 

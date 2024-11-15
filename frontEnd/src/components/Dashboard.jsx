@@ -15,7 +15,7 @@ function Dashboard() {
         const response = await fetch(
           selectedDate
             ? `${API_END_POINT}/${empId}/meetings?date=${selectedDate}`
-            : `${API_END_POINT}/${empId}/meetings`,
+            : `${API_END_POINT}/${empId}/meetings-of-id`,
           {
             method: "GET",
             headers: {
@@ -30,6 +30,7 @@ function Dashboard() {
         }
 
         const data = await response.json();
+        console.log(data.meetings);
         setMeetings(data.meetings || []);
       } catch (error) {
         console.error("Error fetching meetings:", error);
@@ -64,7 +65,7 @@ function Dashboard() {
             Clear Date
           </button>
         </div>
-        <MeetingList meetings={meetings} selectedDate={selectedDate} />
+        <MeetingList meet={meetings} selectDate={selectedDate} />
       </div>
     </div>
   );

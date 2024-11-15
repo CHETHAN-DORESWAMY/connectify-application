@@ -69,6 +69,20 @@ public class ParticipantsController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{participantId}/meetings-of-id")
+    public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(@PathVariable String participantId) {
+
+        Map<String, Object> response = new HashMap<>();
+        List<Meeting> meetings = participantsService.getMeetingsForParticipant(participantId);
+        if (meetings == null) {
+            response.put("message", "No meeting scheduled for that date");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.put("meetings", meetings);
+        response.put("message", "the meeting of the day");
+        return ResponseEntity.ok(response);
+    }
+
 
 //    it is used to get the list of participants of a specific meeting id with their status
     @GetMapping("/meeting-participants-details/{meetId}")

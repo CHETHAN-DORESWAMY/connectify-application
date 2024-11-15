@@ -7,7 +7,7 @@ import Dashboard from "./components/Dashboard";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // import "./App.css";
-import "./index.css"
+import "./index.css";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import ParticipantSearch from "./components/ParticipantSearch";
@@ -15,6 +15,8 @@ import UpdatedAlgorithmCreateMeeting from "./components/UpdatedAlgorithmCreateMe
 import Profile from "./components/Profile";
 import ResetPassword from "./components/ResetPassword";
 import Calendar from "./components/Calendar";
+import ChatComponent from "./components/Chat";
+import ChatApp from "./components/ChatComponent";
 function App() {
   return (
     <Router>
@@ -25,11 +27,16 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create-meeting" element={<UpdatedAlgorithmCreateMeeting />} />
+          <Route
+            path="/create-meeting"
+            element={<UpdatedAlgorithmCreateMeeting />}
+          />
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/chat" element={<ChatComponent />} />
+          <Route path="/chat-with-other" element={<ChatApp />} />
         </Routes>
       </div>
     </Router>

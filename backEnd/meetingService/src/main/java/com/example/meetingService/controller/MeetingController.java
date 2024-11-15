@@ -55,6 +55,21 @@ public class MeetingController {
         }
     }
 
+    @PostMapping("/get-meetings-by-ids")
+    ResponseEntity<List<MeetingEntity>> getMeetingsByIds(@RequestBody List<String> ids) {
+        try {
+
+            List<MeetingEntity> meetings = meetingService.getMeetingsByIds(ids);
+            if (meetings.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(meetings);
+        } catch (DateTimeParseException e) {
+            // Handle invalid date format
+            return null;
+        }
+    }
+
     @PostMapping("/scheduled")
     public ResponseEntity<List<MeetingEntity>> getMeetingsByDateAndIds(@RequestBody MeetingDateDto meetingDateDto) {
         try {
