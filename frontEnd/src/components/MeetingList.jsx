@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 
 function MeetingList({ meetings }) {
   const [employeeTimezone, setEmployeeTimezone] = useState("");
+  const [meetings, setMeetings] = useState(meetings);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [participants, setParticipants] = useState([]);
@@ -14,13 +15,16 @@ function MeetingList({ meetings }) {
     const fetchEmployeeTimezone = async () => {
       try {
         const email = sessionStorage.getItem("email");
-        const response = await fetch(`http://localhost:8222/api/employees/get-by-email/${email}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `http://localhost:8222/api/employees/get-by-email/${email}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
         setEmployeeTimezone(data.employee.empTimezone);
       } catch (error) {
@@ -51,7 +55,7 @@ function MeetingList({ meetings }) {
     if (!showParticipants && selectedMeeting) {
       try {
         const response = await fetch(
-          `http://localhost:8222/api/participants/meeting-participants-details/${selectedMeeting.meetId}`, 
+          `http://localhost:8222/api/participants/meeting-participants-details/${selectedMeeting.meetId}`,
           {
             method: "GET",
             headers: {
@@ -60,7 +64,7 @@ function MeetingList({ meetings }) {
             },
           }
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           setParticipants(data || []);
@@ -76,14 +80,31 @@ function MeetingList({ meetings }) {
     }
   };
 
-  const handleUpdateMeeting = (meetingId) => {
-    // Implement update meeting logic
-    console.log("Update meeting", meetingId);
-  };
-
-  const handleDeleteMeeting = (meetingId) => {
-    // Implement delete meeting logic
-    console.log("Delete meeting", meetingId);
+  const handleDeleteMeeting = async (meetingId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8222/api/meetings/delete/${meetingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-type": "application/json",
+          },
+        }
+      );
+      const data = response.json();
+      if (response.ok) {
+        setMeetings(
+          ...meetings,
+          meetings.filter((meeting) => meeting.meetId != meetingId)
+        );
+        console.log(data.message);
+      } else {
+        console.log(data.message);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   const handleConfirmMeeting = async (meetingId) => {
@@ -98,7 +119,7 @@ function MeetingList({ meetings }) {
           },
         }
       );
-      
+
       if (response.ok) {
         // Refresh the meetings list or update the local state
         console.log("Meeting confirmed successfully");
@@ -110,8 +131,8 @@ function MeetingList({ meetings }) {
     }
   };
 
-  const filteredMeetings = meetings.filter(meeting => 
-    viewMode === "scheduled" 
+  const filteredMeetings = meetings.filter((meeting) =>
+    viewMode === "scheduled"
       ? meeting.meetHostId === userId
       : meeting.meetHostId !== userId
   );
@@ -120,17 +141,27 @@ function MeetingList({ meetings }) {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-semibold text-gray-800">
-          {viewMode === "scheduled" ? "Scheduled Meetings" : "Meetings to Attend"}
+          {viewMode === "scheduled"
+            ? "Scheduled Meetings"
+            : "Meetings to Attend"}
         </h3>
         <div className="space-x-2">
           <button
-            className={`px-4 py-2 rounded ${viewMode === "scheduled" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            className={`px-4 py-2 rounded ${
+              viewMode === "scheduled"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
             onClick={() => setViewMode("scheduled")}
           >
             Scheduled Meetings
           </button>
           <button
-            className={`px-4 py-2 rounded ${viewMode === "toAttend" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            className={`px-4 py-2 rounded ${
+              viewMode === "toAttend"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
             onClick={() => setViewMode("toAttend")}
           >
             Meetings to Attend
@@ -159,17 +190,21 @@ function MeetingList({ meetings }) {
               <td className="py-3 px-4">{meeting.meetName}</td>
               <td className="py-3 px-4">{meeting.meetDescription}</td>
               <td className="py-3 px-4">{meeting.meetHostId}</td>
-              <td className="py-3 px-4">{convertToLocalTime(meeting.meetStartDateTime)}</td>
-              <td className="py-3 px-4">{convertToLocalTime(meeting.meetEndDateTime)}</td>
+              <td className="py-3 px-4">
+                {convertToLocalTime(meeting.meetStartDateTime)}
+              </td>
+              <td className="py-3 px-4">
+                {convertToLocalTime(meeting.meetEndDateTime)}
+              </td>
               <td className="py-3 px-4">
                 {viewMode === "scheduled" ? (
                   <>
-                    <button
+                    {/* <button
                       className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
                       onClick={() => handleUpdateMeeting(meeting.meetId)}
                     >
                       Update
-                    </button>
+                    </button> */}
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded"
                       onClick={() => handleDeleteMeeting(meeting.meetId)}
@@ -192,10 +227,18 @@ function MeetingList({ meetings }) {
       </table>
 
       {selectedMeeting && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" onClick={() => setSelectedMeeting(null)}>
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+          onClick={() => setSelectedMeeting(null)}
+        >
+          <div
+            className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">{selectedMeeting.meetName}</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                {selectedMeeting.meetName}
+              </h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
                   Description: {selectedMeeting.meetDescription}
@@ -204,10 +247,12 @@ function MeetingList({ meetings }) {
                   Host ID: {selectedMeeting.meetHostId}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Start Time: {convertToLocalTime(selectedMeeting.meetStartDateTime)}
+                  Start Time:{" "}
+                  {convertToLocalTime(selectedMeeting.meetStartDateTime)}
                 </p>
                 <p className="text-sm text-gray-500">
-                  End Time: {convertToLocalTime(selectedMeeting.meetEndDateTime)}
+                  End Time:{" "}
+                  {convertToLocalTime(selectedMeeting.meetEndDateTime)}
                 </p>
               </div>
               <div className="items-center px-4 py-3">
@@ -221,7 +266,9 @@ function MeetingList({ meetings }) {
               </div>
               {showParticipants && (
                 <div className="mt-4 px-4">
-                  <h4 className="text-md font-medium text-gray-900 mb-2">Participants</h4>
+                  <h4 className="text-md font-medium text-gray-900 mb-2">
+                    Participants
+                  </h4>
                   <table className="min-w-full bg-white">
                     <thead className="bg-gray-200 text-gray-600">
                       <tr>
@@ -232,8 +279,12 @@ function MeetingList({ meetings }) {
                     <tbody className="text-gray-700">
                       {participants.map((participant, index) => (
                         <tr key={index} className="border-t">
-                          <td className="py-2 px-2 text-xs">{participant.empId}</td>
-                          <td className="py-2 px-2 text-xs">{participant.status}</td>
+                          <td className="py-2 px-2 text-xs">
+                            {participant.empId}
+                          </td>
+                          <td className="py-2 px-2 text-xs">
+                            {participant.status}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
