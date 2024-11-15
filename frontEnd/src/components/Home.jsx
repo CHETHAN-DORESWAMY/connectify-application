@@ -4,10 +4,17 @@ import Navbar from "./Navbar";
 
 function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100 flex flex-col relative">
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0" 
+        style={{
+          backgroundImage: "url('https://cdn.pixabay.com/photo/2018/07/14/11/32/network-3537400_1280.png')",
+          opacity: 0.3
+        }}
+      ></div>
       <Navbar />
       
-      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12 relative z-10">
         <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
           Welcome to <span className="text-sky-800">Connectify</span>
         </h1>
@@ -32,15 +39,15 @@ function Home() {
         <section className="w-full max-w-4xl">
           <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-center">Why Choose Connectify?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+            <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
               <h3 className="font-medium text-lg mb-2 text-center text-sky-800">Easy Scheduling</h3>
               <p className="text-gray-600 text-center text-sm">Effortlessly plan and organize your meetings with our intuitive interface.</p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+            <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
               <h3 className="font-medium text-lg mb-2 text-center text-sky-800">Team Collaboration</h3>
               <p className="text-gray-600 text-center text-sm">Connect and work together seamlessly with powerful collaboration tools.</p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+            <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
               <h3 className="font-medium text-lg mb-2 text-center text-sky-800">Smart Reminders</h3>
               <p className="text-gray-600 text-center text-sm">Never miss an important meeting again with our intelligent reminder system.</p>
             </div>
@@ -48,7 +55,7 @@ function Home() {
         </section>
       </main>
 
-      <footer className="bg-gray-800 text-gray-300 py-8 shadow-inner">
+      <footer className="bg-gray-800 text-gray-300 py-8 shadow-inner relative z-10">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center text-center">
             <div className="w-full md:w-1/3 mb-4 md:mb-0">

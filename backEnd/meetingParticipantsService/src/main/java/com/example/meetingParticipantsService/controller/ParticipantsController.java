@@ -53,13 +53,13 @@ public class ParticipantsController {
         }
     }
 
-    @GetMapping("/{participantId}/meetings")
+    @GetMapping("/{empId}/meetings")
     public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(
-            @PathVariable String participantId,
+            @PathVariable String empId,
             @RequestParam String date) {
 
         Map<String, Object> response = new HashMap<>();
-        List<Meeting> meetings = participantsService.getMeetingsForParticipantOnDate(participantId, date);
+        List<Meeting> meetings = participantsService.getMeetingsForParticipantOnDate(empId, date);
         if (meetings == null) {
             response.put("message", "No meeting scheduled for that date");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -84,11 +84,11 @@ public class ParticipantsController {
 
 
     // Get participant by ID
-    @GetMapping("/get/{id}")
-    public ResponseEntity<HashMap<String, Object>> getParticipantById(@PathVariable String id) {
+    @GetMapping("/get/{empId}")
+    public ResponseEntity<HashMap<String, Object>> getParticipantByEmpId(@PathVariable String id) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            Optional<ParticipantsEntity> participant = participantsService.getParticipantById(id);
+            Optional<ParticipantsEntity> participant = participantsService.getParticipantByEmpId(id);
             if (participant.isPresent()) {
                 response.put("message", "Participant found");
                 response.put("participant", participant.get());
