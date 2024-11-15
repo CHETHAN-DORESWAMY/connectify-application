@@ -7,7 +7,7 @@ import Dashboard from "./components/Dashboard";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // import "./App.css";
-import "./index.css"
+import "./index.css";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import ParticipantSearch from "./components/ParticipantSearch";
@@ -25,7 +25,10 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/create-meeting" element={<UpdatedAlgorithmCreateMeeting />} />
+          <Route
+            path="/create-meeting"
+            element={<UpdatedAlgorithmCreateMeeting />}
+          />
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
           <Route path="/reset-password" element={<ResetPassword />} />
