@@ -50,20 +50,22 @@ function Dashboard() {
             <label htmlFor="date-select" className="block text-sm font-medium text-gray-700">
               Select Date:
             </label>
-            <input
-              type="date"
-              id="date-select"
-              value={selectedDate || ""}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
+            <div className="flex items-center mt-1">
+              <input
+                type="date"
+                id="date-select"
+                value={selectedDate || ""}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+              <button
+                onClick={() => setSelectedDate(null)}
+                className="ml-2 px-3 py-2 bg-sky-800 text-white text-sm rounded-md shadow-sm hover:bg-sky-900 transition duration-300"
+              >
+                Clear
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setSelectedDate(null)}
-            className="ml-4 px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 transition duration-300"
-          >
-            Clear Date
-          </button>
         </div>
         <MeetingList meet={meetings} selectDate={selectedDate} />
       </div>

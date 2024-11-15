@@ -126,29 +126,27 @@ function MeetingList({ meet, selectDate }) {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <div>
-          {selectedDate ? (
-            <h3 className="text-2xl font-semibold text-gray-800">
-              Meetings for {DateTime.fromISO(selectedDate).toLocaleString(DateTime.DATE_FULL)}
-            </h3>
-          ) : (
-            <h3 className="text-2xl font-semibold text-gray-800">
-              {viewMode === "scheduled" ? "Scheduled Meetings" : "Meetings to Attend"}
-            </h3>
-          )}
-        </div>
-        <div className="flex space-x-4">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            {selectedDate
+              ? `Meetings for ${DateTime.fromISO(selectedDate).toLocaleString(DateTime.DATE_FULL)}`
+              : viewMode === "scheduled"
+              ? "Scheduled Meetings"
+              : "Meetings to Attend"}
+          </h3>
           {selectedDate && (
             <button
-              className="bg-gray-500 text-white px-4 py-2 rounded"
+              className="bg-sky-800 text-white px-4 py-2 rounded"
               onClick={handleClearDate}
             >
               Clear Date
             </button>
           )}
+        </div>
+        <div className="flex space-x-4">
           <button
             className={`px-4 py-2 rounded ${
-              viewMode === "scheduled" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+              viewMode === "scheduled" ? "bg-sky-800 text-white" : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setViewMode("scheduled")}
           >
@@ -156,7 +154,7 @@ function MeetingList({ meet, selectDate }) {
           </button>
           <button
             className={`px-4 py-2 rounded ${
-              viewMode === "toAttend" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+              viewMode === "toAttend" ? "bg-sky-800 text-white" : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setViewMode("toAttend")}
           >
