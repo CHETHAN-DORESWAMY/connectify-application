@@ -35,6 +35,7 @@ function Welcome() {
         .then((response) => {
           if (response.ok) return response.json();
           if (response.status === 404) {
+            
             setShowForm(true);
             return null;
           }

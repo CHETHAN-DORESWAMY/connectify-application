@@ -6,7 +6,9 @@ function MeetingList({ meetings }) {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [viewMode, setViewMode] = useState("scheduled"); // "scheduled" or "toAttend"
   const token = sessionStorage.getItem("authToken");
+  const userId = sessionStorage.getItem("userId");
 
   useEffect(() => {
     const fetchEmployeeTimezone = async () => {
@@ -61,9 +63,8 @@ function MeetingList({ meetings }) {
         
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched Participants Data:", data); // Log data to verify structure
-          setParticipants(data || []); // Set to empty array if no participants
-          setShowParticipants(true); // Show participants after data is set
+          setParticipants(data || []);
+          setShowParticipants(true);
         } else {
           console.error("Failed to fetch participants");
         }
@@ -71,15 +72,71 @@ function MeetingList({ meetings }) {
         console.error("Error fetching participants:", error);
       }
     } else {
-      setShowParticipants(false); // Hide participants if already shown
+      setShowParticipants(false);
     }
-  };  
+  };
+
+  const handleUpdateMeeting = (meetingId) => {
+    // Implement update meeting logic
+    console.log("Update meeting", meetingId);
+  };
+
+  const handleDeleteMeeting = (meetingId) => {
+    // Implement delete meeting logic
+    console.log("Delete meeting", meetingId);
+  };
+
+  const handleConfirmMeeting = async (meetingId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8222/api/participants/confirm/${meetingId}/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      if (response.ok) {
+        // Refresh the meetings list or update the local state
+        console.log("Meeting confirmed successfully");
+      } else {
+        console.error("Failed to confirm meeting");
+      }
+    } catch (error) {
+      console.error("Error confirming meeting:", error);
+    }
+  };
+
+  const filteredMeetings = meetings.filter(meeting => 
+    viewMode === "scheduled" 
+      ? meeting.meetHostId === userId
+      : meeting.meetHostId !== userId
+  );
 
   return (
     <div className="container mx-auto p-4">
-      <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-        Today's Meetings
-      </h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-2xl font-semibold text-gray-800">
+          {viewMode === "scheduled" ? "Scheduled Meetings" : "Meetings to Attend"}
+        </h3>
+        <div className="space-x-2">
+          <button
+            className={`px-4 py-2 rounded ${viewMode === "scheduled" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setViewMode("scheduled")}
+          >
+            Scheduled Meetings
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${viewMode === "toAttend" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => setViewMode("toAttend")}
+          >
+            Meetings to Attend
+          </button>
+        </div>
+      </div>
       <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
         <thead className="bg-sky-800 text-white">
           <tr>
@@ -88,22 +145,47 @@ function MeetingList({ meetings }) {
             <th className="py-3 px-4 text-left">Host ID</th>
             <th className="py-3 px-4 text-left">Start Time</th>
             <th className="py-3 px-4 text-left">End Time</th>
+            <th className="py-3 px-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody className="text-gray-700">
-          {meetings.map((meeting, index) => (
+          {filteredMeetings.map((meeting, index) => (
             <tr
               key={index}
               className={`border-t ${
                 index % 2 === 0 ? "bg-gray-50" : "bg-white"
-              } cursor-pointer hover:bg-gray-100`}
-              onClick={() => handleMeetingClick(meeting)}
+              } hover:bg-gray-100`}
             >
               <td className="py-3 px-4">{meeting.meetName}</td>
               <td className="py-3 px-4">{meeting.meetDescription}</td>
               <td className="py-3 px-4">{meeting.meetHostId}</td>
               <td className="py-3 px-4">{convertToLocalTime(meeting.meetStartDateTime)}</td>
               <td className="py-3 px-4">{convertToLocalTime(meeting.meetEndDateTime)}</td>
+              <td className="py-3 px-4">
+                {viewMode === "scheduled" ? (
+                  <>
+                    <button
+                      className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                      onClick={() => handleUpdateMeeting(meeting.meetId)}
+                    >
+                      Update
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                      onClick={() => handleDeleteMeeting(meeting.meetId)}
+                    >
+                      Delete
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleConfirmMeeting(meeting.meetId)}
+                  >
+                    Confirm
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
