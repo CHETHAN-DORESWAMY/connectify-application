@@ -79,7 +79,7 @@ public class ParticipantsService {
 
     public List<ParticipantsStatusDto> getParticipantsStatus(String meetId) {
         List<ParticipantsStatusDto> participantsStatusDtoList = participantsRepository.findByMeetId(meetId).stream()
-                .map(participantsEntity -> new ParticipantsStatusDto(participantsEntity.getParticipantId(), participantsEntity.getStatus()))
+                .map(participantsEntity -> new ParticipantsStatusDto(participantsEntity.getEmpId(), participantsEntity.getStatus()))
                 .collect(Collectors.toList());
 
         return participantsStatusDtoList;

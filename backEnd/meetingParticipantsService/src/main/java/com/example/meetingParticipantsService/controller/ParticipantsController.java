@@ -71,7 +71,7 @@ public class ParticipantsController {
 
 
 //    it is used to get the list of participants of a specific meeting id with their status
-    @GetMapping("/meeting-participants-details/{meeId}")
+    @GetMapping("/meeting-participants-details/{meetId}")
     public ResponseEntity<List<ParticipantsStatusDto>> getParticipantsStatus(@PathVariable String meetId){
         return new ResponseEntity<>(participantsService.getParticipantsStatus(meetId), HttpStatus.OK);
     }
