@@ -6,12 +6,13 @@ function Dashboard() {
   const [meetings, setMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const token = sessionStorage.getItem("authToken");
-  const empId = sessionStorage.getItem("empId");
+  const empId = sessionStorage.getItem("userId");
   const API_END_POINT = `http://localhost:8222/api/participants`;
 
   useEffect(() => {
     const fetchMeetings = async () => {
       try {
+        console.log(empId, selectedDate);
         const response = await fetch(`${API_END_POINT}/${empId}/meetings?date=${selectedDate}`, {
           method: "GET",
           headers: {
