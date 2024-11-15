@@ -4,145 +4,124 @@ import Navbar from './Navbar';
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(DateTime.now());
-  const [meetings, setMeetings] = useState([]);
-  const [employeeTimezone, setEmployeeTimezone] = useState("");
+  const [meetingsByDate, setMeetingsByDate] = useState({});
+  const empId = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("authToken");
-  const empId = sessionStorage.getItem("empId");
 
   useEffect(() => {
-    const fetchEmployeeTimezone = async () => {
+    fetchMeetingsForMonth();
+  }, [currentDate]);
+
+  const fetchMeetingsForMonth = async () => {
+    const startOfMonth = currentDate.startOf('month');
+    const daysInMonth = currentDate.daysInMonth;
+    const newMeetingsByDate = {};
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = startOfMonth.set({ day }).toISODate();
+
       try {
-        const email = sessionStorage.getItem("email");
-        const response = await fetch(`http://localhost:8222/api/employees/get-by-email/${email}`, {
+        const response = await fetch(`http://localhost:8222/api/participants/${empId}/meetings?date=${date}`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        const data = await response.json();
-        setEmployeeTimezone(data.employee.empTimezone);
-      } catch (error) {
-        console.error("Error fetching employee timezone:", error);
-      }
-    };
-    fetchEmployeeTimezone();
-  }, []);
 
-  useEffect(() => {
-    const fetchMeetings = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8222/api/participants/${empId}/meetings?date=${currentDate.toISODate()}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setMeetings(data.meetings || []);
+        if (!response.ok) {
+          console.error(`Failed to fetch meetings for ${date}`);
+          continue;
         }
+
+        const data = await response.json();
+        newMeetingsByDate[date] = data.meetings || [];
       } catch (error) {
         console.error("Error fetching meetings:", error);
       }
-    };
-    fetchMeetings();
-  }, [currentDate, empId]);
+    }
 
-  const daysInMonth = () => {
-    const firstDay = currentDate.startOf('month');
-    const daysArray = [];
-    
-    for (let i = 0; i < firstDay.weekday % 7; i++) {
-      daysArray.push(null);
-    }
-    
-    for (let i = 1; i <= currentDate.daysInMonth; i++) {
-      daysArray.push(i);
-    }
-    
-    return daysArray;
+    setMeetingsByDate(newMeetingsByDate);
   };
 
-  const getMeetingsForDay = (day) => {
-    if (!day) return [];
-    const dayDate = currentDate.set({ day });
-    return meetings.filter(meeting => {
-      const meetingDate = DateTime.fromISO(meeting.meetStartDateTime, { zone: 'utc' })
-        .setZone(employeeTimezone);
-      return meetingDate.hasSame(dayDate, 'day');
-    });
+  const daysInMonth = currentDate.daysInMonth;
+  const firstDayOfMonth = currentDate.startOf('month').weekday;
+
+  const calendarDays = [];
+  for (let i = 1; i < firstDayOfMonth; i++) {
+    calendarDays.push(<div key={`empty-${i}`} className="p-2 border border-gray-200"></div>);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const currentDay = currentDate.set({ day });
+    const isToday = DateTime.now().hasSame(currentDay, 'day');
+    const dayString = currentDay.toISODate();
+    const dayMeetings = meetingsByDate[dayString] || [];
+
+    calendarDays.push(
+      <div
+        key={day}
+        className={`p-2 border border-gray-200 hover:bg-sky-50 cursor-pointer transition duration-300 ${
+          isToday ? 'bg-sky-100 font-bold' : ''
+        }`}
+      >
+        <div className="text-right text-sm text-gray-500">{day}</div>
+        <div className="max-h-24 overflow-y-auto">
+          {dayMeetings.map((meeting, index) => (
+            <div key={index} className="text-xs bg-sky-200 text-sky-800 p-1 mt-1 rounded truncate">
+              {meeting.meetName}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const previousMonth = () => {
+    setCurrentDate(currentDate.minus({ months: 1 }));
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(currentDate.plus({ months: 1 }));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Navbar isLoggedIn={!!token} />
-      
-      <div className="container mx-auto p-4">
-        <div className="bg-white rounded-lg shadow-md p-4 max-w-3xl mx-auto">
-          <div className="flex justify-between items-center mb-4">
+      <div className="container mx-auto p-8">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="flex justify-between items-center bg-sky-600 text-white p-4">
             <button 
-              onClick={() => setCurrentDate(currentDate.minus({ months: 1 }))}
-              className="p-1 rounded-md hover:bg-gray-100"
+              onClick={previousMonth}
+              className="p-2 rounded-full hover:bg-sky-700 transition duration-300"
             >
-              ←
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-2xl font-bold">
               {currentDate.toFormat('MMMM yyyy')}
             </h2>
-            <button 
-              onClick={() => setCurrentDate(currentDate.plus({ months: 1 }))}
-              className="p-1 rounded-md hover:bg-gray-100"
+            <button
+              onClick={nextMonth} 
+              className="p-2 rounded-full hover:bg-sky-700 transition duration-300"
             >
-              →
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-sm">
+          <div className="grid grid-cols-7 gap-1 bg-sky-100 font-semibold text-sky-800">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center font-semibold text-gray-600 p-1">
+              <div key={day} className="text-center p-2">
                 {day}
               </div>
             ))}
-            
-            {daysInMonth().map((day, index) => (
-              <div 
-                key={index}
-                className={`min-h-16 p-1 border rounded-md ${
-                  day ? 'hover:bg-gray-50' : ''
-                } ${
-                  day && currentDate.set({ day }).hasSame(DateTime.now(), 'day')
-                    ? 'bg-sky-50'
-                    : ''
-                }`}
-              >
-                {day && (
-                  <>
-                    <div className="font-medium text-gray-700 text-xs">{day}</div>
-                    <div className="space-y-0.5">
-                      {getMeetingsForDay(day).slice(0, 2).map((meeting, idx) => (
-                        <div 
-                          key={idx}
-                          className="text-xs p-0.5 bg-sky-100 rounded truncate"
-                          title={meeting.meetName}
-                        >
-                          {meeting.meetName.substring(0, 10)}...
-                        </div>
-                      ))}
-                      {getMeetingsForDay(day).length > 2 && (
-                        <div className="text-xs text-gray-500">
-                          +{getMeetingsForDay(day).length - 2} more
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-1">
+            {calendarDays}
           </div>
         </div>
       </div>

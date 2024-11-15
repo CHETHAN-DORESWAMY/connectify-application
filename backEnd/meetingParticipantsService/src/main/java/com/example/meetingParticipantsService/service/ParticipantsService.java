@@ -8,7 +8,6 @@ import com.example.meetingParticipantsService.dto.ParticipantsStatusDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
 import com.example.meetingParticipantsService.feign.MeetingClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,12 +32,12 @@ public class ParticipantsService {
         }
     }
 
-    public List<Meeting> getMeetingsForParticipantOnDate(String participantId, String date) {
+    public List<Meeting> getMeetingsForParticipantOnDate(String empId, String date) {
         // Retrieve all meeting IDs associated with the participant
 //        List<String> meetingIds = participantsRepository.findMeetIdByEmpId(participantId);
 //        System.out.println(meetingIds.get(0));
 
-        List<String> meetingIds = participantsRepository.findByEmpId(participantId).stream()
+        List<String> meetingIds = participantsRepository.findByEmpId(empId).stream()
                 .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
         // Fetch meetings for the specific date and meeting IDs using Feign client
 //        System.out.println(meetingIds.get(0));
@@ -50,7 +49,7 @@ public class ParticipantsService {
     }
 
     // Get participant by ID
-    public Optional<ParticipantsEntity> getParticipantById(String id) {
+    public Optional<ParticipantsEntity> getParticipantByEmpId(String id) {
         return participantsRepository.findById(id);
     }
 
