@@ -222,30 +222,60 @@ const UpdatedAlgorithmCreateMeeting = () => {
 
   const renderTimeBoxes = (workingHours) => {
     const boxes = [];
-    for (let day = 0; day < 2; day++) {
+    const timezoneOffset = DateTime.local().setZone(creatorTimezone).offset;
+    const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
+    const previousDay = selectedDate.minus({ days: 1 });
+    const nextDay = selectedDate.plus({ days: 1 });
+  
+    let workingHoursFound = false;
+
+    for (let day = 0; day < 3; day++) {
+      const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
       for (let hour = 0; hour < 24; hour++) {
-        const time = `${hour.toString().padStart(2, "0")}:00`;
-        const isWorkingHour = time >= workingHours.startTime && time < workingHours.endTime;
+        const currentTime = currentDate.set({ hour });
+        const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
+  
+        const startTime = DateTime.fromFormat(workingHours.startTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        let endTime = DateTime.fromFormat(workingHours.endTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        
+        if (endTime < startTime) {
+          endTime = endTime.plus({ days: 1 });
+        }
+  
+        const isWorkingHour = currentTime >= startTime && currentTime < endTime;
+
+        if (isWorkingHour && day === 1) {
+          workingHoursFound = true;
+        }
+  
         boxes.push(
           <div
             key={`${day}-${hour}`}
-            className={`w-6 h-6 border border-gray-300 ${isWorkingHour ? 'bg-green-500' : 'bg-gray-100'}`}
-            title={`${time} ${creatorTimezone}`}
+            className={`w-6 h-6 border border-gray-300 ${
+              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2 && !workingHoursFound) ? "bg-green-500" : "bg-gray-100"
+            }`}
+            title={`${currentTimeUTC} ${creatorTimezone}`}
           ></div>
         );
       }
     }
     return boxes;
   };
+  
 
   const renderTimeLabels = () => {
     const labels = [];
-    for (let day = 0; day < 2; day++) {
+    const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
+    const previousDay = selectedDate.minus({ days: 1 });
+    const nextDay = selectedDate.plus({ days: 1 });
+
+    for (let day = 0; day < 3; day++) {
+      const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
       for (let hour = 0; hour < 24; hour++) {
         if (hour % 3 === 0) {
           labels.push(
             <div key={`label-${day}-${hour}`} className="w-6 text-xs text-center">
-              {hour === 0 ? (day === 0 ? 'Day 1' : 'Day 2') : `${hour}`}
+              {hour === 0 ? currentDate.toFormat('MMM dd') : `${hour}`}
             </div>
           );
         } else {
