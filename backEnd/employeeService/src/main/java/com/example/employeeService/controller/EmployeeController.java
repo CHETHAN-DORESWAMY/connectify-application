@@ -1,5 +1,6 @@
 package com.example.employeeService.controller;
 
+import com.example.employeeService.dto.EmployeeDto;
 import com.example.employeeService.dto.EmployeeListDto;
 import com.example.employeeService.dto.Interval;
 import com.example.employeeService.dto.TimeClass;
@@ -14,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Time;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -34,7 +32,7 @@ public class EmployeeController {
 
     // Create a new employee
     @PostMapping("/add")
-    public ResponseEntity<HashMap<String, Object>> createEmployee(@RequestBody EmployeeEntity employeeEntity) {
+    public ResponseEntity<HashMap<String, Object>> createEmployee(@RequestBody EmployeeDto employeeEntity) {
         HashMap<String, Object> response = new HashMap<>();
         try {
             EmployeeEntity createdEmployee = employeeService.createEmployee(employeeEntity);
@@ -106,15 +104,15 @@ public class EmployeeController {
     }
 
     @PostMapping("/get-window-time")
-    public ResponseEntity<List<TimeClass>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
+    public ResponseEntity<List<Interval>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
         System.out.println(employeeListDto.getListOfEmployeeId());
         System.out.println(employeeListDto.getMeetingDate());
 
-        List<TimeClass> list = overLappingWindowClass.computeWindow(employeeListDto);
-        System.out.println("Start Time" + list.get(0).getStartTime());
-        System.out.println("end Time" + list.get(0).getEndTime());
-
-
+////        List<TimeClass> list = overLappingWindowClass.computeWindow(employeeListDto);
+//        System.out.println("Start Time" + list.get(0).getStartTime());
+//        System.out.println("end Time" + list.get(0).getEndTime());
+//
+        List<Interval> list = new ArrayList<>();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

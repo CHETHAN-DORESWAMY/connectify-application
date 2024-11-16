@@ -2,6 +2,7 @@ package com.Connectify.authenticationService.controller;
 
 import com.Connectify.authenticationService.dto.UserLogin;
 import com.Connectify.authenticationService.entity.UserCredentialsEntity;
+import com.Connectify.authenticationService.feign.EmployeeClient;
 import com.Connectify.authenticationService.service.OTPService;
 import com.Connectify.authenticationService.service.OTPValidationService;
 import com.Connectify.authenticationService.service.PasswordService;
@@ -36,6 +37,9 @@ public class UserCredentialsController {
 
     @Autowired
     private PasswordService passwordService;
+
+    @Autowired
+    private EmployeeClient employeeClient;
 
     @GetMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestParam String email) {
@@ -73,6 +77,11 @@ public class UserCredentialsController {
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
+            if (!employeeClient.getEmployeeById(user.getId()).getStatusCode().equals(HttpStatus.OK)) {
+                response.put("message", "Employee ID does not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
             UserCredentialsEntity createdUser = userCredService.register(user);
             response.put("data", user);
             response.put("message", "User registered successfully");

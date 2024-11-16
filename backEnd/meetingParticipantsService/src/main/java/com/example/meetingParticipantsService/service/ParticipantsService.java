@@ -84,14 +84,15 @@ public class ParticipantsService {
         return participantsStatusDtoList;
     }
 
-    public ParticipantsEntity updateParticipantStatus(String empId, String meetId, String status) {
+    public ParticipantsEntity updateParticipantStatus(String empId, String meetId, Boolean status) {
         ParticipantsEntity participantsEntity = participantsRepository.findByEmpIdAndMeetId(empId, meetId);
-        if(status.equalsIgnoreCase("pending")){
+        if(status){
             participantsEntity.setStatus("confirmed");
         }
-        else if(status.equalsIgnoreCase("confirmed")){
+        else {
             participantsEntity.setStatus("pending");
         }
+        System.out.println(participantsEntity.getStatus());
         return participantsRepository.save(participantsEntity);
     }
 

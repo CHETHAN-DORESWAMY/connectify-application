@@ -1,6 +1,7 @@
 package com.example.employeeService.service;
 
 import com.example.employeeService.dao.EmployeeDao;
+import com.example.employeeService.dto.EmployeeDto;
 import com.example.employeeService.entity.EmployeeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,23 @@ public class EmployeeService {
     private EmployeeDao employeeDao;
 
     // Create a new employee
-    public EmployeeEntity createEmployee(EmployeeEntity employeeEntity) {
-        return employeeDao.save(employeeEntity);
+    public EmployeeEntity createEmployee(EmployeeDto employeeDto) {
+        EmployeeEntity employee = new EmployeeEntity();
+        employee.setEmpId(employeeDto.getEmpId());
+        employee.setEmpCity(employeeDto.getEmpCity());
+        employee.setEmpDesignation(employeeDto.getEmpDesignation());
+        employee.setEmpEmail(employeeDto.getEmpEmail());
+        employee.setEmpName(employeeDto.getEmpName());
+        employee.setEmpPhone(employeeDto.getEmpPhone());
+        employee.setEmpTimezone(employeeDto.getEmpTimezone());
+
+        ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.now(), employeeDto.getEmpStartTime(), ZoneId.of(employeeDto.getEmpTimezone()) );
+        employee.setEmpStartTime(startDateTime.toInstant());
+
+        ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.now(), employeeDto.getEmpEndTime(), ZoneId.of(employeeDto.getEmpTimezone()) );
+        employee.setEmpEndTime(endDateTime.toInstant());
+
+        return employeeDao.save(employee);
     }
 
     // Get all employees

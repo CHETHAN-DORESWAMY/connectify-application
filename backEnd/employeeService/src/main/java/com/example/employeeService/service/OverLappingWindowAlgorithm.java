@@ -8,6 +8,7 @@ import com.example.employeeService.entity.EmployeeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -33,9 +34,11 @@ public class OverLappingWindowAlgorithm {
         List<Interval> intervals = new ArrayList<>();
 
         for (EmployeeEntity emp : employees) {
-            List<ZonedDateTime> zonedDateTimeList = localToUtcConvertor.convert(emp, meetingDate);
-            ZonedDateTime startUtc = zonedDateTimeList.get(0);
-            ZonedDateTime endUtc = zonedDateTimeList.get(1);
+//            List<ZonedDateTime> zonedDateTimeList = localToUtcConvertor.convert(emp, meetingDate);
+//            ZonedDateTime startUtc = zonedDateTimeList.get(0);
+//            ZonedDateTime endUtc = zonedDateTimeList.get(1);
+            Instant startUtc = emp.getEmpStartTime();
+            Instant endUtc = emp.getEmpStartTime();
 
             boolean found = false;
 

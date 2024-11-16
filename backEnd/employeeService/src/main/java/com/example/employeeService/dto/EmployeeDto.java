@@ -1,16 +1,12 @@
-package com.example.employeeService.entity;
+package com.example.employeeService.dto;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Document(collection = "employee_details")
-public class EmployeeEntity {
+public class EmployeeDto {
 
-    @Id
     String empId;
     String empName;
     String empDesignation;
@@ -18,13 +14,13 @@ public class EmployeeEntity {
     String empPhone;
     String empCity;
     String empTimezone;
-    Instant empStartTime;
-    Instant empEndTime;
+    LocalTime empStartTime;
+    LocalTime empEndTime;
 
-    public EmployeeEntity() {
+    public EmployeeDto() {
     }
 
-    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, Instant empStartTime, Instant empEndTime) {
+    public EmployeeDto(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalTime empStartTime, LocalTime empEndTime) {
         this.empId = empId;
         this.empName = empName;
         this.empDesignation = empDesignation;
@@ -92,19 +88,19 @@ public class EmployeeEntity {
         this.empTimezone = empTimezone;
     }
 
-    public Instant getEmpStartTime() {
+    public LocalTime getEmpStartTime() {
         return empStartTime;
     }
 
-    public void setEmpStartTime(Instant empStartTime) {
+    public void setEmpStartTime(LocalTime empStartTime) {
         this.empStartTime = empStartTime;
     }
 
-    public Instant getEmpEndTime() {
+    public LocalTime getEmpEndTime() {
         return empEndTime;
     }
 
-    public void setEmpEndTime(Instant empEndTime) {
+    public void setEmpEndTime(LocalTime empEndTime) {
         this.empEndTime = empEndTime;
     }
 }
