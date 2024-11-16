@@ -65,12 +65,14 @@ public class EmployeeController {
     // Get employee by ID
     @GetMapping("/get/{empId}")
     public ResponseEntity<HashMap<String, Object>> getEmployeeById(@PathVariable String empId) {
+        System.out.println(empId);
         HashMap<String, Object> response = new HashMap<>();
         try {
             Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
             if (employee.isPresent()) {
                 response.put("message", "Employee found");
                 response.put("employee", employee.get());
+                System.out.println(employee.get());
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("message", "Employee not found");
@@ -95,12 +97,27 @@ public class EmployeeController {
             } else {
                 response.put("message", "Employee not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
+              }
+//            EmployeeEntity employeeEntity = employee.get();
+//            response.put("employee", employee.get());
+//            if(employeeEntity.getProfileStatus()){
+//                return new ResponseEntity<>(response, HttpStatus.OK);
+//            }
+//            else{
+//                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+//            }
         } catch (Exception e) {
             response.put("message", "Error fetching employee");
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/update-status/{empId}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String empId){
+        System.out.println(empId);
+        employeeService.updateStatus(empId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/get-window-time")
