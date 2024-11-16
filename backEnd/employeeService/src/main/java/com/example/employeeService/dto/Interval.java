@@ -1,34 +1,35 @@
 package com.example.employeeService.dto;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Interval {
-    ZonedDateTime startTime;
-    ZonedDateTime endTime;
+    Instant startTime;
+    Instant endTime;
     List<String> employeeIds;
 
 
-    public Interval(ZonedDateTime startTime, ZonedDateTime endTime, List<String> employeeIds) {
+    public Interval(Instant startTime, Instant endTime, List<String> employeeIds) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.employeeIds = new ArrayList<>(employeeIds);
     }
 
-    public ZonedDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(ZonedDateTime startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public ZonedDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(ZonedDateTime endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 

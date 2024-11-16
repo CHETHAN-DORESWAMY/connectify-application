@@ -5,6 +5,7 @@ import "../App.css";
 
 function Register() {
   const API_END_POINT = "http://localhost:8222/api/auth";
+  const API_END_POINT_EMP = "http://localhost:8222/api/employees";
   const [formData, setFormData] = useState({
     id: "",
     email: "",
@@ -21,6 +22,7 @@ function Register() {
   const validate = () => {
     let errors = {};
     if (!formData.id) errors.id = "ID is required";
+
     if (!formData.email) errors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       errors.email = "Email address is invalid";

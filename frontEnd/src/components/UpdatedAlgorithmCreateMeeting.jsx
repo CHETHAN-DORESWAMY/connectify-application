@@ -21,13 +21,15 @@ const UpdatedAlgorithmCreateMeeting = () => {
 
   const API_END_POINT = "http://localhost:8222/api/employees";
   const MEETING_API_END_POINT = "http://localhost:8222/api/meetings/add";
-  const PARTICIPANTS_API_END_POINT = "http://localhost:8222/api/participants/add";
+  const PARTICIPANTS_API_END_POINT =
+    "http://localhost:8222/api/participants/add";
   const token = sessionStorage.getItem("authToken");
   const creatorEmail = sessionStorage.getItem("email");
   const creatorTimezone = sessionStorage.getItem("creatorTimezone");
 
   useEffect(() => {
-    const generateMeetingId = () => `MEET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const generateMeetingId = () =>
+      `MEET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     setMeetingId(generateMeetingId());
   }, []);
 
@@ -322,7 +324,9 @@ const UpdatedAlgorithmCreateMeeting = () => {
               {dropdownVisible && (
                 <div className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow-lg max-h-48 overflow-y-auto">
                   {filteredParticipants.length === 0 ? (
-                    <div className="p-2 text-gray-500">No participants found</div>
+                    <div className="p-2 text-gray-500">
+                      No participants found
+                    </div>
                   ) : (
                     filteredParticipants.map((participant) => (
                       <div
@@ -343,6 +347,8 @@ const UpdatedAlgorithmCreateMeeting = () => {
                   key={participant.empId}
                   className="bg-sky-200 text-sky-800 px-3 py-1 m-1 rounded-full flex items-center"
                 >
+                  {console.log(participant.empStartTime)}
+                  {console.log(participant.empEndTime)}
                   <span className="mr-2">{participant.empName}</span>
                   <button
                     onClick={() => handleRemoveParticipant(participant)}

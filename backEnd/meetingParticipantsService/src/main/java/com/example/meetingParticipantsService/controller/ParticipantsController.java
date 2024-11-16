@@ -92,7 +92,7 @@ public class ParticipantsController {
 
 //    update the status of the meeting of particular person
     @PutMapping("/update-status/{empId}/{meetId}/{status}")
-    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId, @PathVariable String status){
+    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId, @PathVariable Boolean status){
         return new ResponseEntity<>(participantsService.updateParticipantStatus(empId, meetId, status), HttpStatus.OK);
     }
 
