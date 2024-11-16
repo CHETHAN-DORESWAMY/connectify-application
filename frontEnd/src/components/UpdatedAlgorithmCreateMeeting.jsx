@@ -17,12 +17,14 @@ const UpdatedAlgorithmCreateMeeting = () => {
   const [endTime, setEndTime] = useState("");
   const [showTimeFields, setShowTimeFields] = useState(false);
   const [meetingId, setMeetingId] = useState("");
+  const [participantSchedules, setParticipantSchedules] = useState([]);
 
   const API_END_POINT = "http://localhost:8222/api/employees";
   const MEETING_API_END_POINT = "http://localhost:8222/api/meetings/add";
   const PARTICIPANTS_API_END_POINT = "http://localhost:8222/api/participants/add";
   const token = sessionStorage.getItem("authToken");
   const creatorEmail = sessionStorage.getItem("email");
+  const creatorTimezone = sessionStorage.getItem("creatorTimezone");
 
   useEffect(() => {
     const generateMeetingId = () => `MEET-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -61,18 +63,10 @@ const UpdatedAlgorithmCreateMeeting = () => {
     fetchParticipants();
   }, [API_END_POINT, token, creatorEmail]);
 
-  const convertToLocalTime = (utcTime) => {
-    const creatorTimeZone = participants.find(
-      (participant) => participant.empEmail === creatorEmail
-    )?.empTimezone;
-    if (creatorTimeZone) {
-      return DateTime.fromISO(utcTime, { zone: "utc" })
-        .setZone(creatorTimeZone)
-        .toLocaleString(DateTime.DATETIME_MED);
-    } else {
-      console.warn("Creator timezone not found.");
-      return utcTime;
-    }
+  const convertToLocalTime = (utcTime, fromTimezone, toTimezone) => {
+    return DateTime.fromISO(utcTime, { zone: fromTimezone })
+      .setZone(toTimezone)
+      .toLocaleString(DateTime.TIME_24_SIMPLE);
   };
 
   const filteredParticipants = searchQuery
@@ -129,14 +123,37 @@ const UpdatedAlgorithmCreateMeeting = () => {
         const localTimeResult = result.map((item) => ({
           ...item,
           startTime: item.startTime
-            ? convertToLocalTime(item.startTime)
+            ? convertToLocalTime(item.startTime, "utc", creatorTimezone)
             : "No window found",
           endTime: item.endTime
-            ? convertToLocalTime(item.endTime)
+            ? convertToLocalTime(item.endTime, "utc", creatorTimezone)
             : "No window found",
         }));
         setOverlapResult(localTimeResult);
         setShowTimeFields(true);
+
+        // Fetch working hours for each participant
+        const schedules = await Promise.all(
+          selectedParticipantsName.map(async (participant) => {
+            const workingHoursResponse = await fetch(`${API_END_POINT}/get/${participant.empId}`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+            const workingHours = await workingHoursResponse.json();
+            return {
+              ...participant,
+              workingHours: {
+                startTime: convertToLocalTime(participant.empStartTime, "utc", creatorTimezone),
+                endTime: convertToLocalTime(participant.empEndTime, "utc", creatorTimezone),
+              },
+            };
+          })
+        );
+        setParticipantSchedules(schedules);
+        console.log(participantSchedules);
       } else {
         console.error("Failed to find overlap");
       }
@@ -144,6 +161,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
       console.error("Error:", error);
     }
   };
+  
 
   const handleScheduleMeeting = async () => {
     try {
@@ -198,6 +216,42 @@ const UpdatedAlgorithmCreateMeeting = () => {
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const renderTimeBoxes = (workingHours) => {
+    const boxes = [];
+    for (let day = 0; day < 2; day++) {
+      for (let hour = 0; hour < 24; hour++) {
+        const time = `${hour.toString().padStart(2, "0")}:00`;
+        const isWorkingHour = time >= workingHours.startTime && time < workingHours.endTime;
+        boxes.push(
+          <div
+            key={`${day}-${hour}`}
+            className={`w-6 h-6 border border-gray-300 ${isWorkingHour ? 'bg-green-500' : 'bg-gray-100'}`}
+            title={`${time} ${creatorTimezone}`}
+          ></div>
+        );
+      }
+    }
+    return boxes;
+  };
+
+  const renderTimeLabels = () => {
+    const labels = [];
+    for (let day = 0; day < 2; day++) {
+      for (let hour = 0; hour < 24; hour++) {
+        if (hour % 3 === 0) {
+          labels.push(
+            <div key={`label-${day}-${hour}`} className="w-6 text-xs text-center">
+              {hour === 0 ? (day === 0 ? 'Day 1' : 'Day 2') : `${hour}`}
+            </div>
+          );
+        } else {
+          labels.push(<div key={`label-${day}-${hour}`} className="w-6"></div>);
+        }
+      }
+    }
+    return labels;
   };
 
   return (
@@ -299,6 +353,32 @@ const UpdatedAlgorithmCreateMeeting = () => {
                 </div>
               ))}
             </div>
+            {participantSchedules.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Participant Schedules</h3>
+                <p className="text-sm text-gray-600 mb-2">Date: {meetingDate}</p>
+                <div className="overflow-x-auto">
+                  <div className="inline-block min-w-full">
+                    <div className="grid grid-cols-[auto_1fr] gap-4">
+                      <div></div>
+                      <div className="flex">{renderTimeLabels()}</div>
+                      {participantSchedules.map((participant, index) => (
+                        <React.Fragment key={index}>
+                          <div className="flex flex-col justify-center">
+                            <p className="font-medium">{participant.empName}</p>
+                            <p className="text-sm text-gray-600">{participant.empTimezone}</p>
+                            {console.log(participant.empStartTime)}
+                          </div>
+                          <div className="flex">
+                            {renderTimeBoxes(participant.workingHours)}
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             {overlapResult.length > 0 && (
               <div className="mt-4 text-green-500 font-semibold">
                 {overlapResult.map((result, index) => (
