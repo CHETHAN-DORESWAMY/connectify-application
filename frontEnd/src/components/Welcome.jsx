@@ -58,6 +58,11 @@ function Welcome() {
               setShowForm(true);
 
               sessionStorage.setItem("userId", data.employee.empId);
+            } else {
+              sessionStorage.setItem(
+                "creatorTimezone",
+                data.employee.empTimezone
+              );
             }
           }
         })
@@ -97,6 +102,7 @@ function Welcome() {
       if (response.ok) {
         // const result = await response.json();
         // setUserData(result.employee);
+        sessionStorage.setItem("creatorTimezone", empTimezone);
         setShowForm(false);
         navigate("/dashboard");
       } else {

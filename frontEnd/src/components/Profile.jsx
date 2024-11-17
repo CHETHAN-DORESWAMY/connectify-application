@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Navbar from './Navbar';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Navbar from "./Navbar";
+import { DateTime } from "luxon";
 
 const Profile = () => {
   const [employee, setEmployee] = useState(null);
   const { empId } = useParams();
   const endpointUrl = `http://localhost:8222/api/employees/get/${empId}`;
   const token = sessionStorage.getItem("authToken");
+  const UserTimezone = sessionStorage.getItem("creatorTimezone");
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
@@ -31,13 +33,21 @@ const Profile = () => {
     fetchEmployeeDetails();
   }, [endpointUrl, token]);
 
+  const convertToLocalTime = (utcTime, fromTimezone, toTimezone) => {
+    return DateTime.fromISO(utcTime, { zone: fromTimezone })
+      .setZone(toTimezone)
+      .toLocaleString(DateTime.TIME_24_SIMPLE);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 to-sky-200">
       <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
 
       <div className="container mx-auto p-4 mt-6">
         <div className="bg-white shadow-xl rounded-2xl p-6 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-sky-800 mb-4 text-center">Employee Profile</h2>
+          <h2 className="text-2xl font-bold text-sky-800 mb-4 text-center">
+            Employee Profile
+          </h2>
 
           {employee ? (
             <div className="space-y-4">
@@ -49,12 +59,26 @@ const Profile = () => {
                 </div>
               </div>
               <ProfileItem label="Name" value={employee.empName} />
-              <ProfileItem label="Designation" value={employee.empDesignation} />
+              <ProfileItem
+                label="Designation"
+                value={employee.empDesignation}
+              />
               <ProfileItem label="Email" value={employee.empEmail} />
               <ProfileItem label="Phone" value={employee.empPhone} />
               <ProfileItem label="City" value={employee.empCity} />
               <ProfileItem label="Timezone" value={employee.empTimezone} />
-              <ProfileItem label="Work Hours" value={`${employee.empStartTime} - ${employee.empEndTime}`} />
+              <ProfileItem
+                label="Work Hours"
+                value={`${convertToLocalTime(
+                  employee.empStartTime,
+                  "utc",
+                  UserTimezone
+                )} - ${convertToLocalTime(
+                  employee.empEndTime,
+                  "utc",
+                  UserTimezone
+                )} - ${UserTimezone}`}
+              />
             </div>
           ) : (
             <div className="flex justify-center items-center h-48">

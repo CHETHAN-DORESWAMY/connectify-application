@@ -122,6 +122,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
       });
       if (response.ok) {
         const result = await response.json();
+        console.log(result);
         const localTimeResult = result.map((item) => ({
           ...item,
           startTime: item.startTime
@@ -137,19 +138,30 @@ const UpdatedAlgorithmCreateMeeting = () => {
         // Fetch working hours for each participant
         const schedules = await Promise.all(
           selectedParticipantsName.map(async (participant) => {
-            const workingHoursResponse = await fetch(`${API_END_POINT}/get/${participant.empId}`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
+            const workingHoursResponse = await fetch(
+              `${API_END_POINT}/get/${participant.empId}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
             const workingHours = await workingHoursResponse.json();
             return {
               ...participant,
               workingHours: {
-                startTime: convertToLocalTime(participant.empStartTime, "utc", creatorTimezone),
-                endTime: convertToLocalTime(participant.empEndTime, "utc", creatorTimezone),
+                startTime: convertToLocalTime(
+                  participant.empStartTime,
+                  "utc",
+                  creatorTimezone
+                ),
+                endTime: convertToLocalTime(
+                  participant.empEndTime,
+                  "utc",
+                  creatorTimezone
+                ),
               },
             };
           })
@@ -163,7 +175,6 @@ const UpdatedAlgorithmCreateMeeting = () => {
       console.error("Error:", error);
     }
   };
-  
 
   const handleScheduleMeeting = async () => {
     try {
@@ -226,33 +237,51 @@ const UpdatedAlgorithmCreateMeeting = () => {
     const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
     const previousDay = selectedDate.minus({ days: 1 });
     const nextDay = selectedDate.plus({ days: 1 });
-  
+
     let workingHoursFound = false;
 
     for (let day = 0; day < 3; day++) {
-      const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
+      const currentDate =
+        day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
       for (let hour = 0; hour < 24; hour++) {
         const currentTime = currentDate.set({ hour });
-        const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
-  
-        const startTime = DateTime.fromFormat(workingHours.startTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
-        let endTime = DateTime.fromFormat(workingHours.endTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
-        
+        const currentTimeUTC = currentTime
+          .toUTC()
+          .toLocaleString(DateTime.TIME_24_SIMPLE);
+
+        const startTime = DateTime.fromFormat(
+          workingHours.startTime,
+          "HH:mm"
+        ).set({
+          year: selectedDate.year,
+          month: selectedDate.month,
+          day: selectedDate.day,
+        });
+        let endTime = DateTime.fromFormat(workingHours.endTime, "HH:mm").set({
+          year: selectedDate.year,
+          month: selectedDate.month,
+          day: selectedDate.day,
+        });
+
         if (endTime < startTime) {
           endTime = endTime.plus({ days: 1 });
         }
-  
+
         const isWorkingHour = currentTime >= startTime && currentTime < endTime;
 
         if (isWorkingHour && day === 1) {
           workingHoursFound = true;
         }
-  
+
         boxes.push(
           <div
             key={`${day}-${hour}`}
             className={`w-6 h-6 border border-gray-300 ${
-              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2 && !workingHoursFound) ? "bg-green-500" : "bg-gray-100"
+              (isWorkingHour && day === 0) ||
+              (isWorkingHour && day === 1) ||
+              (isWorkingHour && day === 2 && !workingHoursFound)
+                ? "bg-green-500"
+                : "bg-gray-100"
             }`}
             title={`${currentTimeUTC} ${creatorTimezone}`}
           ></div>
@@ -261,7 +290,6 @@ const UpdatedAlgorithmCreateMeeting = () => {
     }
     return boxes;
   };
-  
 
   const renderTimeLabels = () => {
     const labels = [];
@@ -270,12 +298,16 @@ const UpdatedAlgorithmCreateMeeting = () => {
     const nextDay = selectedDate.plus({ days: 1 });
 
     for (let day = 0; day < 3; day++) {
-      const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
+      const currentDate =
+        day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
       for (let hour = 0; hour < 24; hour++) {
         if (hour % 3 === 0) {
           labels.push(
-            <div key={`label-${day}-${hour}`} className="w-6 text-xs text-center">
-              {hour === 0 ? currentDate.toFormat('MMM dd') : `${hour}`}
+            <div
+              key={`label-${day}-${hour}`}
+              className="w-6 text-xs text-center"
+            >
+              {hour === 0 ? currentDate.toFormat("MMM dd") : `${hour}`}
             </div>
           );
         } else {
@@ -377,8 +409,8 @@ const UpdatedAlgorithmCreateMeeting = () => {
                   key={participant.empId}
                   className="bg-sky-200 text-sky-800 px-3 py-1 m-1 rounded-full flex items-center"
                 >
-                  {console.log(participant.empStartTime)}
-                  {console.log(participant.empEndTime)}
+                  {/* {console.log(participant.empStartTime)}
+                  {console.log(participant.empEndTime)} */}
                   <span className="mr-2">{participant.empName}</span>
                   <button
                     onClick={() => handleRemoveParticipant(participant)}
@@ -391,8 +423,12 @@ const UpdatedAlgorithmCreateMeeting = () => {
             </div>
             {participantSchedules.length > 0 && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Participant Schedules</h3>
-                <p className="text-sm text-gray-600 mb-2">Date: {meetingDate}</p>
+                <h3 className="text-lg font-semibold mb-2">
+                  Participant Schedules
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  Date: {meetingDate}
+                </p>
                 <div className="overflow-x-auto">
                   <div className="inline-block min-w-full">
                     <div className="grid grid-cols-[auto_1fr] gap-4">
@@ -402,8 +438,13 @@ const UpdatedAlgorithmCreateMeeting = () => {
                         <React.Fragment key={index}>
                           <div className="flex flex-col justify-center">
                             <p className="font-medium">{participant.empName}</p>
-                            <p className="text-sm text-gray-600">{participant.empTimezone}</p>
-                            {console.log(participant.empStartTime)}
+                            <p className="text-sm text-gray-600">
+                              {participant.empTimezone}
+                            </p>
+                            {console.log(
+                              participant.empName,
+                              participant.empStartTime
+                            )}
                           </div>
                           <div className="flex">
                             {renderTimeBoxes(participant.workingHours)}
@@ -425,6 +466,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
                         <li key={ids}>{ids}</li>
                       ))}
                     </ul>
+
                     <p>Meeting Start Time: {result.startTime}</p>
                     <p>Meeting End Time: {result.endTime}</p>
                   </div>

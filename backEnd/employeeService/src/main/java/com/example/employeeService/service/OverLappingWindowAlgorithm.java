@@ -8,10 +8,7 @@ import com.example.employeeService.entity.EmployeeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,20 +73,25 @@ public class OverLappingWindowAlgorithm {
 
         for (EmployeeEntity emp : employees) {
             // Combine the meeting date with the employee's working hours (Instant)
-            ZonedDateTime meetingStartDate = meetingDate.atStartOfDay(ZoneId.of("UTC"));
-            Instant startUtc = emp.getEmpStartTime();
-            Instant endUtc = emp.getEmpEndTime();
+            // Extract the time from empStartTime and combine it with meetingDate
+            ZonedDateTime meetingStartDate = meetingDate.atStartOfDay(ZoneId.of("UTC")); // Start of the meeting date in UTC
 
-            // Ensure working hours are adjusted for the meeting date
-            Instant meetingStart = meetingStartDate.toInstant();
-            Instant adjustedStart = startUtc.isBefore(meetingStart) ? meetingStart : startUtc;
-            Instant adjustedEnd = endUtc.isBefore(meetingStart) ? meetingStart : endUtc;
+// Convert empStartTime to LocalTime in UTC
+            LocalTime empStartLocalTime = emp.getEmpStartTime().atZone(ZoneId.of("UTC")).toLocalTime();
+            LocalTime empEndLocalTime = emp.getEmpEndTime().atZone(ZoneId.of("UTC")).toLocalTime();
 
-//            System.out.println("Employee: " + emp.getEmpName() +
-//                    ", Start (UTC): " + adjustedStart + ", End (UTC): " + adjustedEnd);
+// Combine meetingDate with empStartLocalTime and empEndLocalTime
+            Instant adjustedStart = ZonedDateTime.of(meetingDate, empStartLocalTime, ZoneId.of("UTC")).toInstant();
+            Instant adjustedEnd = ZonedDateTime.of(meetingDate, empEndLocalTime, ZoneId.of("UTC")).toInstant();
+
+            System.out.println("Employee: " + emp.getEmpName() +
+                    ", Adjusted Start (UTC): " + adjustedStart + ", Adjusted End (UTC): " + adjustedEnd);
+
+// Handle overflow (adjust dates if needed)
             if (adjustedStart.isAfter(adjustedEnd)) {
                 adjustedEnd = adjustedEnd.plusSeconds(24 * 60 * 60); // Add a day in seconds
             }
+
 
             boolean foundOverlap = false;
 
@@ -105,7 +107,7 @@ public class OverLappingWindowAlgorithm {
                     // Update the interval to the common overlapping period
                     interval.setStartTime(interval.getStartTime().isAfter(adjustedStart) ? interval.getStartTime() : adjustedStart);
                     interval.setEndTime(interval.getEndTime().isBefore(adjustedEnd) ? interval.getEndTime() : adjustedEnd);
-//                    System.out.println("Updated Interval - Start Time: " + interval.getStartTime() + " End Time: " + interval.getEndTime());
+                    System.out.println("Updated Interval - Start Time: " + interval.getStartTime() + " End Time: " + interval.getEndTime());
 
                     // Add the employee ID to this interval
                     interval.getEmployeeIds().add(emp.getEmpId());
