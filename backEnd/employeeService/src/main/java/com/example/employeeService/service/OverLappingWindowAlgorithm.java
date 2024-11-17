@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,44 +31,102 @@ public class OverLappingWindowAlgorithm {
         return findOverlappingIntervals(employees, meetingDate);
 
     }
+//    public List<Interval> findOverlappingIntervals(List<EmployeeEntity> employees, LocalDate meetingDate) {
+//        List<Interval> intervals = new ArrayList<>();
+//
+//        for (EmployeeEntity emp : employees) {
+////            List<ZonedDateTime> zonedDateTimeList = localToUtcConvertor.convert(emp, meetingDate);
+////            ZonedDateTime startUtc = zonedDateTimeList.get(0);
+////            ZonedDateTime endUtc = zonedDateTimeList.get(1);
+//            Instant startUtc = emp.getEmpStartTime();
+//            Instant endUtc = emp.getEmpEndTime();
+//            System.out.println(startUtc +  " " + endUtc + " " + emp.getEmpName());
+//
+//            boolean found = false;
+//
+//            for (int i = 0; i < intervals.size() && !found; i++) {
+//                Interval interval = intervals.get(i);
+//
+//                // Check for overlap
+//                if (!interval.getEndTime().isBefore(startUtc) && !interval.getStartTime().isAfter(endUtc)) {
+//                    // Update interval start and end times to be the common overlapping period
+//                    interval.setStartTime(interval.getStartTime().isAfter(startUtc) ? interval.getStartTime() : startUtc);
+//                    interval.setEndTime(interval.getEndTime().isBefore(endUtc) ? interval.getEndTime() : endUtc);
+//
+//                    // Add employee ID to the interval
+//                    interval.getEmployeeIds().add(emp.getEmpId());
+//                    found = true;
+//                }
+//            }
+//
+//            // If no overlapping interval was found, add a new interval
+//            if (!found) {
+//                List<String> empList = new ArrayList<>();
+//                empList.add(emp.getEmpId());
+//                intervals.add(new Interval(startUtc, endUtc, empList));
+//            }
+//        }
+//
+//        return intervals;
+//    }
+
+
     public List<Interval> findOverlappingIntervals(List<EmployeeEntity> employees, LocalDate meetingDate) {
         List<Interval> intervals = new ArrayList<>();
 
         for (EmployeeEntity emp : employees) {
-//            List<ZonedDateTime> zonedDateTimeList = localToUtcConvertor.convert(emp, meetingDate);
-//            ZonedDateTime startUtc = zonedDateTimeList.get(0);
-//            ZonedDateTime endUtc = zonedDateTimeList.get(1);
+            // Combine the meeting date with the employee's working hours (Instant)
+            ZonedDateTime meetingStartDate = meetingDate.atStartOfDay(ZoneId.of("UTC"));
             Instant startUtc = emp.getEmpStartTime();
-            Instant endUtc = emp.getEmpStartTime();
+            Instant endUtc = emp.getEmpEndTime();
 
-            boolean found = false;
+            // Ensure working hours are adjusted for the meeting date
+            Instant meetingStart = meetingStartDate.toInstant();
+            Instant adjustedStart = startUtc.isBefore(meetingStart) ? meetingStart : startUtc;
+            Instant adjustedEnd = endUtc.isBefore(meetingStart) ? meetingStart : endUtc;
 
-            for (int i = 0; i < intervals.size() && !found; i++) {
-                Interval interval = intervals.get(i);
+//            System.out.println("Employee: " + emp.getEmpName() +
+//                    ", Start (UTC): " + adjustedStart + ", End (UTC): " + adjustedEnd);
+            if (adjustedStart.isAfter(adjustedEnd)) {
+                adjustedEnd = adjustedEnd.plusSeconds(24 * 60 * 60); // Add a day in seconds
+            }
 
-                // Check for overlap
-                if (!interval.getEndTime().isBefore(startUtc) && !interval.getStartTime().isAfter(endUtc)) {
-                    // Update interval start and end times to be the common overlapping period
-                    interval.setStartTime(interval.getStartTime().isAfter(startUtc) ? interval.getStartTime() : startUtc);
-                    interval.setEndTime(interval.getEndTime().isBefore(endUtc) ? interval.getEndTime() : endUtc);
+            boolean foundOverlap = false;
 
-                    // Add employee ID to the interval
+            for (Interval interval : intervals) {
+                // Check if there is any overlap between the existing interval and the employee's working time
+                System.out.println("Start Time: " + interval.getStartTime() + " End Time: " + interval.getEndTime());
+
+                if (interval.getEndTime().isAfter(adjustedStart) &&
+                       interval.getStartTime().isBefore(adjustedEnd) &&
+                        !interval.getStartTime().equals(adjustedEnd) &&
+                        !interval.getEndTime().equals(adjustedStart)){ // Ensure no exact overlap at the boundary
+
+                    // Update the interval to the common overlapping period
+                    interval.setStartTime(interval.getStartTime().isAfter(adjustedStart) ? interval.getStartTime() : adjustedStart);
+                    interval.setEndTime(interval.getEndTime().isBefore(adjustedEnd) ? interval.getEndTime() : adjustedEnd);
+//                    System.out.println("Updated Interval - Start Time: " + interval.getStartTime() + " End Time: " + interval.getEndTime());
+
+                    // Add the employee ID to this interval
                     interval.getEmployeeIds().add(emp.getEmpId());
-                    found = true;
+                    foundOverlap = true;
+                    break;
                 }
             }
 
-            // If no overlapping interval was found, add a new interval
-            if (!found) {
+            // If no overlapping interval was found, create a new interval
+            if (!foundOverlap) {
                 List<String> empList = new ArrayList<>();
                 empList.add(emp.getEmpId());
-                intervals.add(new Interval(startUtc, endUtc, empList));
+                intervals.add(new Interval(adjustedStart, adjustedEnd, empList));
             }
         }
 
         return intervals;
     }
 
-
-
 }
+
+
+
+
