@@ -4,6 +4,7 @@ import com.Connectify.messageingService.Entity.Message;
 import com.Connectify.messageingService.dao.MessageRepository;
 import com.Connectify.messageingService.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +28,15 @@ public class MessageController {
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/unread/{receiverId}")
-    public ResponseEntity<List<Message>> getUnreadMessages(@PathVariable String receiverId) {
-        List<Message> unreadMessages = messageService.getUnreadMessages(receiverId);
-        return ResponseEntity.ok(unreadMessages);
+    @GetMapping("/unread/{senderId}")
+    public ResponseEntity<List<Message>> getUnreadMessages(@PathVariable String senderId) {
+        System.out.println(senderId);
+        List<Message> unreadMessages = messageService.getUnreadMessages(senderId);
+        return new ResponseEntity<>(unreadMessages, HttpStatus.OK);
     }
+//
+//    @GetMapping("{reciverId}/{senderId}")
+//    public ResponseEntity
 
     @PutMapping("/mark-as-read")
     public ResponseEntity<Void> markMessagesAsRead(@RequestBody List<String> messageIds) {

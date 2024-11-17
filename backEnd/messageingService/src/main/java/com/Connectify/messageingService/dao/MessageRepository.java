@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
     List<Message> findByReceiverIdAndIsReadFalse(String receiverId);
+
+    List<Message> findBysenderIdAndIsReadFalse(String senderId);
 }

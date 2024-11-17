@@ -43,6 +43,8 @@ function Welcome() {
         .then((data) => {
           if (data) {
             setUserData(data.employee);
+            sessionStorage.setItem("userId", data.employee.empId);
+            console.log(data.employee);
             if (!data.employee.profileStatus) {
               setFormData({
                 empId: data.employee.empId || "",
@@ -56,8 +58,6 @@ function Welcome() {
                 empEndTime: "",
               });
               setShowForm(true);
-
-              sessionStorage.setItem("userId", data.employee.empId);
             } else {
               sessionStorage.setItem(
                 "creatorTimezone",
