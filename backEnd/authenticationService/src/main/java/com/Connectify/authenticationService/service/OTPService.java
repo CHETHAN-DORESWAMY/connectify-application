@@ -20,7 +20,7 @@ public class OTPService {
     @Autowired
     private EmailClient emailClient;
 
-    public String generateAndSendOTP(String email) {
+    public String generateAndSendOTP(String email){
         String otp = OTPGenerator.generateOTP();
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(1); // OTP valid for 5 minutes
 
@@ -31,7 +31,7 @@ public class OTPService {
 
         // Send OTP to email
 
-            return emailClient.sendEmail(email, otp).getBody();
+        return emailClient.sendEmail(email, otp).getBody();
 
 
 
