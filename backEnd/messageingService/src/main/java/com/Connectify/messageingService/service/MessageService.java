@@ -21,8 +21,8 @@ public class MessageService {
 
     private final String QUEUE_NAME = "chatQueue";
 
-    public List<Message> getUnreadMessages(String receiverId) {
-        return messageRepository.findByReceiverIdAndIsReadFalse(receiverId);
+    public List<Message> getUnreadMessages(String senderId) {
+        return messageRepository.findBysenderIdAndIsReadFalse(senderId);
     }
 
     public Message sendMessage(String senderId, ZoneId zoneId, String receiverId, String content) {

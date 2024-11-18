@@ -33,6 +33,9 @@ public class EmployeeService {
         ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.now(), employeeDto.getEmpEndTime(), ZoneId.of(employeeDto.getEmpTimezone()) );
         employee.setEmpEndTime(endDateTime.toInstant());
 
+
+        employee.setProfileStatus(false);
+
         return employeeDao.save(employee);
     }
 
@@ -79,6 +82,13 @@ public class EmployeeService {
 
     public List<EmployeeEntity> getAllEmployeesByIds(List<String> ids) {
         return employeeDao.findByEmpIdIn(ids);
+    }
+
+    public void updateStatus(String empId) {
+        Optional<EmployeeEntity> employeeEntity = getEmployeeById(empId);
+        EmployeeEntity employee = employeeEntity.get();
+        employee.setProfileStatus(true);
+        employeeDao.save(employee);
     }
 }
 

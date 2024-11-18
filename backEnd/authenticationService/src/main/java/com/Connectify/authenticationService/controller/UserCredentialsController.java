@@ -7,6 +7,7 @@ import com.Connectify.authenticationService.service.OTPService;
 import com.Connectify.authenticationService.service.OTPValidationService;
 import com.Connectify.authenticationService.service.PasswordService;
 import com.Connectify.authenticationService.service.UserCredentialsService;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,11 +74,13 @@ public class UserCredentialsController {
         try {
 
             if (userCredService.userExists(user.getEmail()) || userCredService.userExistsById(user.getId())) {
-                response.put("message", "User already exists");
+                response.put("message", "User already exists go to sign in project");
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
+//
             if (!employeeClient.getEmployeeById(user.getId()).getStatusCode().equals(HttpStatus.OK)) {
+                System.out.println(user.getId());
                 response.put("message", "Employee ID does not exist");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -86,7 +89,12 @@ public class UserCredentialsController {
             response.put("data", user);
             response.put("message", "User registered successfully");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
+        }
+        catch(FeignException.NotFound e){
+            response.put("message", "Employee Id doesn't exists");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        catch (Exception e) {
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

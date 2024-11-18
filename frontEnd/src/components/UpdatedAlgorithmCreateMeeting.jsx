@@ -18,6 +18,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
   const [showTimeFields, setShowTimeFields] = useState(false);
   const [meetingId, setMeetingId] = useState("");
   const [participantSchedules, setParticipantSchedules] = useState([]);
+  const [hoveredTime, setHoveredTime] = useState(null);
 
   const API_END_POINT = "http://localhost:8222/api/employees";
   const MEETING_API_END_POINT = "http://localhost:8222/api/meetings/add";
@@ -170,6 +171,10 @@ const UpdatedAlgorithmCreateMeeting = () => {
         );
         setParticipantSchedules(schedules);
         console.log(participantSchedules);
+        // Print participant working hours to console
+        schedules.forEach(participant => {
+          console.log(`${participant.empName}'s working hours:`, participant.workingHours);
+        });
       } else {
         console.error("Failed to find overlap");
       }
@@ -234,7 +239,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
     }
   };
 
-  const renderTimeBoxes = (workingHours) => {
+  const renderTimeBoxes = (workingHours, participantTimezone) => {
     const boxes = [];
     const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
     const previousDay = selectedDate.minus({ days: 1 });
@@ -245,7 +250,8 @@ const UpdatedAlgorithmCreateMeeting = () => {
     for (let day = 0; day < 3; day++) {
       const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
       for (let hour = 0; hour < 24; hour++) {
-        const currentTime = currentDate.set({ hour });
+        const currentTime = currentDate.set({ hour })
+      
         const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
   
         const startTime = DateTime.fromFormat(workingHours.startTime.split(' ')[0], "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
@@ -262,14 +268,21 @@ const UpdatedAlgorithmCreateMeeting = () => {
           workingHoursFound = true;
         }
   
+        const isHovered = hoveredTime && hoveredTime.hasSame(currentTime, 'hour');
+        const participantTime = currentTime.setZone(participantTimezone);
+  
         boxes.push(
           <div
             key={`${day}-${hour}`}
-            className={`w-4 h-4 border border-sky-300 ${
-              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2) ? "bg-sky-500" : "bg-sky-100"
-            }`}
+            className={`w-12 h-12 border border-sky-300 flex items-center justify-center transition-all duration-300 ${
+              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2) ? "bg-sky-500 text-white" : "bg-sky-100 text-sky-800"
+            } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
             title={`${currentTimeUTC} ${creatorTimezone}`}
-          ></div>
+            onMouseEnter={() => setHoveredTime(currentTime)}
+            onMouseLeave={() => setHoveredTime(null)}
+          >
+            <span className="text-[8px]">{currentTime.toFormat('HH:mm')}</span>
+          </div>
         );
       }
     }
@@ -288,12 +301,12 @@ const UpdatedAlgorithmCreateMeeting = () => {
       for (let hour = 0; hour < 24; hour++) {
         if (hour % 3 === 0) {
           labels.push(
-            <div key={`label-${day}-${hour}`} className="w-4 text-xs text-center">
-              {hour === 0 ? currentDate.toFormat('MMM dd') : `${hour}`}
+            <div key={`label-${day}-${hour}`} className="w-12 text-xs text-center">
+              {hour === 0 ? currentDate.toFormat('MMM dd') : `${hour.toString().padStart(2, '0')}:00`}
             </div>
           );
         } else {
-          labels.push(<div key={`label-${day}-${hour}`} className="w-4"></div>);
+          labels.push(<div key={`label-${day}-${hour}`} className="w-12"></div>);
         }
       }
     }
@@ -405,7 +418,8 @@ const UpdatedAlgorithmCreateMeeting = () => {
                             <p className="text-xxs text-sky-600">{participant.empTimezone}</p>
                           </div>
                           <div className="flex">
-                            {renderTimeBoxes(participant.workingHours)}
+                            
+                            {renderTimeBoxes(participant.workingHours, participant.empTimezone)}
                           </div>
                         </React.Fragment>
                       ))}
@@ -421,6 +435,14 @@ const UpdatedAlgorithmCreateMeeting = () => {
                     <p>Available Time Slot {index + 1}:</p>
                     <p className="text-xs">Start: {result.startTime}</p>
                     <p className="text-xs">End: {result.endTime}</p>
+                    <p className="text-xs mt-1">Available Participants:</p>
+                    <ul className="text-xs list-disc list-inside ml-2">
+                      {result.availableParticipants?.map((participant, pIndex) => (
+                        <li key={pIndex}>{participant}</li>
+                      )) || selectedParticipantsName.map((participant, pIndex) => (
+                        <li key={pIndex}>{participant.empName}</li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
