@@ -66,9 +66,16 @@ const UpdatedAlgorithmCreateMeeting = () => {
   }, [API_END_POINT, token, creatorEmail]);
 
   const convertToLocalTime = (utcTime, fromTimezone, toTimezone) => {
-    return DateTime.fromISO(utcTime, { zone: fromTimezone })
-      .setZone(toTimezone)
-      .toLocaleString(DateTime.TIME_24_SIMPLE);
+    const originalTime = DateTime.fromISO(utcTime, { zone: fromTimezone });
+    const convertedTime = originalTime.setZone(toTimezone);
+    
+    console.log(`Original time: ${originalTime.toFormat('HH:mm')} ${fromTimezone}`);
+    console.log(`Converted time: ${convertedTime.toFormat('HH:mm')} ${toTimezone}`);
+    
+    const formattedTime = convertedTime.toFormat('HH:mm');
+    const nextDay = convertedTime.day !== originalTime.day;
+    
+    return { time: formattedTime, nextDay };
   };
 
   const filteredParticipants = searchQuery
@@ -122,15 +129,20 @@ const UpdatedAlgorithmCreateMeeting = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        const localTimeResult = result.map((item) => ({
-          ...item,
-          startTime: item.startTime
+        const localTimeResult = result.map((item) => {
+          const startTimeConverted = item.startTime
             ? convertToLocalTime(item.startTime, "utc", creatorTimezone)
-            : "No window found",
-          endTime: item.endTime
+            : { time: "No window found", nextDay: false };
+          const endTimeConverted = item.endTime
             ? convertToLocalTime(item.endTime, "utc", creatorTimezone)
-            : "No window found",
-        }));
+            : { time: "No window found", nextDay: false };
+
+          return {
+            ...item,
+            startTime: startTimeConverted.time + (startTimeConverted.nextDay ? " (next day)" : ""),
+            endTime: endTimeConverted.time + (endTimeConverted.nextDay ? " (next day)" : ""),
+          };
+        });
         setOverlapResult(localTimeResult);
         setShowTimeFields(true);
 
@@ -145,11 +157,13 @@ const UpdatedAlgorithmCreateMeeting = () => {
               },
             });
             const workingHours = await workingHoursResponse.json();
+            const startTimeConverted = convertToLocalTime(participant.empStartTime, "utc", creatorTimezone);
+            const endTimeConverted = convertToLocalTime(participant.empEndTime, "utc", creatorTimezone);
             return {
               ...participant,
               workingHours: {
-                startTime: convertToLocalTime(participant.empStartTime, "utc", creatorTimezone),
-                endTime: convertToLocalTime(participant.empEndTime, "utc", creatorTimezone),
+                startTime: startTimeConverted.time + (startTimeConverted.nextDay ? " (next day)" : ""),
+                endTime: endTimeConverted.time + (endTimeConverted.nextDay ? " (next day)" : ""),
               },
             };
           })
@@ -222,7 +236,6 @@ const UpdatedAlgorithmCreateMeeting = () => {
 
   const renderTimeBoxes = (workingHours) => {
     const boxes = [];
-    const timezoneOffset = DateTime.local().setZone(creatorTimezone).offset;
     const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
     const previousDay = selectedDate.minus({ days: 1 });
     const nextDay = selectedDate.plus({ days: 1 });
@@ -235,14 +248,15 @@ const UpdatedAlgorithmCreateMeeting = () => {
         const currentTime = currentDate.set({ hour });
         const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
   
-        const startTime = DateTime.fromFormat(workingHours.startTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
-        let endTime = DateTime.fromFormat(workingHours.endTime, "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        const startTime = DateTime.fromFormat(workingHours.startTime.split(' ')[0], "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        let endTime = DateTime.fromFormat(workingHours.endTime.split(' ')[0], "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
         
-        if (endTime < startTime) {
+        if (endTime < startTime || workingHours.endTime.includes("(next day)")) {
           endTime = endTime.plus({ days: 1 });
         }
   
-        const isWorkingHour = currentTime >= startTime && currentTime < endTime;
+        const isWorkingHour = (currentTime >= startTime && currentTime < endTime) ||
+                              (currentTime.plus({ days: 1 }) >= startTime && currentTime.plus({ days: 1 }) < endTime);
 
         if (isWorkingHour && day === 1) {
           workingHoursFound = true;
@@ -251,8 +265,8 @@ const UpdatedAlgorithmCreateMeeting = () => {
         boxes.push(
           <div
             key={`${day}-${hour}`}
-            className={`w-6 h-6 border border-gray-300 ${
-              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2 && !workingHoursFound) ? "bg-green-500" : "bg-gray-100"
+            className={`w-4 h-4 border border-sky-300 ${
+              (isWorkingHour && day === 0) || (isWorkingHour && day === 1) || (isWorkingHour && day === 2) ? "bg-sky-500" : "bg-sky-100"
             }`}
             title={`${currentTimeUTC} ${creatorTimezone}`}
           ></div>
@@ -274,12 +288,12 @@ const UpdatedAlgorithmCreateMeeting = () => {
       for (let hour = 0; hour < 24; hour++) {
         if (hour % 3 === 0) {
           labels.push(
-            <div key={`label-${day}-${hour}`} className="w-6 text-xs text-center">
+            <div key={`label-${day}-${hour}`} className="w-4 text-xs text-center">
               {hour === 0 ? currentDate.toFormat('MMM dd') : `${hour}`}
             </div>
           );
         } else {
-          labels.push(<div key={`label-${day}-${hour}`} className="w-6"></div>);
+          labels.push(<div key={`label-${day}-${hour}`} className="w-4"></div>);
         }
       }
     }
@@ -287,82 +301,70 @@ const UpdatedAlgorithmCreateMeeting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-r from-sky-100 to-sky-200">
       <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
-      <div className="container mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-4">Create Meeting</h2>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Meeting Name:
-              </label>
+      <div className="container mx-auto p-4">
+        <h2 className="text-2xl font-bold mb-4 text-center text-sky-800">Create Meeting</h2>
+        <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-sky-800 mb-1">Meeting Name</label>
               <input
                 type="text"
                 value={meetingName}
                 onChange={(e) => setMeetingName(e.target.value)}
                 required
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Description:
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-sky-800 mb-1">Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Duration (in hours):
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-sky-800 mb-1">Duration (hours)</label>
               <input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 required
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Meeting Date:
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-sky-800 mb-1">Meeting Date</label>
               <input
                 type="date"
                 value={meetingDate}
                 onChange={(e) => setMeetingDate(e.target.value)}
                 required
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
-            <div className="mb-4 relative">
-              <label className="block text-gray-700 font-medium mb-2">
-                Select Participants:
-              </label>
+            <div className="relative">
+              <label className="block text-sm font-medium text-sky-800 mb-1">Select Participants</label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleSearchFocus}
                 placeholder="Search participants"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
               {dropdownVisible && (
-                <div className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 bg-white border border-sky-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
                   {filteredParticipants.length === 0 ? (
-                    <div className="p-2 text-gray-500">
-                      No participants found
-                    </div>
+                    <div className="p-2 text-sm text-sky-500">No participants found</div>
                   ) : (
                     filteredParticipants.map((participant) => (
                       <div
                         key={participant.empId}
                         onClick={() => handleSelectParticipant(participant)}
-                        className="p-2 hover:bg-sky-100 cursor-pointer"
+                        className="p-2 hover:bg-sky-50 cursor-pointer text-sm"
                       >
                         {participant.empName} - {participant.empId}
                       </div>
@@ -371,18 +373,16 @@ const UpdatedAlgorithmCreateMeeting = () => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap mt-2">
+            <div className="flex flex-wrap gap-2">
               {selectedParticipantsName.map((participant) => (
                 <div
                   key={participant.empId}
-                  className="bg-sky-200 text-sky-800 px-3 py-1 m-1 rounded-full flex items-center"
+                  className="bg-sky-100 text-sky-800 px-2 py-1 rounded-full text-xs flex items-center"
                 >
-                  {console.log(participant.empStartTime)}
-                  {console.log(participant.empEndTime)}
-                  <span className="mr-2">{participant.empName}</span>
+                  <span className="mr-1">{participant.empName}</span>
                   <button
                     onClick={() => handleRemoveParticipant(participant)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-sky-500 hover:text-sky-700"
                   >
                     &times;
                   </button>
@@ -391,19 +391,18 @@ const UpdatedAlgorithmCreateMeeting = () => {
             </div>
             {participantSchedules.length > 0 && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Participant Schedules</h3>
-                <p className="text-sm text-gray-600 mb-2">Date: {meetingDate}</p>
+                <h3 className="text-sm font-semibold mb-2 text-sky-800">Participant Schedules</h3>
+                <p className="text-xs text-sky-600 mb-2">Date: {meetingDate}</p>
                 <div className="overflow-x-auto">
                   <div className="inline-block min-w-full">
-                    <div className="grid grid-cols-[auto_1fr] gap-4">
+                    <div className="grid grid-cols-[auto_1fr] gap-2">
                       <div></div>
                       <div className="flex">{renderTimeLabels()}</div>
                       {participantSchedules.map((participant, index) => (
                         <React.Fragment key={index}>
                           <div className="flex flex-col justify-center">
-                            <p className="font-medium">{participant.empName}</p>
-                            <p className="text-sm text-gray-600">{participant.empTimezone}</p>
-                            {console.log(participant.empStartTime)}
+                            <p className="font-medium text-xs text-sky-800">{participant.empName}</p>
+                            <p className="text-xxs text-sky-600">{participant.empTimezone}</p>
                           </div>
                           <div className="flex">
                             {renderTimeBoxes(participant.workingHours)}
@@ -416,57 +415,48 @@ const UpdatedAlgorithmCreateMeeting = () => {
               </div>
             )}
             {overlapResult.length > 0 && (
-              <div className="mt-4 text-green-500 font-semibold">
+              <div className="mt-4 text-sky-600 font-semibold text-sm">
                 {overlapResult.map((result, index) => (
-                  <div key={index}>
-                    <ul>
-                      List:{" "}
-                      {result.employeeIds.map((ids, index) => (
-                        <li key={ids}>{ids}</li>
-                      ))}
-                    </ul>
-                    <p>Meeting Start Time: {result.startTime}</p>
-                    <p>Meeting End Time: {result.endTime}</p>
+                  <div key={index} className="mb-2">
+                    <p>Available Time Slot {index + 1}:</p>
+                    <p className="text-xs">Start: {result.startTime}</p>
+                    <p className="text-xs">End: {result.endTime}</p>
                   </div>
                 ))}
               </div>
             )}
             <button
               type="submit"
-              className="mt-4 bg-sky-800 text-white px-4 py-2 rounded hover:bg-sky-900 transition duration-200"
+              className="w-full bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition duration-300"
             >
               Find Overlapping Interval
             </button>
             {showTimeFields && (
               <>
-                <div className="mt-4">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Meeting Start Time:
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-sky-800 mb-1">Meeting Start Time</label>
                   <input
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                     required
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
-                <div className="mt-4">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Meeting End Time:
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium text-sky-800 mb-1">Meeting End Time</label>
                   <input
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
                     required
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={handleScheduleMeeting}
-                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-200"
+                  className="w-full bg-sky-800 text-white px-4 py-2 rounded-md hover:bg-sky-900 transition duration-300"
                 >
                   Schedule Meeting
                 </button>
