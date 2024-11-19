@@ -405,10 +405,12 @@ const CreateMeeting = () => {
     }
 
     // Get UTC offset in hours for participant time zone
-    const offset = new Date().getTimezoneOffset() / 60; // Offset in hours
+    const offset = getUTCDifference(participantTimezone);
     const getAdjustedDate = (date, hourOffset) => {
       const adjustedDate = new Date(date);
+
       adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
+
       return adjustedDate;
     };
 
@@ -421,8 +423,11 @@ const CreateMeeting = () => {
 
       for (let hour = 0; hour < 24; hour++) {
         // Adjust time for the participant's time zone
-        const currentTime = getAdjustedDate(currentDate, hour - offset);
-        console.log(currentTime.getHours());
+        console.log(offset);
+        const currentTime = getAdjustedDate(currentDate, offset);
+        const currentTimeDisplay = getAdjustedDate(currentDate, hour + offset);
+
+        console.log(currentTime.getHours(), currentTime.getDate());
         console.log(startTime);
 
         const isWorkingHour =
@@ -446,11 +451,11 @@ const CreateMeeting = () => {
                 ? "bg-sky-500 text-white"
                 : "bg-sky-100 text-sky-800"
             } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
-            onMouseEnter={() => setHoveredTime(currentTime)}
+            onMouseEnter={() => setHoveredTime(currentTimeDisplay)}
             onMouseLeave={() => setHoveredTime(null)}
           >
             <span className="text-[8px]">
-              {currentTime.toLocaleTimeString([], {
+              {currentTimeDisplay.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
