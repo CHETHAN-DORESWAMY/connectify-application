@@ -1,6 +1,7 @@
 package com.Connectify.emailService.client;
 
 
+import java.time.Instant;
 import java.time.LocalTime;
 
 
@@ -14,13 +15,22 @@ public class EmployeeEntity {
     String empPhone;
     String empCity;
     String empTimezone;
-    LocalTime empStartTime;
-    LocalTime empEndTime;
+    Instant empStartTime;
+    Instant empEndTime;
+    Boolean profileStatus;
+
+    public Boolean getProfileStatus() {
+        return profileStatus;
+    }
+
+    public void setProfileStatus(Boolean profileStatus) {
+        this.profileStatus = profileStatus;
+    }
 
     public EmployeeEntity() {
     }
 
-    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, LocalTime empStartTime, LocalTime empEndTime) {
+    public EmployeeEntity(String empId, String empName, String empDesignation, String empEmail, String empPhone, String empCity, String empTimezone, Instant empStartTime, Instant empEndTime, Boolean profileStatus) {
         this.empId = empId;
         this.empName = empName;
         this.empDesignation = empDesignation;
@@ -30,6 +40,7 @@ public class EmployeeEntity {
         this.empTimezone = empTimezone;
         this.empStartTime = empStartTime;
         this.empEndTime = empEndTime;
+        this.profileStatus = profileStatus;
     }
 
     public String getEmpId() {
@@ -88,19 +99,19 @@ public class EmployeeEntity {
         this.empTimezone = empTimezone;
     }
 
-    public LocalTime getEmpStartTime() {
+    public Instant getEmpStartTime() {
         return empStartTime;
     }
 
-    public void setEmpStartTime(LocalTime empStartTime) {
+    public void setEmpStartTime(Instant empStartTime) {
         this.empStartTime = empStartTime;
     }
 
-    public LocalTime getEmpEndTime() {
+    public Instant getEmpEndTime() {
         return empEndTime;
     }
 
-    public void setEmpEndTime(LocalTime empEndTime) {
+    public void setEmpEndTime(Instant empEndTime) {
         this.empEndTime = empEndTime;
     }
 }

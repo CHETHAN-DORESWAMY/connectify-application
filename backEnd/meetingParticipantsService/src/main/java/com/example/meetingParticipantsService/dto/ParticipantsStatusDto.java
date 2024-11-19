@@ -3,9 +3,9 @@ package com.example.meetingParticipantsService.dto;
 public class ParticipantsStatusDto {
 
     String empId;
-    String status;
+    Boolean status;
 
-    public ParticipantsStatusDto(String empId, String status) {
+    public ParticipantsStatusDto(String empId, Boolean status) {
         this.empId = empId;
         this.status = status;
     }
@@ -18,11 +18,11 @@ public class ParticipantsStatusDto {
         this.empId = empId;
     }
 
-    public String getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 }

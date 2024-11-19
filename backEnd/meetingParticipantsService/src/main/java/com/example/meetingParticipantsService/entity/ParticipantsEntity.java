@@ -9,19 +9,19 @@ public class ParticipantsEntity {
     String participantId;
     String meetId;
     String empId;
-    String status;
+    Boolean status;
 
     public ParticipantsEntity() {
     }
 
-    public ParticipantsEntity(String participantId, String meetId, String empId, String status) {
+    public ParticipantsEntity(String participantId, String meetId, String empId, Boolean status) {
         this.participantId = participantId;
         this.meetId = meetId;
         this.empId = empId;
         this.status = status;
     }
 
-    public ParticipantsEntity(String empId, String meetId,  String status) {
+    public ParticipantsEntity(String empId, String meetId,  Boolean status) {
 
         this.meetId = meetId;
         this.empId = empId;
@@ -52,11 +52,11 @@ public class ParticipantsEntity {
         this.empId = empId;
     }
 
-    public String getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 }

@@ -44,9 +44,11 @@ public class EmailServiceImpl implements EmailService {
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
                 helper.setFrom("rdchethan22@gmail.com");
+
                 helper.setTo(participant.getEmpEmail());
                 helper.setSubject(meetingDto.getMeetName());
-                helper.setText(meetingDto.toString());
+//                helper.setText(meetingDto.toString());
+                helper.setText("This is the meeting link of the meeting" + meetingDto.getMeetName() + " " + "scheduled on" + meetingDto.getMeetDate());
                 mailSender.send(message);
             } catch (MessagingException e) {
                 throw new RuntimeException(e);

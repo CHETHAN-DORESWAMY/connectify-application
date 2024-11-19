@@ -86,23 +86,28 @@ function Welcome() {
 
     try {
       console.log(sessionStorage.getItem("userId"));
+      console.log(formData.empTimezone, formData.empStartTime);
       const response = await fetch(
-        `http://localhost:8222/api/employees/update-status/${sessionStorage.getItem(
-          "userId"
-        )}`,
+        `http://localhost:8222/api/employees/update-status`,
         {
-          method: "GET",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            empId: formData.empId,
+            empTimezone: formData.empTimezone,
+            empStartTime: formData.empStartTime,
+            empEndTime: formData.empEndTime,
+          }),
         }
       );
 
       if (response.ok) {
         // const result = await response.json();
         // setUserData(result.employee);
-        sessionStorage.setItem("creatorTimezone", empTimezone);
+        sessionStorage.setItem("creatorTimezone", formData.empTimezone);
         setShowForm(false);
         navigate("/dashboard");
       } else {
