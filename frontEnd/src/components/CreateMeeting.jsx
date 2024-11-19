@@ -398,14 +398,17 @@ const CreateMeeting = () => {
     };
 
     const startTime = parseTime(workingHours.startTime, selectedDate);
-    let endTime = parseTime(workingHours.endTime, selectedDate);
+    let endTime = parseTime(workingHours.endTime.slice(0, 5), selectedDate);
+    console.log(endTime, "end Time before converting");
 
     if (endTime <= startTime || workingHours.endTime.includes("(next day)")) {
       endTime.setDate(endTime.getDate() + 1); // Handle next day scenarios
     }
 
     // Get UTC offset in hours for participant time zone
-    const offset = new Date().getTimezoneOffset() / 60; // Offset in hours
+    // const offset = new Date().getTimezoneOffset() / 60;
+    const offset = getUTCDifference(participantTimezone);
+    console.log(offset, "offset"); // Offset in hours
     const getAdjustedDate = (date, hourOffset) => {
       const adjustedDate = new Date(date);
       adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
@@ -423,7 +426,10 @@ const CreateMeeting = () => {
         // Adjust time for the participant's time zone
         const currentTime = getAdjustedDate(currentDate, hour - offset);
         console.log(currentTime.getHours());
-        console.log(startTime);
+        console.log("start time", startTime.getHours());
+
+        console.log( currentTime.getHours());
+        console.log("end time", endTime.getHours());
 
         const isWorkingHour =
           currentTime.getHours() >= startTime.getHours() &&
