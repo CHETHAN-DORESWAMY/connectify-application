@@ -11,6 +11,7 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchMeetings = async () => {
+      console.log(selectedDate);
       try {
         const response = await fetch(
           selectedDate
@@ -19,7 +20,7 @@ function Dashboard() {
           {
             method: "GET",
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -47,7 +48,10 @@ function Dashboard() {
       <div className="container mx-auto px-4 mt-8">
         <div className="flex items-center mb-4">
           <div className="flex-1">
-            <label htmlFor="date-select" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="date-select"
+              className="block text-sm font-medium text-gray-700"
+            >
               Select Date:
             </label>
             <div className="flex items-center mt-1">
@@ -67,6 +71,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
+        {console.log(meetings)}
         <MeetingList meet={meetings} selectDate={selectedDate} />
       </div>
     </div>

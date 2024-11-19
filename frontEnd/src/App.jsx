@@ -17,6 +17,9 @@ import ResetPassword from "./components/ResetPassword";
 import Calendar from "./components/Calendar";
 
 import ChatApp from "./components/ChatComponent";
+import CreateMeeting from "./components/CreateMeeting";
+
+
 function App() {
   return (
     <Router>
@@ -31,11 +34,12 @@ function App() {
             path="/create-meeting"
             element={<UpdatedAlgorithmCreateMeeting />}
           />
+
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/chat" element={<ChatApp />} />
+          <Route path="/example-meeting" element={<CreateMeeting />} />
         </Routes>
       </div>
     </Router>

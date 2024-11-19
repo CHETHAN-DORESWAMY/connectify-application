@@ -27,7 +27,7 @@ public class ParticipantsService {
     public void createParticipant(ParticipantsDto participants) {
         int n = participants.getParticipantsIds().size();
         for(int i = 0; i < n; i++){
-            ParticipantsEntity participantsEntity = new ParticipantsEntity(participants.getParticipantsIds().get(i), participants.getMeetingId(),"pending");
+            ParticipantsEntity participantsEntity = new ParticipantsEntity(participants.getParticipantsIds().get(i), participants.getMeetingId(),false);
             participantsRepository.save(participantsEntity);
         }
     }
@@ -40,7 +40,7 @@ public class ParticipantsService {
         List<String> meetingIds = participantsRepository.findByEmpId(empId).stream()
                 .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
         // Fetch meetings for the specific date and meeting IDs using Feign client
-//        System.out.println(meetingIds.get(0));
+        meetingIds.forEach(meetId -> System.out.println(meetId));
         return meetingClient.getMeetingsByDateAndIds(new MeetingDateDto(date, meetingIds)).getBody();
     }
     // Get all participants
@@ -84,19 +84,15 @@ public class ParticipantsService {
         return participantsStatusDtoList;
     }
 
-    public ParticipantsEntity updateParticipantStatus(String empId, String meetId, Boolean status) {
+    public ParticipantsEntity updateParticipantStatus(String empId, String meetId) {
         ParticipantsEntity participantsEntity = participantsRepository.findByEmpIdAndMeetId(empId, meetId);
-        if(status){
-            participantsEntity.setStatus("confirmed");
-        }
-        else {
-            participantsEntity.setStatus("pending");
-        }
+        participantsEntity.setStatus(!participantsEntity.getStatus());
         System.out.println(participantsEntity.getStatus());
         return participantsRepository.save(participantsEntity);
     }
 
     public List<Meeting> getMeetingsForParticipant(String participantId) {
+        System.out.println(participantId);
         List<String> meetingIds = participantsRepository.findByEmpId(participantId).stream()
                 .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
 

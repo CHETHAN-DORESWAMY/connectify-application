@@ -31,7 +31,7 @@ public class EmailController {
     @PostMapping("/send-meeting-mail")
     public ResponseEntity<String> sendMeetingMail(@RequestBody MeetingDto meetingDto){
         try{
-//            System.out.println(meetingDto.);
+              System.out.println(meetingDto.getMeetName());
             emailService.sendEmail(meetingDto);
 
         } catch (MessagingException e) {

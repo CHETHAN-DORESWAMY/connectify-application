@@ -12,6 +12,8 @@ function ResetPassword() {
   const [timer, setTimer] = useState(300); // 5 minutes in seconds
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [serverMessage, setServerMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   //   const API_END_URL = process.env.REACT_APP_API_END_URL;
   const API_END_URL = "http://localhost:8222/api/auth";
@@ -38,29 +40,38 @@ function ResetPassword() {
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setServerMessage("");
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await fetch(`${API_END_URL}/send-otp?email=${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
 
+      const data = await response.json();
       if (response.ok) {
         setShowOtpField(true);
         setTimer(300);
         setIsTimerRunning(true);
+        setServerMessage(data.message);
         setErrorMessage("");
       } else {
-        const error = await response.json();
-        setErrorMessage(error.message);
+        setErrorMessage(data.message);
       }
     } catch (error) {
       setErrorMessage("Failed to send OTP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setServerMessage("");
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await fetch(
         `${API_END_URL}/validate-otp?email=${email}&otp=${otp}`,
         {
@@ -69,17 +80,20 @@ function ResetPassword() {
         }
       );
 
+      const data = await response.json();
       if (response.ok) {
         setShowOtpField(false);
         setShowPasswordFields(true);
         setIsTimerRunning(false);
+        setServerMessage(data);
         setErrorMessage("");
       } else {
-        const error = await response.json();
-        setErrorMessage(error.message);
+        setErrorMessage(data);
       }
     } catch (error) {
       setErrorMessage("Failed to verify OTP. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,7 +104,10 @@ function ResetPassword() {
       return;
     }
 
+    setIsSubmitting(true);
+    setServerMessage("");
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await fetch(
         `${API_END_URL}/reset-password?email=${email}&newPassword=${newPassword}`,
         {
@@ -99,14 +116,19 @@ function ResetPassword() {
         }
       );
 
+      const data = await response.json();
       if (response.ok) {
-        navigate("/signin");
+        setServerMessage(data);
+        setTimeout(() => {
+          navigate("/signin");
+        }, 2000);
       } else {
-        const error = await response.json();
-        setErrorMessage(error.message);
+        setErrorMessage(data);
       }
     } catch (error) {
       setErrorMessage("Failed to reset password. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -125,6 +147,12 @@ function ResetPassword() {
             </p>
           )}
 
+          {serverMessage && (
+            <p className="text-green-600 text-center p-2 mb-4 rounded-md bg-green-100">
+              {serverMessage}
+            </p>
+          )}
+
           {!showOtpField && !showPasswordFields && (
             <form onSubmit={handleEmailSubmit}>
               <div className="mb-4">
@@ -137,13 +165,26 @@ function ResetPassword() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-sky-800 text-white p-3 rounded-md hover:bg-sky-900 transition duration-300"
+                disabled={isSubmitting}
+                className={`w-full bg-sky-800 text-white p-3 rounded-md transition duration-300 ${
+                  isSubmitting
+                    ? "opacity-70 cursor-not-allowed blur-sm"
+                    : "hover:bg-sky-900"
+                }`}
               >
-                Send OTP
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Sending OTP...
+                  </div>
+                ) : (
+                  "Send OTP"
+                )}
               </button>
             </form>
           )}
@@ -160,6 +201,7 @@ function ResetPassword() {
                   onChange={(e) => setOtp(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
                   required
+                  disabled={isSubmitting}
                 />
                 <p className="text-sm text-gray-600 mt-2">
                   Time remaining: {formatTime(timer)}
@@ -167,9 +209,21 @@ function ResetPassword() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-sky-800 text-white p-3 rounded-md hover:bg-sky-900 transition duration-300"
+                disabled={isSubmitting}
+                className={`w-full bg-sky-800 text-white p-3 rounded-md transition duration-300 ${
+                  isSubmitting
+                    ? "opacity-70 cursor-not-allowed blur-sm"
+                    : "hover:bg-sky-900"
+                }`}
               >
-                Verify OTP
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Verifying OTP...
+                  </div>
+                ) : (
+                  "Verify OTP"
+                )}
               </button>
             </form>
           )}
@@ -186,6 +240,7 @@ function ResetPassword() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <div className="mb-4">
@@ -198,13 +253,26 @@ function ResetPassword() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-sky-800 text-white p-3 rounded-md hover:bg-sky-900 transition duration-300"
+                disabled={isSubmitting}
+                className={`w-full bg-sky-800 text-white p-3 rounded-md transition duration-300 ${
+                  isSubmitting
+                    ? "opacity-70 cursor-not-allowed blur-sm"
+                    : "hover:bg-sky-900"
+                }`}
               >
-                Reset Password
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Resetting Password...
+                  </div>
+                ) : (
+                  "Reset Password"
+                )}
               </button>
             </form>
           )}

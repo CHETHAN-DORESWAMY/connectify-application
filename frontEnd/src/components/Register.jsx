@@ -13,6 +13,7 @@ function Register() {
   });
   const [errors, setErrors] = useState({});
   const [serverMessage, setServerMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -37,7 +38,11 @@ function Register() {
     setServerMessage("");
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
+      setIsSubmitting(true);
       try {
+        // Add 2 second delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         const response = await fetch(API_END_POINT + "/register", {
           method: "POST",
           headers: {
@@ -52,11 +57,14 @@ function Register() {
           setServerMessage(userData.message);
           navigate("/signin");
         } else {
+          console.log(userData.message);
           setServerMessage(userData.message);
         }
       } catch (error) {
         console.error("Error during registration:", error);
-        setServerMessage("An error occurred. Please try again later.");
+        setServerMessage("Server is down. Please try again later.");
+      } finally {
+        setIsSubmitting(false);
       }
     } else {
       setErrors(validationErrors);
@@ -96,7 +104,8 @@ function Register() {
               name="id"
               value={formData.id}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
+              disabled={isSubmitting}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
             {errors.id && (
               <p className="text-red-600 text-xs mt-1">{errors.id}</p>
@@ -113,7 +122,8 @@ function Register() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
+              disabled={isSubmitting}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
             {errors.email && (
               <p className="text-red-600 text-xs mt-1">{errors.email}</p>
@@ -130,7 +140,8 @@ function Register() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800"
+              disabled={isSubmitting}
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
             {errors.password && (
               <p className="text-red-600 text-xs mt-1">{errors.password}</p>
@@ -140,9 +151,22 @@ function Register() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-sky-800 text-white py-2 rounded-md hover:bg-sky-900 transition duration-300"
+            disabled={isSubmitting}
+            className={`w-full bg-sky-800 text-white py-2 rounded-md transition duration-300 
+              ${
+                isSubmitting
+                  ? "opacity-70 cursor-not-allowed blur-sm"
+                  : "hover:bg-sky-900"
+              }`}
           >
-            Register
+            {isSubmitting ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                Registering...
+              </div>
+            ) : (
+              "Register"
+            )}
           </button>
 
           {/* Sign In Link */}

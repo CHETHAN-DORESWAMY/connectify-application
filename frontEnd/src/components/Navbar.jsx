@@ -100,6 +100,12 @@ function Navbar({ isLoggedIn, employeeName }) {
             >
               chat
             </Link>
+            <Link
+              to="/example-meeting"
+              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+            >
+              example-meeting
+            </Link>
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"

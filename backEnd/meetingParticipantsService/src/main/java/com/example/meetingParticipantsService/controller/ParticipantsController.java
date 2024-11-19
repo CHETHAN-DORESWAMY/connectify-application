@@ -72,6 +72,7 @@ public class ParticipantsController {
     @GetMapping("/{participantId}/meetings-of-id")
     public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(@PathVariable String participantId) {
 
+        System.out.println(participantId);
         Map<String, Object> response = new HashMap<>();
         List<Meeting> meetings = participantsService.getMeetingsForParticipant(participantId);
         if (meetings == null) {
@@ -91,9 +92,9 @@ public class ParticipantsController {
     }
 
 //    update the status of the meeting of particular person
-    @PutMapping("/update-status/{empId}/{meetId}/{status}")
-    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId, @PathVariable Boolean status){
-        return new ResponseEntity<>(participantsService.updateParticipantStatus(empId, meetId, status), HttpStatus.OK);
+    @PutMapping("/update-status/{empId}/{meetId}")
+    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.updateParticipantStatus(empId, meetId), HttpStatus.OK);
     }
 
 

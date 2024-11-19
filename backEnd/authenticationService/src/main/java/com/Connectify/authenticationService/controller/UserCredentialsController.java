@@ -44,7 +44,17 @@ public class UserCredentialsController {
 
     @GetMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestParam String email) {
-        return new ResponseEntity<>(otpService.generateAndSendOTP(email), HttpStatus.OK);
+
+        try{
+            String message = otpService.generateAndSendOTP(email);
+            System.out.println(message);
+            return new ResponseEntity<>(message, HttpStatus.OK);
+        }
+        catch(FeignException e){
+            return new ResponseEntity<>("problem in backend!! try again later", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
 
     }
 
@@ -94,8 +104,13 @@ public class UserCredentialsController {
             response.put("message", "Employee Id doesn't exists");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+        catch(FeignException e){
+            response.put("message", "Failed to fetch employee details, (may be backend is down");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
         catch (Exception e) {
             response.put("message", e.getMessage());
+//            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

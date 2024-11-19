@@ -1,9 +1,6 @@
 package com.example.employeeService.controller;
 
-import com.example.employeeService.dto.EmployeeDto;
-import com.example.employeeService.dto.EmployeeListDto;
-import com.example.employeeService.dto.Interval;
-import com.example.employeeService.dto.TimeClass;
+import com.example.employeeService.dto.*;
 import com.example.employeeService.entity.EmployeeEntity;
 import com.example.employeeService.entity.OverlapWindow;
 import com.example.employeeService.service.EmployeeService;
@@ -98,14 +95,7 @@ public class EmployeeController {
                 response.put("message", "Employee not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
               }
-//            EmployeeEntity employeeEntity = employee.get();
-//            response.put("employee", employee.get());
-//            if(employeeEntity.getProfileStatus()){
-//                return new ResponseEntity<>(response, HttpStatus.OK);
-//            }
-//            else{
-//                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-//            }
+
         } catch (Exception e) {
             response.put("message", "Error fetching employee");
             response.put("error", e.getMessage());
@@ -113,10 +103,10 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("/update-status/{empId}")
-    public ResponseEntity<Void> updateStatus(@PathVariable String empId){
-        System.out.println(empId);
-        employeeService.updateStatus(empId);
+    @PutMapping("/update-status")
+    public ResponseEntity<Void> updateStatus(@RequestBody UpdatedEmployeeDto updatedEmployeeDto){
+
+        employeeService.updateStatus(updatedEmployeeDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

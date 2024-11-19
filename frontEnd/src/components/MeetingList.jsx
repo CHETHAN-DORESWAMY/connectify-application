@@ -21,13 +21,16 @@ function MeetingList({ meet, selectDate }) {
     const fetchEmployeeTimezone = async () => {
       try {
         const email = sessionStorage.getItem("email");
-        const response = await fetch(`http://localhost:8222/api/employees/get-by-email/${email}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `http://localhost:8222/api/employees/get-by-email/${email}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
         setEmployeeTimezone(data.employee.empTimezone);
       } catch (error) {
@@ -74,16 +77,21 @@ function MeetingList({ meet, selectDate }) {
 
   const handleDeleteMeeting = async (meetingId) => {
     try {
-      const response = await fetch(`http://localhost:8222/api/meetings/delete/${meetingId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8222/api/meetings/delete/${meetingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.ok) {
         // Remove the deleted meeting from the list
-        const updatedMeetings = meetings.filter((meeting) => meeting.meetId !== meetingId);
+        const updatedMeetings = meetings.filter(
+          (meeting) => meeting.meetId !== meetingId
+        );
         setMeetings(updatedMeetings);
         console.log("Meeting deleted successfully");
       } else {
@@ -96,9 +104,9 @@ function MeetingList({ meet, selectDate }) {
 
   const handleConfirmMeeting = async (meetingId) => {
     try {
-      const status = "confirmed";
+      // const status = "confirmed";
       const response = await fetch(
-        `http://localhost:8222/api/participants/update-status/${userId}/${meetingId}/${status}`,
+        `http://localhost:8222/api/participants/update-status/${userId}/${meetingId}`,
         {
           method: "PUT",
           headers: {
@@ -129,7 +137,9 @@ function MeetingList({ meet, selectDate }) {
         <div className="flex items-center space-x-4">
           <h3 className="text-2xl font-semibold text-gray-800">
             {selectedDate
-              ? `Meetings for ${DateTime.fromISO(selectedDate).toLocaleString(DateTime.DATE_FULL)}`
+              ? `Meetings for ${DateTime.fromISO(selectedDate).toLocaleString(
+                  DateTime.DATE_FULL
+                )}`
               : viewMode === "scheduled"
               ? "Scheduled Meetings"
               : "Meetings to Attend"}
@@ -146,7 +156,9 @@ function MeetingList({ meet, selectDate }) {
         <div className="flex space-x-4">
           <button
             className={`px-4 py-2 rounded ${
-              viewMode === "scheduled" ? "bg-sky-800 text-white" : "bg-gray-200 text-gray-700"
+              viewMode === "scheduled"
+                ? "bg-sky-800 text-white"
+                : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setViewMode("scheduled")}
           >
@@ -154,7 +166,9 @@ function MeetingList({ meet, selectDate }) {
           </button>
           <button
             className={`px-4 py-2 rounded ${
-              viewMode === "toAttend" ? "bg-sky-800 text-white" : "bg-gray-200 text-gray-700"
+              viewMode === "toAttend"
+                ? "bg-sky-800 text-white"
+                : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setViewMode("toAttend")}
           >
@@ -185,8 +199,12 @@ function MeetingList({ meet, selectDate }) {
                 <td className="py-3 px-4">{meeting.meetName}</td>
                 <td className="py-3 px-4">{meeting.meetDescription}</td>
                 <td className="py-3 px-4">{meeting.meetHostId}</td>
-                <td className="py-3 px-4">{convertToLocalTime(meeting.meetStartDateTime)}</td>
-                <td className="py-3 px-4">{convertToLocalTime(meeting.meetEndDateTime)}</td>
+                <td className="py-3 px-4">
+                  {convertToLocalTime(meeting.meetStartDateTime)}
+                </td>
+                <td className="py-3 px-4">
+                  {convertToLocalTime(meeting.meetEndDateTime)}
+                </td>
                 <td className="py-3 px-4">
                   {viewMode === "scheduled" ? (
                     <button
@@ -196,7 +214,9 @@ function MeetingList({ meet, selectDate }) {
                       Delete
                     </button>
                   ) : confirmedMeetings.includes(meeting.meetId) ? (
-                    <span className="text-green-500 font-semibold">Confirmed</span>
+                    <span className="text-green-500 font-semibold">
+                      Confirmed
+                    </span>
                   ) : (
                     <button
                       onClick={() => handleConfirmMeeting(meeting.meetId)}
@@ -211,7 +231,9 @@ function MeetingList({ meet, selectDate }) {
           </tbody>
         </table>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No meetings found for this selection.</p>
+        <p className="text-center text-gray-500 mt-4">
+          No meetings found for this selection.
+        </p>
       )}
     </div>
   );
