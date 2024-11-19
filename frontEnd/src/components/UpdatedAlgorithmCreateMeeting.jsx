@@ -278,33 +278,14 @@ const UpdatedAlgorithmCreateMeeting = () => {
       const currentDate =
         day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
       for (let hour = 0; hour < 24; hour++) {
-        const currentTime = currentDate.set({ hour });
-
-        const currentTimeUTC = currentTime
-          .toUTC()
-          .toLocaleString(DateTime.TIME_24_SIMPLE);
-
-        const startTime = DateTime.fromFormat(
-          workingHours.startTime.split(" ")[0],
-          "HH:mm"
-        ).set({
-          year: selectedDate.year,
-          month: selectedDate.month,
-          day: selectedDate.day,
-        });
-        let endTime = DateTime.fromFormat(
-          workingHours.endTime.split(" ")[0],
-          "HH:mm"
-        ).set({
-          year: selectedDate.year,
-          month: selectedDate.month,
-          day: selectedDate.day,
-        });
-
-        if (
-          endTime < startTime ||
-          workingHours.endTime.includes("(next day)")
-        ) {
+        const currentTime = currentDate.setZone(creatorTimezone).set({ hour })
+      
+        const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
+  
+        const startTime = DateTime.fromFormat(workingHours.startTime.split(' ')[0], "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        let endTime = DateTime.fromFormat(workingHours.endTime.split(' ')[0], "HH:mm").set({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+        
+        if (endTime < startTime || workingHours.endTime.includes("(next day)")) {
           endTime = endTime.plus({ days: 1 });
         }
 
