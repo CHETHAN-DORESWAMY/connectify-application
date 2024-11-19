@@ -291,85 +291,175 @@ const CreateMeeting = () => {
     return hours;
   }
 
+  // const renderTimeBoxes = (workingHours, participantTimezone) => {
+  //   const boxes = [];
+  //   // const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
+  //   const selectedDate =
+  //     DateTime.fromISO(meetingDate).setZone(participantTimezone);
+  //   console.log("the selected date is", selectedDate);
+
+  //   const previousDay = selectedDate.minus({ days: 1 });
+  //   const nextDay = selectedDate.plus({ days: 1 });
+  //   const offset = getUTCDifference(participantTimezone);
+  //   // console.log(workingHours, "offest", offset);
+
+  //   let workingHoursFound = false;
+
+  //   for (let day = 0; day < 3; day++) {
+  //     const currentDate =
+  //       day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
+  //     for (let hour = 0; hour < 24; hour++) {
+  //       // const currentTimeUTC = currentTime
+  //       //   .toUTC()
+  //       //   .toLocaleString(DateTime.TIME_24_SIMPLE);
+  //       // console.log(workingHours.startTime);
+
+  //       const startTime = DateTime.fromFormat(
+  //         workingHours.startTime.split(" ")[0],
+  //         "HH:mm"
+  //       ).set({
+  //         year: selectedDate.year,
+  //         month: selectedDate.month,
+  //         day: selectedDate.day,
+  //       });
+  //       let endTime = DateTime.fromFormat(
+  //         workingHours.endTime.split(" ")[0],
+  //         "HH:mm"
+  //       ).set({
+  //         year: selectedDate.year,
+  //         month: selectedDate.month,
+  //         day: selectedDate.day,
+  //       });
+
+  //       if (
+  //         endTime < startTime ||
+  //         workingHours.endTime.includes("(next day)")
+  //       ) {
+  //         endTime = endTime.plus({ days: 1 });
+  //       }
+
+  //       const calclatedHour = hour + offset;
+  //       const currentTime = currentDate.set({ hour: calclatedHour });
+
+  //       console.log(currentTime);
+  //       console.log(startTime);
+  //       const isWorkingHour =
+  //         (currentTime.getHours() >= startTime.getHours() &&
+  //           currentTime.getHours() < endTime.getHours()) ||
+  //         (currentTime.plus({ days: 1 }) >= startTime &&
+  //           currentTime.plus({ days: 1 }) < endTime);
+
+  //       if (isWorkingHour && day === 1) {
+  //         workingHoursFound = true;
+  //       }
+
+  //       const isHovered =
+  //         hoveredTime && hoveredTime.hasSame(currentTime, "hour");
+  //       const participantTime = currentTime.setZone(participantTimezone);
+
+  //       boxes.push(
+  //         <div
+  //           key={`${day}-${hour}`}
+  //           className={`w-12 h-12 border border-sky-300 flex items-center justify-center transition-all duration-300 ${
+  //             (isWorkingHour && day === 0) ||
+  //             (isWorkingHour && day === 1) ||
+  //             (isWorkingHour && day === 2)
+  //               ? "bg-sky-500 text-white"
+  //               : "bg-sky-100 text-sky-800"
+  //           } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
+  //           // title={`${currentTimeUTC} ${creatorTimezone}`}
+  //           onMouseEnter={() => setHoveredTime(currentTime)}
+  //           onMouseLeave={() => setHoveredTime(null)}
+  //         >
+  //           <span className="text-[8px]">{currentTime.toFormat("HH:mm")}</span>
+  //         </div>
+  //       );
+  //     }
+  //   }
+  //   return boxes;
+  // };
   const renderTimeBoxes = (workingHours, participantTimezone) => {
     const boxes = [];
-    const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
-    const previousDay = selectedDate.minus({ days: 1 });
-    const nextDay = selectedDate.plus({ days: 1 });
-    const offset = getUTCDifference(participantTimezone);
-    // console.log(workingHours, "offest", offset);
+    const selectedDate = new Date(meetingDate);
+
+    // Calculate previous and next days
+    const previousDay = new Date(selectedDate);
+    previousDay.setDate(selectedDate.getDate() - 1);
+
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(selectedDate.getDate() + 1);
+
+    // Parse working hours (assume workingHours.startTime and endTime are strings like "09:00" and "18:00")
+    const parseTime = (time, baseDate) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      const parsedDate = new Date(baseDate);
+      parsedDate.setHours(hours, minutes, 0, 0);
+      return parsedDate;
+    };
+
+    const startTime = parseTime(workingHours.startTime, selectedDate);
+    let endTime = parseTime(workingHours.endTime, selectedDate);
+
+    if (endTime <= startTime || workingHours.endTime.includes("(next day)")) {
+      endTime.setDate(endTime.getDate() + 1); // Handle next day scenarios
+    }
+
+    // Get UTC offset in hours for participant time zone
+    const offset = new Date().getTimezoneOffset() / 60; // Offset in hours
+    const getAdjustedDate = (date, hourOffset) => {
+      const adjustedDate = new Date(date);
+      adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
+      return adjustedDate;
+    };
 
     let workingHoursFound = false;
 
+    // Iterate over three days
     for (let day = 0; day < 3; day++) {
       const currentDate =
         day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
+
       for (let hour = 0; hour < 24; hour++) {
-        const calclatedHour = hour + offset;
-        const currentTime = currentDate.set({ hour: calclatedHour });
-        console.log(currentTime);
+        // Adjust time for the participant's time zone
+        const currentTime = getAdjustedDate(currentDate, hour - offset);
+        console.log(currentTime.getHours());
+        console.log(startTime);
 
-        const currentTimeUTC = currentTime
-          .toUTC()
-          .toLocaleString(DateTime.TIME_24_SIMPLE);
-
-        const startTime = DateTime.fromFormat(
-          workingHours.startTime.split(" ")[0],
-          "HH:mm"
-        ).set({
-          year: selectedDate.year,
-          month: selectedDate.month,
-          day: selectedDate.day,
-        });
-        let endTime = DateTime.fromFormat(
-          workingHours.endTime.split(" ")[0],
-          "HH:mm"
-        ).set({
-          year: selectedDate.year,
-          month: selectedDate.month,
-          day: selectedDate.day,
-        });
-
-        if (
-          endTime < startTime ||
-          workingHours.endTime.includes("(next day)")
-        ) {
-          endTime = endTime.plus({ days: 1 });
-        }
-
-        console.log(startTime, "the current time is", currentTime);
         const isWorkingHour =
-          (currentTime >= startTime && currentTime < endTime) ||
-          (currentTime.plus({ days: 1 }) >= startTime &&
-            currentTime.plus({ days: 1 }) < endTime);
+          currentTime.getHours() >= startTime.getHours() &&
+          currentTime.getHours() <= endTime.getHours();
 
         if (isWorkingHour && day === 1) {
           workingHoursFound = true;
         }
 
         const isHovered =
-          hoveredTime && hoveredTime.hasSame(currentTime, "hour");
-        const participantTime = currentTime.setZone(participantTimezone);
+          hoveredTime &&
+          hoveredTime.getHours() === currentTime.getHours() &&
+          hoveredTime.getDate() === currentTime.getDate();
 
         boxes.push(
           <div
             key={`${day}-${hour}`}
             className={`w-12 h-12 border border-sky-300 flex items-center justify-center transition-all duration-300 ${
-              (isWorkingHour && day === 0) ||
-              (isWorkingHour && day === 1) ||
-              (isWorkingHour && day === 2)
+              isWorkingHour
                 ? "bg-sky-500 text-white"
                 : "bg-sky-100 text-sky-800"
             } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
-            title={`${currentTimeUTC} ${creatorTimezone}`}
             onMouseEnter={() => setHoveredTime(currentTime)}
             onMouseLeave={() => setHoveredTime(null)}
           >
-            <span className="text-[8px]">{currentTime.toFormat("HH:mm")}</span>
+            <span className="text-[8px]">
+              {currentTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           </div>
         );
       }
     }
+
     return boxes;
   };
 
