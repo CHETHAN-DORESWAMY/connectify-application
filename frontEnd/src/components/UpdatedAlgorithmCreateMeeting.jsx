@@ -250,7 +250,7 @@ const UpdatedAlgorithmCreateMeeting = () => {
     for (let day = 0; day < 3; day++) {
       const currentDate = day === 0 ? previousDay : (day === 1 ? selectedDate : nextDay);
       for (let hour = 0; hour < 24; hour++) {
-        const currentTime = currentDate.set({ hour })
+        const currentTime = currentDate.setZone(creatorTimezone).set({ hour })
       
         const currentTimeUTC = currentTime.toUTC().toLocaleString(DateTime.TIME_24_SIMPLE);
   
