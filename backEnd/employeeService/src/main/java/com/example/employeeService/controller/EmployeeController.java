@@ -62,14 +62,12 @@ public class EmployeeController {
     // Get employee by ID
     @GetMapping("/get/{empId}")
     public ResponseEntity<HashMap<String, Object>> getEmployeeById(@PathVariable String empId) {
-        System.out.println(empId);
         HashMap<String, Object> response = new HashMap<>();
         try {
             Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
             if (employee.isPresent()) {
                 response.put("message", "Employee found");
                 response.put("employee", employee.get());
-                System.out.println(employee.get());
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("message", "Employee not found");
@@ -112,28 +110,13 @@ public class EmployeeController {
 
     @PostMapping("/get-window-time")
     public ResponseEntity<List<Interval>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
-        System.out.println(employeeListDto.getListOfEmployeeId());
-        System.out.println(employeeListDto.getMeetingDate());
-
-////        List<TimeClass> list = overLappingWindowClass.computeWindow(employeeListDto);
-//        System.out.println("Start Time" + list.get(0).getStartTime());
-//        System.out.println("end Time" + list.get(0).getEndTime());
-
-
         List<Interval> list = new ArrayList<>();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PostMapping("/get-red-window")
     public ResponseEntity<List<Interval>>  computeRedWindowTime(@RequestBody EmployeeListDto employeeListDto){
-        System.out.println(employeeListDto.getListOfEmployeeId());
-        System.out.println(employeeListDto.getMeetingDate());
-
         List<Interval> list = overLappingWindowAlgorithm.computeWindow(employeeListDto);
-        System.out.println("Start Time" + list.get(0).getStartTime());
-        System.out.println("end Time" + list.get(0).getEndTime());
-
-
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -141,10 +124,6 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeeEntity>> getEmployeeByIds(@RequestBody List<String> ids){
         return new ResponseEntity<>(employeeService.getAllEmployeesByIds(ids), HttpStatus.OK);
     }
-
-
-
-
 
     // Update employee by ID
     @PutMapping("/update/{empId}")

@@ -411,9 +411,7 @@ const CreateMeeting = () => {
     console.log(offset, "offset"); // Offset in hours
     const getAdjustedDate = (date, hourOffset) => {
       const adjustedDate = new Date(date);
-
       adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
-
       return adjustedDate;
     };
 
@@ -430,7 +428,7 @@ const CreateMeeting = () => {
         console.log(currentTime.getHours());
         console.log("start time", startTime.getHours());
 
-        console.log( currentTime.getHours());
+        console.log(currentTime.getHours());
         console.log("end time", endTime.getHours());
 
         const isWorkingHour =
@@ -454,11 +452,11 @@ const CreateMeeting = () => {
                 ? "bg-sky-500 text-white"
                 : "bg-sky-100 text-sky-800"
             } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
-            onMouseEnter={() => setHoveredTime(currentTimeDisplay)}
+            onMouseEnter={() => setHoveredTime(currentTime)}
             onMouseLeave={() => setHoveredTime(null)}
           >
             <span className="text-[8px]">
-              {currentTimeDisplay.toLocaleTimeString([], {
+              {currentTime.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
