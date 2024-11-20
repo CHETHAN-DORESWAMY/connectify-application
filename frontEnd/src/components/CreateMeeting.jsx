@@ -447,10 +447,10 @@ const CreateMeeting = () => {
         boxes.push(
           <div
             key={`${day}-${hour}`}
-            className={`w-12 h-12 border border-sky-300 flex items-center justify-center transition-all duration-300 ${
+            className={`w-12 h-12 border border-indigo-300 flex items-center justify-center transition-all duration-300 ${
               isWorkingHour
-                ? "bg-sky-500 text-white"
-                : "bg-sky-100 text-sky-800"
+                ? "bg-indigo-500 text-white"
+                : "bg-indigo-100 text-indigo-800"
             } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
             onMouseEnter={() => setHoveredTime(currentTime)}
             onMouseLeave={() => setHoveredTime(null)}
@@ -483,7 +483,7 @@ const CreateMeeting = () => {
           labels.push(
             <div
               key={`label-${day}-${hour}`}
-              className="w-12 text-xs text-center"
+              className="w-12 text-xs text-center text-indigo-600"
             >
               {hour === 0
                 ? currentDate.toFormat("MMM dd")
@@ -501,76 +501,85 @@ const CreateMeeting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-sky-100 to-sky-200">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-100 to-purple-200">
       <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
-      <div className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4 text-center text-sky-800">
+      <div className="container mx-auto p-8">
+        <h2 className="text-4xl font-bold mb-12 text-center text-indigo-800 animate-fade-in">
           Create Meeting
         </h2>
-        <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-sky-800 mb-1">
-                Meeting Name
-              </label>
-              <input
-                type="text"
-                value={meetingName}
-                onChange={(e) => setMeetingName(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-sky-800 mb-1">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-sky-800 mb-1">
-                Duration (hours)
-              </label>
-              <input
-                type="number"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-sky-800 mb-1">
-                Meeting Date
-              </label>
-              <input
-                type="date"
-                value={meetingDate}
-                onChange={(e) => setMeetingDate(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-            <div className="relative">
-              <label className="block text-sm font-medium text-sky-800 mb-1">
-                Select Participants
-              </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Meeting Details</h3>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-indigo-800 mb-2">
+                  Meeting Name
+                </label>
+                <input
+                  type="text"
+                  value={meetingName}
+                  onChange={(e) => setMeetingName(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-indigo-800 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-indigo-800 mb-2">
+                  Duration (hours)
+                </label>
+                <input
+                  type="number"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-indigo-800 mb-2">
+                  Meeting Date
+                </label>
+                <input
+                  type="date"
+                  value={meetingDate}
+                  onChange={(e) => setMeetingDate(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
+              >
+                Find Overlapping Interval
+              </button>
+            </form>
+          </div>
+          <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Participants</h3>
+            <div className="relative mb-6">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleSearchFocus}
                 placeholder="Search participants"
-                className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
               />
               {dropdownVisible && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-sky-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-2 bg-white border border-indigo-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                   {filteredParticipants.length === 0 ? (
-                    <div className="p-2 text-sm text-sky-500">
+                    <div className="p-4 text-sm text-indigo-500">
                       No participants found
                     </div>
                   ) : (
@@ -578,7 +587,7 @@ const CreateMeeting = () => {
                       <div
                         key={participant.empId}
                         onClick={() => handleSelectParticipant(participant)}
-                        className="p-2 hover:bg-sky-50 cursor-pointer text-sm"
+                        className="p-3 hover:bg-indigo-50 cursor-pointer text-sm transition duration-200"
                       >
                         {participant.empName} - {participant.empId}
                       </div>
@@ -587,90 +596,26 @@ const CreateMeeting = () => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 mb-6">
               {selectedParticipantsName.map((participant) => (
                 <div
                   key={participant.empId}
-                  className="bg-sky-100 text-sky-800 px-2 py-1 rounded-full text-xs flex items-center"
+                  className="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm flex items-center transition-all duration-300 hover:bg-indigo-200"
                 >
-                  <span className="mr-1">{participant.empName}</span>
+                  <span className="mr-2">{participant.empName}</span>
                   <button
                     onClick={() => handleRemoveParticipant(participant)}
-                    className="text-sky-500 hover:text-sky-700"
+                    className="text-indigo-500 hover:text-indigo-700 transition duration-200"
                   >
                     &times;
                   </button>
                 </div>
               ))}
             </div>
-            {participantSchedules.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-2 text-sky-800">
-                  Participant Schedules
-                </h3>
-                <p className="text-xs text-sky-600 mb-2">Date: {meetingDate}</p>
-                <div className="overflow-x-auto">
-                  <div className="inline-block min-w-full">
-                    <div className="grid grid-cols-[auto_1fr] gap-2">
-                      <div></div>
-                      <div className="flex">{renderTimeLabels()}</div>
-                      {participantSchedules.map((participant, index) => (
-                        <React.Fragment key={index}>
-                          <div className="flex flex-col justify-center">
-                            <p className="font-medium text-xs text-sky-800">
-                              {participant.empName}
-                            </p>
-                            <p className="text-xxs text-sky-600">
-                              {participant.empTimezone}
-                              {/* {console.log(participant.workingHours)} */}
-                            </p>
-                          </div>
-                          <div className="flex">
-                            {renderTimeBoxes(
-                              participant.workingHours,
-                              participant.empTimezone
-                            )}
-                          </div>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            {console.log(overlapResult)}
-            {overlapResult.length > 0 && (
-              <div className="mt-4 text-sky-600 font-semibold text-sm">
-                {overlapResult.map((result, index) => (
-                  <div key={index} className="mb-2">
-                    <p>Available Time Slot {index + 1}:</p>
-                    <p className="text-xs">Start: {result.startTime}</p>
-                    <p className="text-xs">End: {result.endTime}</p>
-                    <p className="text-xs mt-1">Available Participants:</p>
-                    <ul className="text-xs list-disc list-inside ml-2">
-                      {result.availableParticipants?.map(
-                        (participant, pIndex) => (
-                          <li key={pIndex}>{participant}</li>
-                        )
-                      ) ||
-                        selectedParticipantsName.map((participant, pIndex) => (
-                          <li key={pIndex}>{participant.empName}</li>
-                        ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button
-              type="submit"
-              className="w-full bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition duration-300"
-            >
-              Find Overlapping Interval
-            </button>
             {showTimeFields && (
-              <>
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-sky-800 mb-1">
+                  <label className="block text-sm font-medium text-indigo-800 mb-2">
                     Meeting Start Time
                   </label>
                   <input
@@ -678,11 +623,11 @@ const CreateMeeting = () => {
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-sky-800 mb-1">
+                  <label className="block text-sm font-medium text-indigo-800 mb-2">
                     Meeting End Time
                   </label>
                   <input
@@ -690,20 +635,84 @@ const CreateMeeting = () => {
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-sky-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={handleScheduleMeeting}
-                  className="w-full bg-sky-800 text-white px-4 py-2 rounded-md hover:bg-sky-900 transition duration-300"
+                  className="w-full bg-indigo-800 text-white px-6 py-3 rounded-lg hover:bg-indigo-900 transition duration-300 transform hover:scale-105"
                 >
                   Schedule Meeting
                 </button>
-              </>
+              </div>
             )}
-          </form>
+          </div>
         </div>
+        {participantSchedules.length > 0 && (
+          <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Participant Schedules
+            </h3>
+            <p className="text-sm text-indigo-600 mb-6">Date: {meetingDate}</p>
+            <div className="overflow-x-auto">
+              <div className="inline-block min-w-full">
+                <div className="grid grid-cols-[auto_1fr] gap-6">
+                  <div></div>
+                  <div className="flex">{renderTimeLabels()}</div>
+                  {participantSchedules.map((participant, index) => (
+                    <React.Fragment key={index}>
+                      <div className="flex flex-col justify-center">
+                        <p className="font-medium text-sm text-indigo-800">
+                          {participant.empName}
+                        </p>
+                        <p className="text-xs text-indigo-600">
+                          {participant.empTimezone}
+                        </p>
+                      </div>
+                      <div className="flex">
+                        {renderTimeBoxes(
+                          participant.workingHours,
+                          participant.empTimezone
+                        )}
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {overlapResult.length > 0 && (
+          <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Available Time Slots
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {overlapResult.map((result, index) => (
+                <div 
+                  key={index} 
+                  className="bg-indigo-50 p-6 rounded-xl transition-all duration-300 hover:shadow-md hover:bg-indigo-100 transform hover:scale-105"
+                >
+                  <p className="font-semibold text-indigo-800 mb-3">Time Slot {index + 1}</p>
+                  <p className="text-sm mb-1">Start: <span className="font-medium text-indigo-700">{result.startTime}</span></p>
+                  <p className="text-sm mb-3">End: <span className="font-medium text-indigo-700">{result.endTime}</span></p>
+                  <p className="text-sm font-medium text-indigo-800 mb-2">Available Participants:</p>
+                  <ul className="text-sm list-disc list-inside ml-2 text-indigo-600">
+                    {result.availableParticipants?.map(
+                      (participant, pIndex) => (
+                        <li key={pIndex} className="transition-colors duration-200 hover:text-indigo-800">{participant}</li>
+                      )
+                    ) ||
+                      selectedParticipantsName.map((participant, pIndex) => (
+                        <li key={pIndex}>{participant.empName}</li>
+                      ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

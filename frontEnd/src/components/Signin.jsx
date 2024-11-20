@@ -56,7 +56,7 @@ function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url("/meetingImage.jpg")'}}>
       <div>
         <Navbar isLoggedIn={isLoggedIn} employeeName={formData.email} />
         <div className="flex items-center justify-center pt-16">

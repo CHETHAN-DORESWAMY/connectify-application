@@ -4,114 +4,94 @@ import Navbar from "./Navbar";
 
 function Welcome() {
   const location = useLocation();
-  const [userData, setUserData] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    empId: "",
-    empName: "",
-    empDesignation: "",
-    empEmail: "",
-    empPhone: "",
-    empCity: "",
-    empTimezone: "",
-    empStartTime: "",
-    empEndTime: "",
-  });
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+  const [profileData, setProfileData] = useState({
+    id: "", name: "", role: "", email: "", contact: "", location: "",
+    timezone: "", workHoursStart: "", workHoursEnd: "",
+  });
 
-  const API_END_POINT = "http://localhost:8222/api/employees";
-  const email = location.state?.userEmail;
+  const API_BASE_URL = "http://localhost:8222/api/employees";
+  const userEmail = location.state?.userEmail;
 
   useEffect(() => {
-    if (email) {
-      const token = sessionStorage.getItem("authToken");
-      fetch(`${API_END_POINT}/get-by-email/${email}`, {
-        method: "GET",
+    if (userEmail) {
+      fetchUserData(userEmail);
+    } else {
+      setIsProfileIncomplete(true);
+    }
+  }, [userEmail]);
+
+  const fetchUserData = async (email) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/get-by-email/${email}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
           "Content-Type": "application/json",
         },
-      })
-        .then((response) => {
-          if (response.ok) return response.json();
-          if (response.status === 404) {
-            setShowForm(true);
-            return null;
-          }
-          throw new Error("Failed to fetch employee data");
-        })
-        .then((data) => {
-          if (data) {
-            setUserData(data.employee);
-            sessionStorage.setItem("userId", data.employee.empId);
-            console.log(data.employee);
-            if (!data.employee.profileStatus) {
-              setFormData({
-                empId: data.employee.empId || "",
-                empName: data.employee.empName || "",
-                empDesignation: data.employee.empDesignation || "",
-                empEmail: data.employee.empEmail || "",
-                empPhone: data.employee.empPhone || "",
-                empCity: data.employee.empCity || "",
-                empTimezone: "",
-                empStartTime: "",
-                empEndTime: "",
-              });
-              setShowForm(true);
-            } else {
-              sessionStorage.setItem(
-                "creatorTimezone",
-                data.employee.empTimezone
-              );
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          setShowForm(true);
-        });
-    } else {
-      setShowForm(true);
+      });
+      if (response.ok) {
+        const data = await response.json();
+        handleUserData(data.employee);
+      } else if (response.status === 404) {
+        setIsProfileIncomplete(true);
+      } else {
+        throw new Error("Failed to retrieve employee information");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setIsProfileIncomplete(true);
     }
-  }, [email]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleUserData = (employee) => {
+    setUserData(employee);
+    sessionStorage.setItem("userId", employee.empId);
+    if (!employee.profileStatus) {
+      setProfileData({
+        id: employee.empId || "",
+        name: employee.empName || "",
+        role: employee.empDesignation || "",
+        email: employee.empEmail || "",
+        contact: employee.empPhone || "",
+        location: employee.empCity || "",
+        timezone: "",
+        workHoursStart: "",
+        workHoursEnd: "",
+      });
+      setIsProfileIncomplete(true);
+    } else {
+      sessionStorage.setItem("creatorTimezone", employee.empTimezone);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  };
+
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem("authToken");
-
     try {
-      console.log(sessionStorage.getItem("userId"));
-      console.log(formData.empTimezone, formData.empStartTime);
-      const response = await fetch(
-        `http://localhost:8222/api/employees/update-status`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            empId: formData.empId,
-            empTimezone: formData.empTimezone,
-            empStartTime: formData.empStartTime,
-            empEndTime: formData.empEndTime,
-          }),
-        }
-      );
-
+      const response = await fetch(`${API_BASE_URL}/update-status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          empId: profileData.id,
+          empTimezone: profileData.timezone,
+          empStartTime: profileData.workHoursStart,
+          empEndTime: profileData.workHoursEnd,
+        }),
+      });
       if (response.ok) {
-        // const result = await response.json();
-        // setUserData(result.employee);
-        sessionStorage.setItem("creatorTimezone", formData.empTimezone);
-        setShowForm(false);
+        sessionStorage.setItem("creatorTimezone", profileData.timezone);
+        setIsProfileIncomplete(false);
         navigate("/dashboard");
       } else {
-        console.error("Failed to save profile");
+        console.error("Profile update failed");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -119,143 +99,105 @@ function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
-      <div className="container mx-auto p-6">
-        {showForm ? (
-          <div className="bg-white shadow-md rounded-lg max-w-xl mx-auto p-8">
-            <h2 className="text-2xl font-semibold mb-6 text-sky-800">
-              Complete Your Profile
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {Object.entries(formData).map(([key, value]) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {key
-                      .replace("emp", "")
-                      .replace(/([A-Z])/g, " $1")
-                      .trim()}
-                    :
-                  </label>
-                  {key === "empTimezone" ? (
-                    <select
-                      name={key}
-                      value={value}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-sky-800 transition-all duration-300"
-                      required
-                    >
-                      <option value="">Select Timezone</option>
-                      <option value="Asia/Kolkata">
-                        Mumbai (Asia/Kolkata)
-                      </option>
-                      <option value="Europe/London">
-                        London (Europe/London)
-                      </option>
-                      <option value="America/New_York">
-                        New York (America/New_York)
-                      </option>
-                      <option value="America/Los_Angeles">
-                        Los Angeles (America/Los_Angeles)
-                      </option>
-                      <option value="Asia/Singapore">
-                        Singapore (Asia/Singapore)
-                      </option>
-                    </select>
-                  ) : key === "empStartTime" || key === "empEndTime" ? (
-                    <input
-                      type="time"
-                      name={key}
-                      value={value}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-sky-800 transition-all duration-300"
-                      required
-                    />
-                  ) : (
-                    <input
-                      type={key === "empEmail" ? "email" : "text"}
-                      name={key}
-                      value={value}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-sky-800 transition-all duration-300"
-                      required={["empId", "empName", "empEmail"].includes(key)}
-                      readOnly={[
-                        "empId",
-                        "empName",
-                        "empDesignation",
-                        "empEmail",
-                        "empPhone",
-                        "empCity",
-                      ].includes(key)}
-                    />
-                  )}
-                </div>
-              ))}
-              <button
-                type="submit"
-                className="w-full bg-sky-800 text-white py-2 px-4 rounded-md hover:bg-sky-900 transition-all duration-300"
-              >
-                Save Profile
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="bg-white shadow-md rounded-lg max-w-2xl mx-auto p-8">
-            <h1 className="text-3xl font-semibold mb-6 text-sky-800">
-              Welcome, {userData?.empName || email}
-            </h1>
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4 text-sky-800">
-                Your Profile
-              </h2>
-              {userData && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-600">
-                      Name
-                    </span>
-                    <span className="text-lg text-gray-800">
-                      {userData.empName}
-                    </span>
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url("/meetingImage.jpg")'}}>
+      <div className="min-h-screen bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm">
+        <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto bg-white bg-opacity-90 shadow-xl rounded-lg overflow-hidden">
+            <div className="px-6 py-8">
+              <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center">
+                Welcome, {userData?.empName || userEmail}
+              </h1>
+              {isProfileIncomplete ? (
+                <form onSubmit={handleProfileSubmit} className="space-y-4">
+                  <h2 className="text-2xl font-semibold text-gray-700 mb-4 text-center">
+                    Complete Your Profile
+                  </h2>
+                  {Object.entries(profileData).map(([key, value]) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
+                      </label>
+                      {key === "timezone" ? (
+                        <select
+                          name={key}
+                          value={value}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Select Timezone</option>
+                          <option value="Asia/Kolkata">Mumbai (GMT+5:30)</option>
+                          <option value="Europe/London">London (GMT+0/+1)</option>
+                          <option value="America/New_York">New York (GMT-5/-4)</option>
+                          <option value="America/Los_Angeles">Los Angeles (GMT-8/-7)</option>
+                          <option value="Asia/Singapore">Singapore (GMT+8)</option>
+                        </select>
+                      ) : key === "workHoursStart" || key === "workHoursEnd" ? (
+                        <input
+                          type="time"
+                          name={key}
+                          value={value}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
+                        />
+                      ) : (
+                        <input
+                          type={key === "email" ? "email" : "text"}
+                          name={key}
+                          value={value}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required={["id", "name", "email"].includes(key)}
+                          readOnly={["id", "name", "role", "email", "contact", "location"].includes(key)}
+                        />
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
+                  >
+                    Finalize Profile
+                  </button>
+                </form>
+              ) : (
+                <div className="text-center">
+                  <div className="mb-8">
+                    <h3 className="text-2xl font-semibold text-gray-700 mb-4">
+                      Your Profile
+                    </h3>
+                    {userData && (
+                      <div className="space-y-2">
+                        <ProfileDetail label="Name" value={userData.empName} />
+                        <ProfileDetail label="Role" value={userData.empDesignation} />
+                        <ProfileDetail label="Email" value={userData.empEmail} />
+                        <ProfileDetail label="Location" value={userData.empCity} />
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-600">
-                      Designation
-                    </span>
-                    <span className="text-lg text-gray-800">
-                      {userData.empDesignation}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-600">
-                      Email
-                    </span>
-                    <span className="text-lg text-gray-800">
-                      {userData.empEmail}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-600">
-                      City
-                    </span>
-                    <span className="text-lg text-gray-800">
-                      {userData.empCity}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="w-full bg-sky-800 text-white py-3 px-4 rounded-md hover:bg-sky-900 transition duration-300 transform hover:scale-105"
+                  >
+                    Go to Dashboard
+                  </button>
                 </div>
               )}
             </div>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="mt-6 w-full bg-sky-800 text-white py-2 px-4 rounded-md hover:bg-sky-900 transition-all duration-300"
-            >
-              Go to Dashboard
-            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
+
+const ProfileDetail = ({ label, value }) => (
+  <div>
+    <span className="text-sm font-medium text-gray-600">{label}: </span>
+    <span className="text-sm text-gray-800">{value}</span>
+  </div>
+);
 
 export default Welcome;

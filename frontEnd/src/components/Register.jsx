@@ -72,111 +72,113 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar /> {/* Navbar positioned at the top */}
-      <div className="flex items-center justify-center pt-16">
-        <form
-          className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
-          onSubmit={handleSubmit}
-        >
-          <h2 className="text-xl font-semibold text-center mb-4">Register</h2>
-
-          {/* Server Message */}
-          {serverMessage && (
-            <p
-              className={`text-center p-2 mb-4 rounded-md ${
-                serverMessage.includes("successfully")
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {serverMessage}
-            </p>
-          )}
-
-          {/* Employee ID */}
-          <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Employee ID
-            </label>
-            <input
-              type="text"
-              name="id"
-              value={formData.id}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
-            {errors.id && (
-              <p className="text-red-600 text-xs mt-1">{errors.id}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
-            {errors.email && (
-              <p className="text-red-600 text-xs mt-1">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
-            {errors.password && (
-              <p className="text-red-600 text-xs mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full bg-sky-800 text-white py-2 rounded-md transition duration-300 
-              ${
-                isSubmitting
-                  ? "opacity-70 cursor-not-allowed blur-sm"
-                  : "hover:bg-sky-900"
-              }`}
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url("/meetingImage.jpg")'}}>
+      <div className="min-h-screen bg-black bg-opacity-50">
+        <Navbar /> {/* Navbar positioned at the top */}
+        <div className="flex items-center justify-center pt-16">
+          <form
+            className="bg-white bg-opacity-90 p-6 rounded-lg shadow-md w-full max-w-md"
+            onSubmit={handleSubmit}
           >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                Registering...
-              </div>
-            ) : (
-              "Register"
-            )}
-          </button>
+            <h2 className="text-xl font-semibold text-center mb-4">Register</h2>
 
-          {/* Sign In Link */}
-          <p className="text-center text-sm mt-3">
-            Already have an account?{" "}
-            <Link to="/signin" className="text-sky-800 hover:underline">
-              Sign In
-            </Link>
-          </p>
-        </form>
+            {/* Server Message */}
+            {serverMessage && (
+              <p
+                className={`text-center p-2 mb-4 rounded-md ${
+                  serverMessage.includes("successfully")
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {serverMessage}
+              </p>
+            )}
+
+            {/* Employee ID */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Employee ID
+              </label>
+              <input
+                type="text"
+                name="id"
+                value={formData.id}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              {errors.id && (
+                <p className="text-red-600 text-xs mt-1">{errors.id}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              {errors.email && (
+                <p className="text-red-600 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              {errors.password && (
+                <p className="text-red-600 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full bg-sky-800 text-white py-2 rounded-md transition duration-300 
+                ${
+                  isSubmitting
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-sky-900"
+                }`}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  Registering...
+                </div>
+              ) : (
+                "Register"
+              )}
+            </button>
+
+            {/* Sign In Link */}
+            <p className="text-center text-sm mt-3">
+              Already have an account?{" "}
+              <Link to="/signin" className="text-sky-800 hover:underline">
+                Sign In
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );
