@@ -48,8 +48,10 @@ function ResetPassword() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-
+      console.log("hello");
+      console.log(response);
       const data = await response.json();
+
       if (response.ok) {
         setShowOtpField(true);
         setTimer(300);

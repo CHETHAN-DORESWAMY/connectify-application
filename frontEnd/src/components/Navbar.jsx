@@ -216,7 +216,7 @@ function Navbar({ isLoggedIn, employeeName }) {
             Dashboard
           </Link>
           <Link
-            to="/create-meeting"
+            to="/example-meeting"
             onClick={toggleMenu}
             className="block text-white font-medium hover:text-sky-200 py-1 transform hover:translate-x-2 transition-all duration-200 text-xs"
           >
