@@ -6,6 +6,7 @@ import com.example.meetingParticipantsService.dto.MeetingDateDto;
 import com.example.meetingParticipantsService.dto.ParticipantsDto;
 import com.example.meetingParticipantsService.dto.ParticipantsStatusDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
+import com.example.meetingParticipantsService.feign.EmailClient;
 import com.example.meetingParticipantsService.feign.MeetingClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ public class ParticipantsService {
 
     @Autowired
     private ParticipantsDao participantsRepository;
+
+    @Autowired
+    private EmailClient emailClient;
 
     @Autowired
     private MeetingClient meetingClient;
@@ -71,7 +75,8 @@ public class ParticipantsService {
         }
 
         for(int i = 0; i < participantsEntities.size();i++){
-            participantsRepository.deleteById(participantsEntities.get(0).getParticipantId());
+            emailClient.sendCanceledMeetingMail(participantsEntities.get(i).getEmpId(), participantsEntities.get(i).getMeetId());
+            participantsRepository.deleteById(participantsEntities.get(i).getParticipantId());
         }
     }
 
