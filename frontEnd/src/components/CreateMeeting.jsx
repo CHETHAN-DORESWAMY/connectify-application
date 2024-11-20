@@ -292,93 +292,6 @@ const CreateMeeting = () => {
     return hours;
   }
 
-  // const renderTimeBoxes = (workingHours, participantTimezone) => {
-  //   const boxes = [];
-  //   // const selectedDate = DateTime.fromISO(meetingDate).setZone(creatorTimezone);
-  //   const selectedDate =
-  //     DateTime.fromISO(meetingDate).setZone(participantTimezone);
-  //   console.log("the selected date is", selectedDate);
-
-  //   const previousDay = selectedDate.minus({ days: 1 });
-  //   const nextDay = selectedDate.plus({ days: 1 });
-  //   const offset = getUTCDifference(participantTimezone);
-  //   // console.log(workingHours, "offest", offset);
-
-  //   let workingHoursFound = false;
-
-  //   for (let day = 0; day < 3; day++) {
-  //     const currentDate =
-  //       day === 0 ? previousDay : day === 1 ? selectedDate : nextDay;
-  //     for (let hour = 0; hour < 24; hour++) {
-  //       // const currentTimeUTC = currentTime
-  //       //   .toUTC()
-  //       //   .toLocaleString(DateTime.TIME_24_SIMPLE);
-  //       // console.log(workingHours.startTime);
-
-  //       const startTime = DateTime.fromFormat(
-  //         workingHours.startTime.split(" ")[0],
-  //         "HH:mm"
-  //       ).set({
-  //         year: selectedDate.year,
-  //         month: selectedDate.month,
-  //         day: selectedDate.day,
-  //       });
-  //       let endTime = DateTime.fromFormat(
-  //         workingHours.endTime.split(" ")[0],
-  //         "HH:mm"
-  //       ).set({
-  //         year: selectedDate.year,
-  //         month: selectedDate.month,
-  //         day: selectedDate.day,
-  //       });
-
-  //       if (
-  //         endTime < startTime ||
-  //         workingHours.endTime.includes("(next day)")
-  //       ) {
-  //         endTime = endTime.plus({ days: 1 });
-  //       }
-
-  //       const calclatedHour = hour + offset;
-  //       const currentTime = currentDate.set({ hour: calclatedHour });
-
-  //       console.log(currentTime);
-  //       console.log(startTime);
-  //       const isWorkingHour =
-  //         (currentTime.getHours() >= startTime.getHours() &&
-  //           currentTime.getHours() < endTime.getHours()) ||
-  //         (currentTime.plus({ days: 1 }) >= startTime &&
-  //           currentTime.plus({ days: 1 }) < endTime);
-
-  //       if (isWorkingHour && day === 1) {
-  //         workingHoursFound = true;
-  //       }
-
-  //       const isHovered =
-  //         hoveredTime && hoveredTime.hasSame(currentTime, "hour");
-  //       const participantTime = currentTime.setZone(participantTimezone);
-
-  //       boxes.push(
-  //         <div
-  //           key={`${day}-${hour}`}
-  //           className={`w-12 h-12 border border-sky-300 flex items-center justify-center transition-all duration-300 ${
-  //             (isWorkingHour && day === 0) ||
-  //             (isWorkingHour && day === 1) ||
-  //             (isWorkingHour && day === 2)
-  //               ? "bg-sky-500 text-white"
-  //               : "bg-sky-100 text-sky-800"
-  //           } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
-  //           // title={`${currentTimeUTC} ${creatorTimezone}`}
-  //           onMouseEnter={() => setHoveredTime(currentTime)}
-  //           onMouseLeave={() => setHoveredTime(null)}
-  //         >
-  //           <span className="text-[8px]">{currentTime.toFormat("HH:mm")}</span>
-  //         </div>
-  //       );
-  //     }
-  //   }
-  //   return boxes;
-  // };
   const renderTimeBoxes = (workingHours, participantTimezone) => {
     const boxes = [];
     const selectedDate = new Date(meetingDate);
@@ -409,7 +322,7 @@ const CreateMeeting = () => {
     // Get UTC offset in hours for participant time zone
     // const offset = new Date().getTimezoneOffset() / 60;
     const offset = getUTCDifference(participantTimezone);
-    console.log(offset, "offset"); // Offset in hours
+    // console.log(offset, "offset"); // Offset in hours
     const getAdjustedDate = (date, hourOffset) => {
       const adjustedDate = new Date(date);
       adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
@@ -425,12 +338,12 @@ const CreateMeeting = () => {
 
       for (let hour = 0; hour < 24; hour++) {
         // Adjust time for the participant's time zone
-        const currentTime = getAdjustedDate(currentDate, hour - offset);
-        console.log(currentTime.getHours());
-        console.log("start time", startTime.getHours());
+        const currentTime = getAdjustedDate(currentDate, hour + offset);
+        // console.log(currentTime.getHours());
+        // console.log("start time", startTime.getHours());
 
-        console.log( currentTime.getHours());
-        console.log("end time", endTime.getHours());
+        // console.log(currentTime.getHours());
+        // console.log("end time", endTime.getHours());
 
         const isWorkingHour =
           currentTime.getHours() >= startTime.getHours() &&
@@ -510,11 +423,13 @@ const CreateMeeting = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
-            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Meeting Details</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Meeting Details
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-indigo-800 mb-2">
-                  Meeting Name
+                  Meeting Title
                 </label>
                 <input
                   type="text"
@@ -558,16 +473,12 @@ const CreateMeeting = () => {
                   className="w-full px-4 py-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
                 />
               </div>
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
-              >
-                Find Overlapping Interval
-              </button>
             </form>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
-            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Participants</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Participants
+            </h3>
             <div className="relative mb-6">
               <input
                 type="text"
@@ -613,8 +524,15 @@ const CreateMeeting = () => {
                 </div>
               ))}
             </div>
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
+            >
+              Find Available Time
+            </button>
             {showTimeFields && (
-              <div className="space-y-6">
+              <div className="space-y-6 mt-6">
                 <div>
                   <label className="block text-sm font-medium text-indigo-800 mb-2">
                     Meeting Start Time
@@ -684,6 +602,7 @@ const CreateMeeting = () => {
             </div>
           </div>
         )}
+        {console.log(overlapResult)}
         {overlapResult.length > 0 && (
           <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
@@ -691,20 +610,38 @@ const CreateMeeting = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {overlapResult.map((result, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="bg-indigo-50 p-6 rounded-xl transition-all duration-300 hover:shadow-md hover:bg-indigo-100 transform hover:scale-105"
                 >
-                  <p className="font-semibold text-indigo-800 mb-3">Time Slot {index + 1}</p>
-                  <p className="text-sm mb-1">Start: <span className="font-medium text-indigo-700">{result.startTime}</span></p>
-                  <p className="text-sm mb-3">End: <span className="font-medium text-indigo-700">{result.endTime}</span></p>
-                  <p className="text-sm font-medium text-indigo-800 mb-2">Available Participants:</p>
+                  <p className="font-semibold text-indigo-800 mb-3">
+                    Time Slot {index + 1}
+                  </p>
+                  <p className="text-sm mb-1">
+                    Start:{" "}
+                    <span className="font-medium text-indigo-700">
+                      {result.startTime}
+                    </span>
+                  </p>
+                  <p className="text-sm mb-3">
+                    End:{" "}
+                    <span className="font-medium text-indigo-700">
+                      {result.endTime}
+                    </span>
+                  </p>
+                  <p className="text-sm font-medium text-indigo-800 mb-2">
+                    Available Participants:
+                  </p>
                   <ul className="text-sm list-disc list-inside ml-2 text-indigo-600">
-                    {result.availableParticipants?.map(
-                      (participant, pIndex) => (
-                        <li key={pIndex} className="transition-colors duration-200 hover:text-indigo-800">{participant}</li>
-                      )
-                    ) ||
+                    {result.employeeIds?.map((participant, pIndex) => (
+                      <li
+                        key={pIndex}
+                        className="transition-colors duration-200 hover:text-indigo-800"
+                      >
+                        {participant.empName} - {participant.empEmail} -{" "}
+                        {participant.empPhone}
+                      </li>
+                    )) ||
                       selectedParticipantsName.map((participant, pIndex) => (
                         <li key={pIndex}>{participant.empName}</li>
                       ))}

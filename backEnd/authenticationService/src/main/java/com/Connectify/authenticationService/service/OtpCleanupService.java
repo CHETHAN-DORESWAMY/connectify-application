@@ -12,7 +12,7 @@ public class OtpCleanupService {
     @Autowired
     private OTPRepository otpRepository;
 
-    // This method will run every minute (you can adjust the frequency)
+    // This method will run every minute
     @Scheduled(fixedRate = 60000) // runs every 60 seconds
     public void removeExpiredOtps() {
         LocalDateTime now = LocalDateTime.now();
@@ -20,6 +20,6 @@ public class OtpCleanupService {
         // Delete OTPs that have expired
         otpRepository.deleteByExpirationTimeBefore(now);
 
-        System.out.println("Expired OTPs removed.");
+
     }
 }

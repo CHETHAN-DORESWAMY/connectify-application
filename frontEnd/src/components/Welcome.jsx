@@ -56,11 +56,11 @@ function Welcome() {
         email: employee.empEmail || "",
         contact: employee.empPhone || "",
         location: employee.empCity || "",
-        timezone: "",
-        workHoursStart: "",
-        workHoursEnd: "",
+        timezone: employee.empTimezone || "",
+        workHoursStart: employee.empStartTime || "",
+        workHoursEnd: employee.empEndTime || "",
       });
-      setIsProfileIncomplete(true);
+      //setIsProfileIncomplete(true);
     } else {
       sessionStorage.setItem("creatorTimezone", employee.empTimezone);
     }

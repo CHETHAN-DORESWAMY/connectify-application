@@ -126,6 +126,13 @@ function SignIn() {
               >
                 Forgot Password?
               </Link>
+              {" | "}
+              <Link
+                to="/register"
+                className="text-sky-800 hover:underline"
+              >
+                Sign Up
+              </Link>
             </p>
           </form>
         </div>

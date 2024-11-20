@@ -67,7 +67,7 @@ function Navbar({ isLoggedIn, employeeName }) {
             className="h-8 w-8 rounded-full shadow-md border-2 border-white transform hover:scale-110 transition-transform duration-300"
           />
           <h1
-            onClick={() => navigate("/")}
+            onClick={() => navigate(isLoggedIn ? "/welcome" : "/")}
             className="text-white text-2xl font-bold tracking-wide cursor-pointer hover:text-sky-200 transition-colors duration-300"
           >
             Connectify

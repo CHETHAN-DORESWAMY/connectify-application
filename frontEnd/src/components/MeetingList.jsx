@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DateTime } from "luxon";
 
 function MeetingList({ meet, selectDate }) {
@@ -12,6 +12,12 @@ function MeetingList({ meet, selectDate }) {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [participantStatus, setParticipantStatus] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [meetingToCancel, setMeetingToCancel] = useState(null);
+  const [hoveredMeeting, setHoveredMeeting] = useState(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     if (meet) {
@@ -40,6 +46,19 @@ function MeetingList({ meet, selectDate }) {
       }
     };
     fetchEmployeeTimezone();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const convertToLocalTime = (utcTime) => {
@@ -76,7 +95,7 @@ function MeetingList({ meet, selectDate }) {
     setSelectedDate(null);
   };
 
-  const handleDeleteMeeting = async (meetingId) => {
+  const handleCancelMeeting = async (meetingId) => {
     try {
       const response = await fetch(
         `http://localhost:8222/api/meetings/delete/${meetingId}`,
@@ -93,12 +112,12 @@ function MeetingList({ meet, selectDate }) {
           (meeting) => meeting.meetId !== meetingId
         );
         setMeetings(updatedMeetings);
-        console.log("Meeting deleted successfully");
+        console.log("Meeting cancelled successfully");
       } else {
-        console.error("Failed to delete meeting");
+        console.error("Failed to cancel meeting");
       }
     } catch (error) {
-      console.error("Error deleting meeting:", error);
+      console.error("Error cancelling meeting:", error);
     }
   };
 
@@ -152,7 +171,27 @@ function MeetingList({ meet, selectDate }) {
         );
         if (response.ok) {
           const data = await response.json();
-          setParticipants(data);
+          setParticipantStatus(data);
+          const empIds = data.map(participant => participant.empId);
+
+          const empResponse = await fetch(
+            `http://localhost:8222/api/employees/get-employee-by-ids`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(empIds ),
+            }
+          );
+
+          if (empResponse.ok) {
+            const empData = await empResponse.json();
+            setParticipants(empData);
+          } else {
+            console.error("Failed to fetch employee names");
+          }
         } else {
           console.error("Failed to fetch participants");
         }
@@ -161,6 +200,29 @@ function MeetingList({ meet, selectDate }) {
       }
     }
     setShowParticipants(!showParticipants);
+  };
+
+  const handleDropdownToggle = (meetingId) => {
+    setShowDropdown(showDropdown === meetingId ? null : meetingId);
+  };
+
+  const handleCancelClick = (meetingId) => {
+    setMeetingToCancel(meetingId);
+    setShowConfirmation(true);
+    setShowDropdown(null);
+  };
+
+  const handleConfirmCancel = () => {
+    if (meetingToCancel) {
+      handleCancelMeeting(meetingToCancel);
+      setShowConfirmation(false);
+      setMeetingToCancel(null);
+    }
+  };
+
+  const handleCancelCancellation = () => {
+    setShowConfirmation(false);
+    setMeetingToCancel(null);
   };
 
   if (!meetings) {
@@ -225,66 +287,71 @@ function MeetingList({ meet, selectDate }) {
         </div>
       </div>
       {filteredMeetings.length > 0 ? (
-        <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
-          <thead className="bg-sky-800 text-white">
-            <tr>
-              <th className="py-3 px-4 text-left">Meeting Name</th>
-              <th className="py-3 px-4 text-left">Description</th>
-              <th className="py-3 px-4 text-left">Host ID</th>
-              <th className="py-3 px-4 text-left">Start Time</th>
-              <th className="py-3 px-4 text-left">End Time</th>
-              <th className="py-3 px-4 text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-700">
-            {filteredMeetings.map((meeting, index) => (
-              <tr
-                key={index}
-                className={`border-t ${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } hover:bg-gray-100 cursor-pointer`}
-                onClick={() => handleMeetingClick(meeting)}
-              >
-                <td className="py-3 px-4">{meeting.meetName}</td>
-                <td className="py-3 px-4">{meeting.meetDescription}</td>
-                <td className="py-3 px-4">{meeting.meetHostId}</td>
-                <td className="py-3 px-4">
-                  {convertToLocalTime(meeting.meetStartDateTime)}
-                </td>
-                <td className="py-3 px-4">
-                  {convertToLocalTime(meeting.meetEndDateTime)}
-                </td>
-                <td className="py-3 px-4">
-                  {meeting.meetHostId === userId ? (
+        <div className="space-y-4">
+          {filteredMeetings.map((meeting, index) => (
+            <div
+              key={index}
+              className={`bg-white shadow-lg rounded-lg p-4 flex items-center justify-between cursor-pointer transition-colors duration-200 ${
+                hoveredMeeting === meeting.meetId ? 'bg-gray-100' : ''
+              }`}
+              onClick={() => handleMeetingClick(meeting)}
+              onMouseEnter={() => setHoveredMeeting(meeting.meetId)}
+              onMouseLeave={() => setHoveredMeeting(null)}
+            >
+              <div className="flex-grow">
+                <h4 className="text-lg font-semibold">{meeting.meetName}</h4>
+                <p className="text-sm text-gray-600">{meeting.meetDescription}</p>
+                <p className="text-sm text-gray-500">
+                  {convertToLocalTime(meeting.meetStartDateTime)} - {convertToLocalTime(meeting.meetEndDateTime)}
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
+                {meeting.meetHostId === userId ? (
+                  <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteMeeting(meeting.meetId);
+                        handleDropdownToggle(meeting.meetId);
                       }}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      className="text-gray-500 hover:text-gray-700 focus:outline-none"
                     >
-                      Delete
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                      </svg>
                     </button>
-                  ) : meeting.participantStatus === false ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleConfirmMeeting(meeting.meetId);
-                      }}
-                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                    >
-                      Confirm
-                    </button>
-                  ) : (
-                    <span className="text-green-500 font-semibold">
-                      Confirmed
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    {showDropdown === meeting.meetId && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCancelClick(meeting.meetId);
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : participantStatus.find(p => p.empId === userId)?.status === false ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConfirmMeeting(meeting.meetId);
+                    }}
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                  >
+                    Confirm
+                  </button>
+                ) : (
+                  <span className="text-green-500 font-semibold">
+                    Confirmed
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <p className="text-center text-gray-500 mt-4">
           No meetings found for this selection.
@@ -311,13 +378,21 @@ function MeetingList({ meet, selectDate }) {
               <div className="mt-4">
                 <h3 className="text-xl font-semibold mb-2">Participants</h3>
                 {participants.length > 0 ? (
-                  <ul>
-                    {participants.map((participant, index) => (
-                      <li key={index} className="mb-2">
-                        <strong>Name:</strong> {participant.empId}, <strong>Status:</strong> {participant.status}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-2">
+                    {participants.map((participant) => {
+                      const status = participantStatus.find(
+                        (p) => p.empId === participant.empId
+                      );
+                      const statusText = status ? (status.status ? "Confirmed" : "Pending") : "Unknown";
+                      const statusColor = status ? (status.status ? "text-green-600" : "text-yellow-600") : "text-gray-600";
+                      return (
+                        <div key={participant.empId} className="flex items-center justify-between p-2 bg-gray-100 rounded-full text-sm">
+                          <span className="font-semibold ml-4">{participant.empName}</span>
+                          <span className={`mr-4 ${statusColor}`}>{statusText}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <p>Loading participants...</p>
                 )}
@@ -330,6 +405,29 @@ function MeetingList({ meet, selectDate }) {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Confirm Cancellation</h2>
+            <p className="mb-4">Are you sure you want to cancel this meeting?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleCancelCancellation}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+              >
+                No, Keep
+              </button>
+              <button
+                onClick={handleConfirmCancel}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Yes, Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

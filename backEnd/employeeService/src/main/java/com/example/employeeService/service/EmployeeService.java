@@ -26,15 +26,6 @@ public class EmployeeService {
         employee.setEmpEmail(employeeDto.getEmpEmail());
         employee.setEmpName(employeeDto.getEmpName());
         employee.setEmpPhone(employeeDto.getEmpPhone());
-//        employee.setEmpTimezone(employeeDto.getEmpTimezone());
-//
-//        ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.now(), employeeDto.getEmpStartTime(), ZoneId.of(employeeDto.getEmpTimezone()) );
-//        employee.setEmpStartTime(startDateTime.toInstant());
-//
-//        ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.now(), employeeDto.getEmpEndTime(), ZoneId.of(employeeDto.getEmpTimezone()) );
-//        employee.setEmpEndTime(endDateTime.toInstant());
-
-
         employee.setProfileStatus(false);
 
         return employeeDao.save(employee);
