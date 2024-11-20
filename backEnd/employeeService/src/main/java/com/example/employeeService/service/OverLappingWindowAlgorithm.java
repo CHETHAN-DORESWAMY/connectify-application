@@ -4,6 +4,7 @@ package com.example.employeeService.service;
 import com.example.employeeService.dao.EmployeeDao;
 import com.example.employeeService.dto.EmployeeListDto;
 import com.example.employeeService.dto.Interval;
+import com.example.employeeService.dto.ScheduledEmployeeDto;
 import com.example.employeeService.entity.EmployeeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,7 +72,7 @@ public class OverLappingWindowAlgorithm {
                     System.out.println("Updated Interval - Start Time: " + interval.getStartTime() + " End Time: " + interval.getEndTime());
 
                     // Add the employee ID to this interval
-                    interval.getEmployeeIds().add(emp.getEmpId());
+                    interval.getEmployeeIds().add(new ScheduledEmployeeDto(emp.getEmpId(), emp.getEmpName(), emp.getEmpPhone(), emp.getEmpEmail()));
                     foundOverlap = true;
                     break;
                 }
@@ -79,8 +80,8 @@ public class OverLappingWindowAlgorithm {
 
             // If no overlapping interval was found, create a new interval
             if (!foundOverlap) {
-                List<String> empList = new ArrayList<>();
-                empList.add(emp.getEmpId());
+                List<ScheduledEmployeeDto> empList = new ArrayList<>();
+                empList.add(new ScheduledEmployeeDto(emp.getEmpId(), emp.getEmpName(), emp.getEmpPhone(), emp.getEmpEmail()));
                 intervals.add(new Interval(adjustedStart, adjustedEnd, empList));
             }
         }

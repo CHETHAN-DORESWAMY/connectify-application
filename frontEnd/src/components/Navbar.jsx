@@ -83,7 +83,7 @@ function Navbar({ isLoggedIn, employeeName }) {
               Dashboard
             </Link>
             <Link
-              to="/create-meeting"
+              to="/example-meeting"
               className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
               Schedule

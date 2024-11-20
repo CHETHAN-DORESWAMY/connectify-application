@@ -408,7 +408,7 @@ const CreateMeeting = () => {
     // Get UTC offset in hours for participant time zone
     // const offset = new Date().getTimezoneOffset() / 60;
     const offset = getUTCDifference(participantTimezone);
-    console.log(offset, "offset"); // Offset in hours
+    // console.log(offset, "offset"); // Offset in hours
     const getAdjustedDate = (date, hourOffset) => {
       const adjustedDate = new Date(date);
       adjustedDate.setHours(adjustedDate.getHours() + hourOffset);
@@ -424,12 +424,12 @@ const CreateMeeting = () => {
 
       for (let hour = 0; hour < 24; hour++) {
         // Adjust time for the participant's time zone
-        const currentTime = getAdjustedDate(currentDate, hour - offset);
-        console.log(currentTime.getHours());
-        console.log("start time", startTime.getHours());
+        const currentTime = getAdjustedDate(currentDate, hour + offset);
+        // console.log(currentTime.getHours());
+        // console.log("start time", startTime.getHours());
 
-        console.log(currentTime.getHours());
-        console.log("end time", endTime.getHours());
+        // console.log(currentTime.getHours());
+        // console.log("end time", endTime.getHours());
 
         const isWorkingHour =
           currentTime.getHours() >= startTime.getHours() &&
@@ -509,7 +509,9 @@ const CreateMeeting = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
-            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Meeting Details</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Meeting Details
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-indigo-800 mb-2">
@@ -566,7 +568,9 @@ const CreateMeeting = () => {
             </form>
           </div>
           <div className="bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
-            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">Participants</h3>
+            <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
+              Participants
+            </h3>
             <div className="relative mb-6">
               <input
                 type="text"
@@ -683,6 +687,7 @@ const CreateMeeting = () => {
             </div>
           </div>
         )}
+        {console.log(overlapResult)}
         {overlapResult.length > 0 && (
           <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700">
@@ -690,20 +695,38 @@ const CreateMeeting = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {overlapResult.map((result, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="bg-indigo-50 p-6 rounded-xl transition-all duration-300 hover:shadow-md hover:bg-indigo-100 transform hover:scale-105"
                 >
-                  <p className="font-semibold text-indigo-800 mb-3">Time Slot {index + 1}</p>
-                  <p className="text-sm mb-1">Start: <span className="font-medium text-indigo-700">{result.startTime}</span></p>
-                  <p className="text-sm mb-3">End: <span className="font-medium text-indigo-700">{result.endTime}</span></p>
-                  <p className="text-sm font-medium text-indigo-800 mb-2">Available Participants:</p>
+                  <p className="font-semibold text-indigo-800 mb-3">
+                    Time Slot {index + 1}
+                  </p>
+                  <p className="text-sm mb-1">
+                    Start:{" "}
+                    <span className="font-medium text-indigo-700">
+                      {result.startTime}
+                    </span>
+                  </p>
+                  <p className="text-sm mb-3">
+                    End:{" "}
+                    <span className="font-medium text-indigo-700">
+                      {result.endTime}
+                    </span>
+                  </p>
+                  <p className="text-sm font-medium text-indigo-800 mb-2">
+                    Available Participants:
+                  </p>
                   <ul className="text-sm list-disc list-inside ml-2 text-indigo-600">
-                    {result.availableParticipants?.map(
-                      (participant, pIndex) => (
-                        <li key={pIndex} className="transition-colors duration-200 hover:text-indigo-800">{participant}</li>
-                      )
-                    ) ||
+                    {result.employeeIds?.map((participant, pIndex) => (
+                      <li
+                        key={pIndex}
+                        className="transition-colors duration-200 hover:text-indigo-800"
+                      >
+                        {participant.empName} - {participant.empEmail} -{" "}
+                        {participant.empPhone}
+                      </li>
+                    )) ||
                       selectedParticipantsName.map((participant, pIndex) => (
                         <li key={pIndex}>{participant.empName}</li>
                       ))}

@@ -8,10 +8,10 @@ import java.util.List;
 public class Interval {
     Instant startTime;
     Instant endTime;
-    List<String> employeeIds;
+    List<ScheduledEmployeeDto> employeeIds;
 
 
-    public Interval(Instant startTime, Instant endTime, List<String> employeeIds) {
+    public Interval(Instant startTime, Instant endTime, List<ScheduledEmployeeDto> employeeIds) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.employeeIds = new ArrayList<>(employeeIds);
@@ -33,11 +33,11 @@ public class Interval {
         this.endTime = endTime;
     }
 
-    public List<String> getEmployeeIds() {
+    public List<ScheduledEmployeeDto> getEmployeeIds() {
         return employeeIds;
     }
 
-    public void setEmployeeIds(List<String> employeeIds) {
+    public void setEmployeeIds(List<ScheduledEmployeeDto> employeeIds) {
         this.employeeIds = employeeIds;
     }
 

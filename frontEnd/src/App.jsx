@@ -30,10 +30,10 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route
+          {/* <Route
             path="/create-meeting"
             element={<UpdatedAlgorithmCreateMeeting />}
-          />
+          /> */}
 
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
