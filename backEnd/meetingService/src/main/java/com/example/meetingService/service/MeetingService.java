@@ -96,9 +96,11 @@ public class MeetingService {
 
     // DELETE: Delete a meeting by its ID
     public String deleteMeeting(String id) {
-//        System.out.println(meetingDao.deleteById(id));
+
+
+        participantsClient.deleteByMeetId(id).getBody();
         meetingDao.deleteByMeetId(id);
-        return participantsClient.deleteByMeetId(id).getBody();
+        return "meeting deleted success fully";
 
 
     }

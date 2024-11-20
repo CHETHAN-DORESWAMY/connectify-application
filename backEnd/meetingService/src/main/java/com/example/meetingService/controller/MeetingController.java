@@ -29,7 +29,7 @@ public class MeetingController {
         HashMap<String, Object> response = new HashMap<>();
         try {
             MeetingEntity createdMeeting = meetingService.createMeeting(meetingDto);
-            response.put("message", "Meeting created successfully");
+            response.put("message", "Meeting created successfully || mail sent to the participants");
             response.put("meeting", createdMeeting);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -109,6 +109,24 @@ public class MeetingController {
         }
     }
 
+    @GetMapping("/get-by-meetId-feign/{meetId}")
+    public ResponseEntity<MeetingEntity> getMeetingByIdForFeign(@PathVariable String meetId) {
+
+
+        try {
+            Optional<MeetingEntity> meeting = meetingService.getMeetingById(meetId);
+            if (meeting.isPresent()) {
+                return new ResponseEntity<>(meeting.get(), HttpStatus.OK);
+            } else {
+
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Update meeting by ID
     @PutMapping("/update/{id}")
     public ResponseEntity<HashMap<String, Object>> updateMeeting(@PathVariable String id, @RequestBody MeetingDto updatedMeeting) {
@@ -136,7 +154,7 @@ public class MeetingController {
         HashMap<String, Object> response = new HashMap<>();
         try {
             meetingService.deleteMeeting(id);
-            response.put("message", "Meeting deleted successfully");
+            response.put("message", "Meeting deleted successfully ||  mail sent to each participants");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.put("message", "Error deleting meeting");

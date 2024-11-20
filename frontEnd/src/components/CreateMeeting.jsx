@@ -46,7 +46,6 @@ const CreateMeeting = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setParticipants(data.employees);
           const creator = data.employees.find(
             (participant) => participant.empEmail === creatorEmail
           );
@@ -56,6 +55,12 @@ const CreateMeeting = () => {
             setSelectedParticipants([creator.empId]);
             setSelectedParticipantsName([creator]);
           }
+
+          setParticipants(
+            data.employees.filter(
+              (employee) => employee.empId !== creator.empId
+            )
+          );
         } else {
           console.error("Failed to fetch participants");
         }
@@ -96,6 +101,9 @@ const CreateMeeting = () => {
     if (!selectedParticipants.some((p) => p === participant.empId)) {
       setSelectedParticipants([...selectedParticipants, participant.empId]);
       setSelectedParticipantsName([...selectedParticipantsName, participant]);
+      setParticipants((prevParticipants) =>
+        prevParticipants.filter((p) => p.empId !== participant.empId)
+      );
     }
     setSearchQuery("");
     setDropdownVisible(false);
@@ -174,7 +182,7 @@ const CreateMeeting = () => {
               "utc",
               participant.empTimezone
             );
-            console.log(startTimeConverted, "this is thier local time");
+
             const endTimeConverted = convertToLocalTime(
               participant.empEndTime,
               "utc",
@@ -339,34 +347,27 @@ const CreateMeeting = () => {
       for (let hour = 0; hour < 24; hour++) {
         // Adjust time for the participant's time zone
         const currentTime = getAdjustedDate(currentDate, hour + offset);
-        // console.log(currentTime.getHours());
-        // console.log("start time", startTime.getHours());
-
-        // console.log(currentTime.getHours());
-        // console.log("end time", endTime.getHours());
 
         const isWorkingHour =
           currentTime.getHours() >= startTime.getHours() &&
-          currentTime.getHours() <= endTime.getHours();
+          currentTime.getHours() < endTime.getHours();
 
         if (isWorkingHour && day === 1) {
           workingHoursFound = true;
         }
 
-        const isHovered =
-          hoveredTime &&
-          hoveredTime.getHours() === currentTime.getHours() &&
-          hoveredTime.getDate() === currentTime.getDate();
+        const isHovered = hoveredTime == hour;
 
         boxes.push(
           <div
             key={`${day}-${hour}`}
+            id={`${hour}`}
             className={`w-12 h-12 border border-indigo-300 flex items-center justify-center transition-all duration-300 ${
               isWorkingHour
                 ? "bg-indigo-500 text-white"
                 : "bg-indigo-100 text-indigo-800"
             } ${isHovered ? "transform scale-110 z-10 shadow-lg" : ""}`}
-            onMouseEnter={() => setHoveredTime(currentTime)}
+            onMouseEnter={() => setHoveredTime(hour)}
             onMouseLeave={() => setHoveredTime(null)}
           >
             <span className="text-[8px]">
@@ -399,9 +400,7 @@ const CreateMeeting = () => {
               key={`label-${day}-${hour}`}
               className="w-12 text-xs text-center text-indigo-600"
             >
-              {hour === 0
-                ? currentDate.toFormat("MMM dd")
-                : `${hour.toString().padStart(2, "0")}:00`}
+              {hour === 0 ? currentDate.toFormat("MMM dd") : ``}
             </div>
           );
         } else {
@@ -429,7 +428,13 @@ const CreateMeeting = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-indigo-800 mb-2">
-                  Meeting Title
+                  Meeting Name
+                  <span
+                    className="ml-2 text-indigo-500 cursor-pointer"
+                    title="this is the name of meeting"
+                  >
+                    ℹ️
+                  </span>
                 </label>
                 <input
                   type="text"
@@ -442,6 +447,12 @@ const CreateMeeting = () => {
               <div>
                 <label className="block text-sm font-medium text-indigo-800 mb-2">
                   Description
+                  <span
+                    className="ml-2 text-indigo-500 cursor-pointer"
+                    title="give the meeting Description"
+                  >
+                    ℹ️
+                  </span>
                 </label>
                 <textarea
                   value={description}
@@ -464,6 +475,12 @@ const CreateMeeting = () => {
               <div>
                 <label className="block text-sm font-medium text-indigo-800 mb-2">
                   Meeting Date
+                  <span
+                    className="ml-2 text-indigo-500 cursor-pointer"
+                    title="give the meeting Date"
+                  >
+                    ℹ️
+                  </span>
                 </label>
                 <input
                   type="date"
@@ -524,13 +541,6 @@ const CreateMeeting = () => {
                 </div>
               ))}
             </div>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
-            >
-              Find Available Time
-            </button>
             {showTimeFields && (
               <div className="space-y-6 mt-6">
                 <div>
@@ -602,7 +612,7 @@ const CreateMeeting = () => {
             </div>
           </div>
         )}
-        {console.log(overlapResult)}
+
         {overlapResult.length > 0 && (
           <div className="mt-12 bg-white p-8 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
             <h3 className="text-2xl font-semibold mb-6 text-indigo-700">

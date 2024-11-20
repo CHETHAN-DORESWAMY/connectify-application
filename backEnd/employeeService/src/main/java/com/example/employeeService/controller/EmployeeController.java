@@ -67,7 +67,8 @@ public class EmployeeController {
             Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
             if (employee.isPresent()) {
                 response.put("message", "Employee found");
-                response.put("employee", employee.get());
+                EmployeeEntity emp = employee.get();
+                response.put("employee", emp);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("message", "Employee not found");
@@ -77,6 +78,24 @@ public class EmployeeController {
             response.put("message", "Error fetching employee");
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-emp/{empId}")
+    public ResponseEntity<EmployeeEntity> getEmployeeByIdForFeign(@PathVariable String empId) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
+            if (employee.isPresent()) {
+
+                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+            } else {
+
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
