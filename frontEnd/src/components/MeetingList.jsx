@@ -4,14 +4,16 @@ import { DateTime } from "luxon";
 function MeetingList({ meet, selectDate }) {
   const [employeeTimezone, setEmployeeTimezone] = useState("");
   const [selectedDate, setSelectedDate] = useState(selectDate);
-  const [viewMode, setViewMode] = useState("scheduled"); // "scheduled" or "toAttend"
+  const [viewMode, setViewMode] = useState("allMeetings");
   const token = sessionStorage.getItem("authToken");
   const userId = sessionStorage.getItem("userId");
   const [confirmedMeetings, setConfirmedMeetings] = useState([]);
-  const [meetings, setMeetings] = useState(null); // Initialize as null
+  const [meetings, setMeetings] = useState(null);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [showParticipants, setShowParticipants] = useState(false);
+  const [participants, setParticipants] = useState([]);
 
   useEffect(() => {
-    // Wait for `meet` to be defined and then set it to `meetings`
     if (meet) {
       setMeetings([...meet]);
     }
@@ -50,21 +52,20 @@ function MeetingList({ meet, selectDate }) {
     }
   };
 
-  // Filter the meetings only if `meetings` is defined
   const filteredMeetings = meetings
     ? meetings.filter((meeting) => {
         if (selectedDate) {
-          // Filter by selected date
           return DateTime.fromISO(meeting.meetStartDateTime).hasSame(
             DateTime.fromISO(selectedDate),
             "day"
           );
         } else {
-          // Show all meetings based on viewMode
-          if (viewMode === "scheduled") {
-            return meeting.meetHostId === userId; // Hosted by user
+          if (viewMode === "allMeetings") {
+            return true;
+          } else if (viewMode === "hosted") {
+            return meeting.meetHostId === userId;
           } else if (viewMode === "toAttend") {
-            return meeting.meetHostId !== userId; // User is a participant
+            return meeting.meetHostId !== userId;
           }
         }
         return false;
@@ -88,7 +89,6 @@ function MeetingList({ meet, selectDate }) {
         }
       );
       if (response.ok) {
-        // Remove the deleted meeting from the list
         const updatedMeetings = meetings.filter(
           (meeting) => meeting.meetId !== meetingId
         );
@@ -104,7 +104,6 @@ function MeetingList({ meet, selectDate }) {
 
   const handleConfirmMeeting = async (meetingId) => {
     try {
-      // const status = "confirmed";
       const response = await fetch(
         `http://localhost:8222/api/participants/update-status/${userId}/${meetingId}`,
         {
@@ -126,8 +125,45 @@ function MeetingList({ meet, selectDate }) {
     }
   };
 
+  const handleMeetingClick = (meeting) => {
+    setSelectedMeeting(meeting);
+    setShowParticipants(false);
+    setParticipants([]);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedMeeting(null);
+    setShowParticipants(false);
+    setParticipants([]);
+  };
+
+  const handleShowParticipants = async () => {
+    if (!showParticipants && selectedMeeting) {
+      try {
+        const response = await fetch(
+          `http://localhost:8222/api/participants/meeting-participants-details/${selectedMeeting.meetId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setParticipants(data);
+        } else {
+          console.error("Failed to fetch participants");
+        }
+      } catch (error) {
+        console.error("Error fetching participants:", error);
+      }
+    }
+    setShowParticipants(!showParticipants);
+  };
+
   if (!meetings) {
-    // Render a loading message while `meetings` is not set
     return <p>Loading meetings...</p>;
   }
 
@@ -140,8 +176,10 @@ function MeetingList({ meet, selectDate }) {
               ? `Meetings for ${DateTime.fromISO(selectedDate).toLocaleString(
                   DateTime.DATE_FULL
                 )}`
-              : viewMode === "scheduled"
-              ? "Scheduled Meetings"
+              : viewMode === "allMeetings"
+              ? "All Meetings"
+              : viewMode === "hosted"
+              ? "Hosted Meetings"
               : "Meetings to Attend"}
           </h3>
           {selectedDate && (
@@ -156,13 +194,23 @@ function MeetingList({ meet, selectDate }) {
         <div className="flex space-x-4">
           <button
             className={`px-4 py-2 rounded ${
-              viewMode === "scheduled"
+              viewMode === "allMeetings"
                 ? "bg-sky-800 text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
-            onClick={() => setViewMode("scheduled")}
+            onClick={() => setViewMode("allMeetings")}
           >
-            Scheduled Meetings
+            All Meetings
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${
+              viewMode === "hosted"
+                ? "bg-sky-800 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setViewMode("hosted")}
+          >
+            Hosted Meetings
           </button>
           <button
             className={`px-4 py-2 rounded ${
@@ -194,7 +242,8 @@ function MeetingList({ meet, selectDate }) {
                 key={index}
                 className={`border-t ${
                   index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } hover:bg-gray-100`}
+                } hover:bg-gray-100 cursor-pointer`}
+                onClick={() => handleMeetingClick(meeting)}
               >
                 <td className="py-3 px-4">{meeting.meetName}</td>
                 <td className="py-3 px-4">{meeting.meetDescription}</td>
@@ -206,24 +255,30 @@ function MeetingList({ meet, selectDate }) {
                   {convertToLocalTime(meeting.meetEndDateTime)}
                 </td>
                 <td className="py-3 px-4">
-                  {viewMode === "scheduled" ? (
+                  {meeting.meetHostId === userId ? (
                     <button
-                      onClick={() => handleDeleteMeeting(meeting.meetId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteMeeting(meeting.meetId);
+                      }}
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                     >
                       Delete
                     </button>
-                  ) : confirmedMeetings.includes(meeting.meetId) ? (
-                    <span className="text-green-500 font-semibold">
-                      Confirmed
-                    </span>
-                  ) : (
+                  ) : meeting.participantStatus === false ? (
                     <button
-                      onClick={() => handleConfirmMeeting(meeting.meetId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConfirmMeeting(meeting.meetId);
+                      }}
                       className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                     >
                       Confirm
                     </button>
+                  ) : (
+                    <span className="text-green-500 font-semibold">
+                      Confirmed
+                    </span>
                   )}
                 </td>
               </tr>
@@ -234,6 +289,49 @@ function MeetingList({ meet, selectDate }) {
         <p className="text-center text-gray-500 mt-4">
           No meetings found for this selection.
         </p>
+      )}
+
+      {selectedMeeting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg max-w-2xl w-full">
+            <h2 className="text-2xl font-bold mb-4">{selectedMeeting.meetName}</h2>
+            <p className="mb-2"><strong>Description:</strong> {selectedMeeting.meetDescription}</p>
+            <p className="mb-2"><strong>Host ID:</strong> {selectedMeeting.meetHostId}</p>
+            <p className="mb-2"><strong>Start Time:</strong> {convertToLocalTime(selectedMeeting.meetStartDateTime)}</p>
+            <p className="mb-2"><strong>End Time:</strong> {convertToLocalTime(selectedMeeting.meetEndDateTime)}</p>
+            
+            <button
+              onClick={handleShowParticipants}
+              className="bg-sky-800 text-white px-4 py-2 rounded mt-4"
+            >
+              {showParticipants ? "Hide Participants" : "Show Participants"}
+            </button>
+
+            {showParticipants && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold mb-2">Participants</h3>
+                {participants.length > 0 ? (
+                  <ul>
+                    {participants.map((participant, index) => (
+                      <li key={index} className="mb-2">
+                        <strong>Name:</strong> {participant.empId}, <strong>Status:</strong> {participant.status}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>Loading participants...</p>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={handleClosePopup}
+              className="bg-gray-300 text-gray-800 px-4 py-2 rounded mt-4 ml-2"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

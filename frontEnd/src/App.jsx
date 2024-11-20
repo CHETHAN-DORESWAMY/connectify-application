@@ -32,14 +32,14 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route
             path="/create-meeting"
-            element={<UpdatedAlgorithmCreateMeeting />}
+            element={<CreateMeeting />}
           />
 
           <Route path="/profile/:empId" element={<Profile />} />
           <Route path="/search" element={<ParticipantSearch />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/example-meeting" element={<CreateMeeting />} />
+          {/* <Route path="/example-meeting" element={<CreateMeeting />} /> */}
         </Routes>
       </div>
     </Router>

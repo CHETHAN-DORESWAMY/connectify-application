@@ -241,6 +241,7 @@ const CreateMeeting = () => {
         body: JSON.stringify({
           meetingId: meetingId,
           participantsIds: selectedParticipants,
+          hostId: sessionStorage.getItem("creatorId"),
         }),
       });
       if (response.ok && responseParticipants.ok) {
