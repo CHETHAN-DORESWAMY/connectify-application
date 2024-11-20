@@ -58,53 +58,47 @@ function Navbar({ isLoggedIn, employeeName }) {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-sky-600 via-sky-800 to-black p-3 shadow-lg">
-      <div className="container mx-auto max-w-5xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+    <nav className="bg-sky-800 p-3 shadow-md">
+      <div className="container mx-auto max-w-6xl flex items-center justify-between">
+        <div className="flex items-center space-x-2">
           <img
             src="https://th.bing.com/th?id=OIP.OQPmorjMA98lRVYZXXHJYAHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
             alt="App Icon"
-            className="h-8 w-8 rounded-full shadow-md border-2 border-white"
+            className="h-8 w-8 rounded-full shadow-md border-2 border-white transform hover:scale-110 transition-transform duration-300"
           />
           <h1
             onClick={() => navigate("/")}
-            className="text-white text-2xl font-extrabold tracking-wider cursor-pointer hover:text-yellow-300 transition-colors duration-300"
+            className="text-white text-2xl font-bold tracking-wide cursor-pointer hover:text-sky-200 transition-colors duration-300"
           >
             Connectify
           </h1>
         </div>
 
         {isLoggedIn && (
-          <div className="hidden md:flex space-x-6 items-center">
+          <div className="hidden lg:flex items-center space-x-6">
             <Link
               to="/dashboard"
-              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+              className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
               Dashboard
             </Link>
             <Link
               to="/create-meeting"
-              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+              className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
-              Schedule Meeting
+              Schedule
             </Link>
             <Link
               to="/calendar"
-              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+              className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
               Calendar
             </Link>
             <Link
               to="/chat"
-              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
+              className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
-              chat
-            </Link>
-            <Link
-              to="/example-meeting"
-              className="text-white font-semibold hover:text-yellow-300 transition-colors duration-200 text-base transform hover:scale-110"
-            >
-              example-meeting
+              Chat
             </Link>
             <form onSubmit={handleSearch} className="relative">
               <input
@@ -112,7 +106,7 @@ function Navbar({ isLoggedIn, employeeName }) {
                 placeholder="Search People"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white bg-opacity-20 text-black placeholder-gray-600 pl-3 pr-8 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300 text-sm"
+                className="bg-white bg-opacity-20 text-white placeholder-sky-200 pl-3 pr-8 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-300 transition-all duration-300 text-xs w-56"
               />
               <button
                 type="submit"
@@ -120,7 +114,7 @@ function Navbar({ isLoggedIn, employeeName }) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-black"
+                  className="h-4 w-4 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -134,12 +128,12 @@ function Navbar({ isLoggedIn, employeeName }) {
                 </svg>
               </button>
               {filteredEmployees.length > 0 && (
-                <ul className="absolute top-full left-0 mt-2 bg-white text-gray-800 w-full rounded-lg shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+                <ul className="absolute top-full left-0 mt-1 bg-white text-sky-800 w-full rounded-md shadow-lg overflow-hidden max-h-40 overflow-y-auto">
                   {filteredEmployees.map((emp) => (
                     <li
                       key={emp.empId}
                       onClick={() => navigate(`/profile/${emp.empId}`)}
-                      className="px-3 py-1 hover:bg-gray-100 cursor-pointer transition-colors duration-200 text-sm"
+                      className="px-3 py-1 hover:bg-sky-100 cursor-pointer transition-colors duration-200 text-xs"
                     >
                       {emp.empId} - {emp.empName} ({emp.empEmail})
                     </li>
@@ -147,110 +141,110 @@ function Navbar({ isLoggedIn, employeeName }) {
                 </ul>
               )}
             </form>
+            <div className="relative">
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center space-x-1 text-white hover:text-sky-200 transition duration-300"
+              >
+                <span className="font-medium text-xs">{employeeName}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z"
+                  />
+                </svg>
+              </button>
+              {showDropdown && (
+                <div className="absolute right-0 mt-1 bg-white rounded-md shadow-lg p-1 w-40 z-50">
+                  <Link
+                    to={`/profile/${sessionStorage.getItem("userId")}`}
+                    className="block text-sky-700 hover:bg-sky-100 px-3 py-1 rounded transition-colors duration-200 text-xs"
+                  >
+                    View Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      sessionStorage.removeItem("authToken");
+                      navigate("/signin");
+                    }}
+                    className="block text-sky-700 hover:bg-sky-100 px-3 py-1 w-full text-left rounded transition-colors duration-200 text-xs"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        <div className="flex items-center space-x-3 relative">
-          {isLoggedIn && (
-            <span className="text-white mr-2 hidden md:inline font-semibold text-sm">
-              {employeeName}
-            </span>
-          )}
-          <div className="relative">
-            <button
-              onClick={handleProfileClick}
-              className="text-white hover:text-yellow-300 transition duration-300"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z"
-                />
-              </svg>
-            </button>
-            {showDropdown && isLoggedIn && (
-              <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-xl p-2 w-44 z-50">
-                <div className="block text-gray-800 font-semibold px-3 py-1 border-b border-gray-200 text-sm">
-                  {employeeName}
-                </div>
-                <Link
-                  to={`/profile/${sessionStorage.getItem("userId")}`}
-                  className="block text-gray-700 hover:bg-blue-100 px-3 py-1 rounded transition-colors duration-200 text-sm"
-                >
-                  View Profile
-                </Link>
-                <button
-                  onClick={() => {
-                    sessionStorage.removeItem("authToken");
-                    navigate("/signin");
-                  }}
-                  className="block text-gray-700 hover:bg-blue-100 px-3 py-1 w-full text-left rounded transition-colors duration-200 text-sm"
-                >
-                  Sign Out
-                </button>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={toggleMenu}
-            className="md:hidden text-white focus:outline-none hover:text-yellow-300 transition-colors duration-200"
+        <button
+          onClick={toggleMenu}
+          className="lg:hidden text-white focus:outline-none hover:text-sky-200 transition-colors duration-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-5 h-5"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
       </div>
 
       {isMenuOpen && isLoggedIn && (
-        <div className="md:hidden mt-3 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-3">
+        <div className="lg:hidden mt-3 bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-md shadow-md p-3">
           <Link
             to="/dashboard"
             onClick={toggleMenu}
-            className="block text-white font-semibold hover:text-yellow-300 py-1 transform hover:translate-x-2 transition-all duration-200 text-sm"
+            className="block text-white font-medium hover:text-sky-200 py-1 transform hover:translate-x-2 transition-all duration-200 text-xs"
           >
             Dashboard
           </Link>
           <Link
             to="/create-meeting"
             onClick={toggleMenu}
-            className="block text-white font-semibold hover:text-yellow-300 py-1 transform hover:translate-x-2 transition-all duration-200 text-sm"
+            className="block text-white font-medium hover:text-sky-200 py-1 transform hover:translate-x-2 transition-all duration-200 text-xs"
           >
             Schedule Meeting
           </Link>
           <Link
             to="/calendar"
             onClick={toggleMenu}
-            className="block text-white font-semibold hover:text-yellow-300 py-1 transform hover:translate-x-2 transition-all duration-200 text-sm"
+            className="block text-white font-medium hover:text-sky-200 py-1 transform hover:translate-x-2 transition-all duration-200 text-xs"
           >
             Calendar
           </Link>
           <Link
-            to="/search"
+            to="/chat"
             onClick={toggleMenu}
-            className="block text-white font-semibold hover:text-yellow-300 py-1 transform hover:translate-x-2 transition-all duration-200 text-sm"
+            className="block text-white font-medium hover:text-sky-200 py-1 transform hover:translate-x-2 transition-all duration-200 text-xs"
           >
-            Search People
+            Chat
           </Link>
+          <form onSubmit={handleSearch} className="mt-2">
+            <input
+              type="text"
+              placeholder="Search People"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white bg-opacity-20 text-white placeholder-sky-200 pl-3 pr-8 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-300 transition-all duration-300 text-xs"
+            />
+          </form>
         </div>
       )}
     </nav>

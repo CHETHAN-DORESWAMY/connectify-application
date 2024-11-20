@@ -40,61 +40,77 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 to-sky-200">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 to-sky-300">
       <Navbar isLoggedIn={!!sessionStorage.getItem("authToken")} />
 
-      <div className="container mx-auto p-4 mt-6">
-        <div className="bg-white shadow-xl rounded-2xl p-6 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-sky-800 mb-4 text-center">
-            Employee Profile
-          </h2>
-
-          {employee ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-24 h-24 bg-sky-200 rounded-full flex items-center justify-center">
-                  <span className="text-3xl font-bold text-sky-800">
+      {employee ? (
+        <div className="container mx-auto p-8 mt-10">
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Left column - Profile Picture and Basic Info */}
+            <div className="md:w-1/3">
+              <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div className="bg-sky-600 h-32 flex items-center justify-center">
+                  <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-sky-800">
                     {employee.empName.charAt(0)}
-                  </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-sky-800 mb-2">{employee.empName}</h2>
+                  <p className="text-lg text-sky-600 mb-4">{employee.empDesignation}</p>
+                  <ProfileItem icon="📧" label="Email" value={employee.empEmail} />
+                  <ProfileItem icon="📞" label="Phone" value={employee.empPhone} />
                 </div>
               </div>
-              <ProfileItem label="Name" value={employee.empName} />
-              <ProfileItem
-                label="Designation"
-                value={employee.empDesignation}
-              />
-              <ProfileItem label="Email" value={employee.empEmail} />
-              <ProfileItem label="Phone" value={employee.empPhone} />
-              <ProfileItem label="City" value={employee.empCity} />
-              <ProfileItem label="Timezone" value={employee.empTimezone} />
-              <ProfileItem
-                label="Work Hours"
-                value={`${convertToLocalTime(
-                  employee.empStartTime,
-                  "utc",
-                  UserTimezone
-                )} - ${convertToLocalTime(
-                  employee.empEndTime,
-                  "utc",
-                  UserTimezone
-                )} - ${UserTimezone}`}
-              />
             </div>
-          ) : (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-800"></div>
+
+            {/* Right column - Additional Details */}
+            <div className="md:w-2/3">
+              <div className="bg-white shadow-lg rounded-lg p-6">
+                <h3 className="text-xl font-semibold text-sky-800 mb-4">Additional Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <ProfileItem icon="🏙️" label="City" value={employee.empCity} />
+                  <ProfileItem icon="🌐" label="Timezone" value={employee.empTimezone} />
+                  <ProfileItem 
+                    icon="⏰" 
+                    label="Work Hours" 
+                    value={`${convertToLocalTime(employee.empStartTime, "utc", UserTimezone)} - ${convertToLocalTime(employee.empEndTime, "utc", UserTimezone)}`} 
+                    subValue={`(${UserTimezone})`}
+                  />
+                </div>
+              </div>
+
+              {/* Additional sections can be added here */}
+              <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
+                <h3 className="text-xl font-semibold text-sky-800 mb-4">Work History</h3>
+                {/* Add work history content here */}
+                <p className="text-gray-600">Work history information can be displayed here.</p>
+              </div>
+
+              <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
+                <h3 className="text-xl font-semibold text-sky-800 mb-4">Skills</h3>
+                {/* Add skills content here */}
+                <p className="text-gray-600">Employee skills can be listed here.</p>
+              </div>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex justify-center items-center h-96">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-sky-600"></div>
+        </div>
+      )}
     </div>
   );
 };
 
-const ProfileItem = ({ label, value }) => (
-  <div className="flex items-center border-b border-gray-200 py-2">
-    <span className="text-gray-600 font-semibold w-1/3 text-sm">{label}:</span>
-    <span className="text-sky-800 font-medium w-2/3 text-sm">{value}</span>
+const ProfileItem = ({ icon, label, value, subValue }) => (
+  <div className="flex items-start space-x-3 p-4 bg-sky-50 rounded-lg transition-all duration-300 hover:bg-sky-100 hover:shadow-md">
+    <span className="text-2xl">{icon}</span>
+    <div>
+      <p className="text-gray-600 font-medium text-sm">{label}</p>
+      <p className="text-sky-800 font-semibold">{value}</p>
+      {subValue && <p className="text-sky-600 text-sm">{subValue}</p>}
+    </div>
   </div>
 );
 
