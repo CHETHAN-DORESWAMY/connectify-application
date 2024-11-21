@@ -159,7 +159,7 @@ function Welcome() {
                     type="submit"
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
                   >
-                    Finalize Profile
+                    Update Profile
                   </button>
                 </form>
               ) : (
@@ -181,7 +181,7 @@ function Welcome() {
                     onClick={() => navigate("/dashboard")}
                     className="w-full bg-sky-800 text-white py-3 px-4 rounded-md hover:bg-sky-900 transition duration-300 transform hover:scale-105"
                   >
-                    Go to Dashboard
+                    Find your meetings
                   </button>
                 </div>
               )}

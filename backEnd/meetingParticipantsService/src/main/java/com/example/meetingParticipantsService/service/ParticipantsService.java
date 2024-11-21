@@ -1,5 +1,6 @@
 package com.example.meetingParticipantsService.service;
 
+import com.example.meetingParticipantsService.client.DeleteMeeting;
 import com.example.meetingParticipantsService.client.Meeting;
 import com.example.meetingParticipantsService.dao.ParticipantsDao;
 import com.example.meetingParticipantsService.dto.MeetingDateDto;
@@ -71,14 +72,14 @@ public class ParticipantsService {
     }
 
     // Delete participant by meetId
-    public void deleteParticiantsByMeetId(String meetId) throws Exception {
+    public void deleteParticiantsByMeetId(String meetId, String reason) throws Exception {
         List<ParticipantsEntity> participantsEntities = participantsRepository.findByMeetId(meetId);
         if(participantsEntities.size() == 0){
             throw new Exception("No participants");
         }
 
         for(int i = 0; i < participantsEntities.size();i++){
-            emailClient.sendCanceledMeetingMail(participantsEntities.get(i).getEmpId(), participantsEntities.get(i).getMeetId());
+            emailClient.sendCanceledMeetingMail(new DeleteMeeting(participantsEntities.get(i).getEmpId(), meetId, reason));
             participantsRepository.deleteById(participantsEntities.get(i).getParticipantId());
         }
     }
@@ -105,6 +106,13 @@ public class ParticipantsService {
                 .map(ParticipantsEntity::getMeetId).collect(Collectors.toList());
 
         return meetingClient.getMeetingsByIds(meetingIds).getBody();
+    }
+
+    public List<String> countPendingParticipants(String meetId) {
+        return participantsRepository.findByMeetId(meetId).stream()
+                .filter(participantsEntity -> participantsEntity.getStatus() == false)
+                .map(ParticipantsEntity::getEmpId)
+                .collect(Collectors.toList());
     }
 }
 

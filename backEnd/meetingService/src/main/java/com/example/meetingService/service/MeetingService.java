@@ -1,6 +1,7 @@
 package com.example.meetingService.service;
 
 import com.example.meetingService.dao.MeetingDao;
+import com.example.meetingService.dto.DeleteMeetingEmail;
 import com.example.meetingService.dto.MeetingDto;
 import com.example.meetingService.entity.MeetingEntity;
 import com.example.meetingService.feign.EmailClient;
@@ -8,10 +9,7 @@ import com.example.meetingService.feign.ParticipantsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +47,7 @@ public class MeetingService {
         meetingData.setMeetingDate(meeting.getMeetDate());
         meetingData.setMeetStatus("Pending");
 
-        emailClient.sendMeetingMail(meeting);
+        emailClient.sendMeetingMail(new DeleteMeetingEmail(meetingData, meeting.getMeetParticipants()));
 
 
         return meetingDao.save(meetingData);
@@ -95,14 +93,20 @@ public class MeetingService {
     }
 
     // DELETE: Delete a meeting by its ID
-    public String deleteMeeting(String id) {
+    public String deleteMeeting(String id, String reason) {
 
 
-        participantsClient.deleteByMeetId(id).getBody();
+        participantsClient.deleteByMeetId(id, reason).getBody();
         meetingDao.deleteByMeetId(id);
         return "meeting deleted success fully";
 
 
+    }
+
+    public List<MeetingEntity> getMeetingsStartingSoon() {
+        Instant now = Instant.now();
+        Instant withinTwoHours = now.minus(Duration.ofHours(2));
+        return meetingDao.findMeetingsStartingInTimeRange(now, withinTwoHours);
     }
 
     public List<MeetingEntity> getMeetingsByIds(List<String> ids) {

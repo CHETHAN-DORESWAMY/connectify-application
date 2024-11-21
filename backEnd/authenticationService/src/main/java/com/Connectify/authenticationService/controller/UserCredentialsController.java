@@ -84,6 +84,21 @@ public class UserCredentialsController {
 
     }
 
+    @GetMapping("/get-user/{email}")
+    public ResponseEntity<Map<String, String>> getUser(@PathVariable String email){
+
+        Map<String, String> response = new HashMap<>();
+        if(userCredService.userExists(email)){
+            response.put("message", "User exists");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else{
+            response.put("message", "User doesn't exists");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody UserCredentialsEntity user) {

@@ -16,7 +16,8 @@ public class RouteValidator {
         "/validate/token",
         "/validate-otp?**",
         "/reset-password?**",
-        "/send-otp?**"
+        "/send-otp?**",
+        "/get-user/**"
 
             );
     public Predicate<ServerHttpRequest> isSecured = request -> openApiEndpoints

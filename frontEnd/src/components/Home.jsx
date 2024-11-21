@@ -25,7 +25,7 @@ function Home() {
               onClick={() => navigate("/dashboard")}
               className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-sky-700 to-sky-900 text-white rounded-full hover:from-sky-800 hover:to-sky-950 transition duration-300 text-base font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-sky-300"
             >
-              Go to Dashboard
+              Find your meetings
             </button>
           ) : (
             <>
@@ -70,8 +70,8 @@ function Home() {
             </div>
             <div className="w-full md:w-1/4 mb-6 md:mb-0">
               <h3 className="text-lg font-semibold mb-3 text-sky-400">Contact Us</h3>
-              <p className="text-xs mb-1">Email: support@connectify.com</p>
-              <p className="text-xs">Phone: (123) 456-7890</p>
+              <p className="text-xs mb-1">Email: connectify@gmail.com</p>
+              <p className="text-xs">Phone: 1010101010</p>
             </div>
             <div className="w-full md:w-1/4">
               <h3 className="text-lg font-semibold mb-3 text-sky-400">Follow Us</h3>
@@ -93,7 +93,7 @@ function Home() {
             </div>
           </div>
           <div className="mt-8 border-t border-gray-700 pt-6 text-xs text-center text-gray-400">
-            <p>&copy; 2023 Connectify. All rights reserved.</p>
+            <p>&copy; 2024 Connectify. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -21,6 +21,8 @@ function MeetingList({ meet, selectDate }) {
   const [isLoading, setIsLoading] = useState(false);
   const [confirmingMeeting, setConfirmingMeeting] = useState(null);
   const [cancellationReason, setCancellationReason] = useState("");
+  const [showConfirmPrompt, setShowConfirmPrompt] = useState(false);
+  const [meetingToConfirm, setMeetingToConfirm] = useState(null);
 
   useEffect(() => {
     if (meet) {
@@ -144,6 +146,7 @@ function MeetingList({ meet, selectDate }) {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          // to pass the reason.
           body: JSON.stringify({ reason: cancellationReason }),
         }
       );
@@ -191,6 +194,8 @@ function MeetingList({ meet, selectDate }) {
       console.error("Error confirming meeting:", error);
     } finally {
       setConfirmingMeeting(null);
+      setShowConfirmPrompt(false);
+      setMeetingToConfirm(null);
     }
   };
 
@@ -274,6 +279,22 @@ function MeetingList({ meet, selectDate }) {
     setShowConfirmation(false);
     setMeetingToCancel(null);
     setCancellationReason("");
+  };
+
+  const handleConfirmClick = (meetingId) => {
+    setMeetingToConfirm(meetingId);
+    setShowConfirmPrompt(true);
+  };
+
+  const handleConfirmYes = () => {
+    if (meetingToConfirm) {
+      handleConfirmMeeting(meetingToConfirm);
+    }
+  };
+
+  const handleConfirmNo = () => {
+    setShowConfirmPrompt(false);
+    setMeetingToConfirm(null);
   };
 
   if (!meetings) {
@@ -396,23 +417,21 @@ function MeetingList({ meet, selectDate }) {
                       </div>
                     )}
                   </div>
-                ) : participantStatus.find(p => p.empId === userId)?.status === false ? (
+                ) : participantStatus.find(p => p.empId === userId && p.meetId === meeting.meetId)?.status === true || confirmedMeetings.includes(meeting.meetId) ? (
+                  <span className="text-green-800 font-semibold">
+                    Confirmed
+                  </span>
+                ) : (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleConfirmMeeting(meeting.meetId);
+
                     }}
-                    className={`bg-green-800 text-white px-3 py-1 rounded hover:bg-green-600 ${
-                      confirmingMeeting === meeting.meetId ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                    disabled={confirmingMeeting === meeting.meetId}
+                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
                   >
-                    {confirmingMeeting === meeting.meetId ? 'Confirming...' : 'Confirm'}
+                    Confirm
                   </button>
-                ) : (
-                  <span className="text-green-800 font-semibold">
-                    Confirmed
-                  </span>
                 )}
               </div>
             </div>
@@ -502,6 +521,29 @@ function MeetingList({ meet, selectDate }) {
                 disabled={isLoading || !cancellationReason.trim()}
               >
                 {isLoading ? 'Cancelling...' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfirmPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Confirm Meeting</h2>
+            <p className="mb-4">Are you sure you want to confirm this meeting?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleConfirmNo}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirmYes}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
+                Yes, Confirm
               </button>
             </div>
           </div>
