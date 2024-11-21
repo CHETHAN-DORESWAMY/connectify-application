@@ -43,36 +43,43 @@ public class UserCredentialsController {
     private EmployeeClient employeeClient;
 
     @GetMapping("/send-otp")
-    public ResponseEntity<String> sendOtp(@RequestParam String email) {
-
-        try{
+    public ResponseEntity<Map<String, String>> sendOtp(@RequestParam String email) {
+        try {
             String message = otpService.generateAndSendOTP(email);
             System.out.println(message);
-            return new ResponseEntity<>(message, HttpStatus.OK);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", message);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (FeignException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Problem in backend! Try again later.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        catch(FeignException e){
-            return new ResponseEntity<>("problem in backend!! try again later", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-
-
     }
 
+
     @GetMapping("/validate-otp")
-    public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp) {
+    public ResponseEntity<Map<String, String>> validateOtp(@RequestParam String email, @RequestParam String otp) {
         boolean isValid = otpValidationService.validateOTP(email, otp);
+        Map<String, String> response = new HashMap<>();
         if (isValid) {
-            return new ResponseEntity<>("OTP is valid", HttpStatus.OK);
+            response.put("message", "OTP is valid");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Invalid OTP", HttpStatus.BAD_REQUEST);
+            response.put("message", "OTP is invalid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
 
         passwordService.changePassword(email, newPassword);
-        return new ResponseEntity<>("password changed successfully", HttpStatus.OK);
+        Map<String, String> response = new HashMap<>();
+        response.put("message",  "Password changed successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
 
     }

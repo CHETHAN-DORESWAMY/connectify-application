@@ -18,6 +18,9 @@ function MeetingList({ meet, selectDate }) {
   const [meetingToCancel, setMeetingToCancel] = useState(null);
   const [hoveredMeeting, setHoveredMeeting] = useState(null);
   const dropdownRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmingMeeting, setConfirmingMeeting] = useState(null);
+  const [cancellationReason, setCancellationReason] = useState("");
 
   useEffect(() => {
     if (meet) {
@@ -61,6 +64,39 @@ function MeetingList({ meet, selectDate }) {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchParticipantStatus = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8222/api/participants/get-status/${userId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                setParticipantStatus(data); 
+                const confirmedIds = data
+                    .filter((participant) => participant.status === true)
+                    .map((participant) => participant.meetId);
+                setConfirmedMeetings(confirmedIds); 
+            } else {
+                console.error("Failed to fetch participant status");
+            }
+        } catch (error) {
+            console.error("Error fetching participant status:", error);
+        }
+    };
+
+    fetchParticipantStatus();
+}, [userId, token]);
+
+
   const convertToLocalTime = (utcTime) => {
     if (employeeTimezone) {
       return DateTime.fromISO(utcTime, { zone: "utc" })
@@ -73,18 +109,20 @@ function MeetingList({ meet, selectDate }) {
 
   const filteredMeetings = meetings
     ? meetings.filter((meeting) => {
+        const meetingDateTime = DateTime.fromISO(meeting.meetStartDateTime);
+        const now = DateTime.now();
+
         if (selectedDate) {
-          return DateTime.fromISO(meeting.meetStartDateTime).hasSame(
-            DateTime.fromISO(selectedDate),
-            "day"
-          );
+          return meetingDateTime.hasSame(DateTime.fromISO(selectedDate), "day");
         } else {
           if (viewMode === "allMeetings") {
             return true;
           } else if (viewMode === "hosted") {
             return meeting.meetHostId === userId;
           } else if (viewMode === "toAttend") {
-            return meeting.meetHostId !== userId;
+            return meeting.meetHostId !== userId && meetingDateTime > now;
+          } else if (viewMode === "past") {
+            return meetingDateTime < now;
           }
         }
         return false;
@@ -96,6 +134,7 @@ function MeetingList({ meet, selectDate }) {
   };
 
   const handleCancelMeeting = async (meetingId) => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `http://localhost:8222/api/meetings/delete/${meetingId}`,
@@ -105,23 +144,27 @@ function MeetingList({ meet, selectDate }) {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ reason: cancellationReason }),
         }
       );
       if (response.ok) {
-        const updatedMeetings = meetings.filter(
-          (meeting) => meeting.meetId !== meetingId
+        setMeetings((prevMeetings) =>
+          prevMeetings.filter((meeting) => meeting.meetId !== meetingId)
         );
-        setMeetings(updatedMeetings);
         console.log("Meeting cancelled successfully");
       } else {
         console.error("Failed to cancel meeting");
       }
     } catch (error) {
       console.error("Error cancelling meeting:", error);
+    } finally {
+      setIsLoading(false);
+      setCancellationReason("");
     }
   };
 
   const handleConfirmMeeting = async (meetingId) => {
+    setConfirmingMeeting(meetingId);
     try {
       const response = await fetch(
         `http://localhost:8222/api/participants/update-status/${userId}/${meetingId}`,
@@ -136,11 +179,18 @@ function MeetingList({ meet, selectDate }) {
       if (response.ok) {
         console.log("Meeting confirmed successfully");
         setConfirmedMeetings([...confirmedMeetings, meetingId]);
+        setParticipantStatus((prevStatus) =>
+          prevStatus.map((p) =>
+            p.empId === userId && p.meetId === meetingId ? { ...p, status: true } : p
+          )
+        );
       } else {
         console.error("Failed to confirm meeting");
       }
     } catch (error) {
       console.error("Error confirming meeting:", error);
+    } finally {
+      setConfirmingMeeting(null);
     }
   };
 
@@ -223,6 +273,7 @@ function MeetingList({ meet, selectDate }) {
   const handleCancelCancellation = () => {
     setShowConfirmation(false);
     setMeetingToCancel(null);
+    setCancellationReason("");
   };
 
   if (!meetings) {
@@ -242,7 +293,9 @@ function MeetingList({ meet, selectDate }) {
               ? "All Meetings"
               : viewMode === "hosted"
               ? "Hosted Meetings"
-              : "Meetings to Attend"}
+              : viewMode === "toAttend"
+              ? "Upcoming Meetings"
+              : "Past Meetings"}
           </h3>
           {selectedDate && (
             <button
@@ -282,7 +335,17 @@ function MeetingList({ meet, selectDate }) {
             }`}
             onClick={() => setViewMode("toAttend")}
           >
-            Meetings to Attend
+            Upcoming Meetings
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${
+              viewMode === "past"
+                ? "bg-sky-800 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setViewMode("past")}
+          >
+            Past Meetings
           </button>
         </div>
       </div>
@@ -339,12 +402,15 @@ function MeetingList({ meet, selectDate }) {
                       e.stopPropagation();
                       handleConfirmMeeting(meeting.meetId);
                     }}
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    className={`bg-green-800 text-white px-3 py-1 rounded hover:bg-green-600 ${
+                      confirmingMeeting === meeting.meetId ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    disabled={confirmingMeeting === meeting.meetId}
                   >
-                    Confirm
+                    {confirmingMeeting === meeting.meetId ? 'Confirming...' : 'Confirm'}
                   </button>
                 ) : (
-                  <span className="text-green-500 font-semibold">
+                  <span className="text-green-800 font-semibold">
                     Confirmed
                   </span>
                 )}
@@ -383,8 +449,8 @@ function MeetingList({ meet, selectDate }) {
                       const status = participantStatus.find(
                         (p) => p.empId === participant.empId
                       );
-                      const statusText = status ? (status.status ? "Confirmed" : "Pending") : "Unknown";
-                      const statusColor = status ? (status.status ? "text-green-600" : "text-yellow-600") : "text-gray-600";
+                      const statusText = status && status.status ? "Confirmed" : "Pending";
+                      const statusColor = status && status.status ? "text-green-600" : "text-yellow-600";
                       return (
                         <div key={participant.empId} className="flex items-center justify-between p-2 bg-gray-100 rounded-full text-sm">
                           <span className="font-semibold ml-4">{participant.empName}</span>
@@ -414,6 +480,13 @@ function MeetingList({ meet, selectDate }) {
           <div className="bg-white p-8 rounded-lg max-w-md w-full">
             <h2 className="text-2xl font-bold mb-4">Confirm Cancellation</h2>
             <p className="mb-4">Are you sure you want to cancel this meeting?</p>
+            <textarea
+              className="w-full p-2 border rounded mb-4"
+              rows="3"
+              placeholder="Enter reason for cancellation"
+              value={cancellationReason}
+              onChange={(e) => setCancellationReason(e.target.value)}
+            ></textarea>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={handleCancelCancellation}
@@ -423,9 +496,12 @@ function MeetingList({ meet, selectDate }) {
               </button>
               <button
                 onClick={handleConfirmCancel}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className={`bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                disabled={isLoading || !cancellationReason.trim()}
               >
-                Yes, Cancel
+                {isLoading ? 'Cancelling...' : 'Yes, Cancel'}
               </button>
             </div>
           </div>

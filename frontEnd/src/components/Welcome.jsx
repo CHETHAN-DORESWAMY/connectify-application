@@ -60,7 +60,7 @@ function Welcome() {
         workHoursStart: employee.empStartTime || "",
         workHoursEnd: employee.empEndTime || "",
       });
-      //setIsProfileIncomplete(true);
+      setIsProfileIncomplete(true);
     } else {
       sessionStorage.setItem("creatorTimezone", employee.empTimezone);
     }
@@ -150,7 +150,7 @@ function Welcome() {
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           required={["id", "name", "email"].includes(key)}
-                          readOnly={["id", "name", "role", "email", "contact", "location"].includes(key)}
+                          readOnly={["id", "email"].includes(key)}
                         />
                       )}
                     </div>

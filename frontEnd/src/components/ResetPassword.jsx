@@ -48,8 +48,9 @@ function ResetPassword() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-
+      console.log(response);
       const data = await response.json();
+      console.log(data);
       if (response.ok) {
         setShowOtpField(true);
         setTimer(300);
@@ -85,7 +86,7 @@ function ResetPassword() {
         setShowOtpField(false);
         setShowPasswordFields(true);
         setIsTimerRunning(false);
-        setServerMessage(data);
+        setServerMessage(data.message);
         setErrorMessage("");
       } else {
         setErrorMessage(data);
@@ -118,12 +119,12 @@ function ResetPassword() {
 
       const data = await response.json();
       if (response.ok) {
-        setServerMessage(data);
+        setServerMessage(data.message);
         setTimeout(() => {
           navigate("/signin");
         }, 2000);
       } else {
-        setErrorMessage(data);
+        setErrorMessage(data.message);
       }
     } catch (error) {
       setErrorMessage("Failed to reset password. Please try again.");
