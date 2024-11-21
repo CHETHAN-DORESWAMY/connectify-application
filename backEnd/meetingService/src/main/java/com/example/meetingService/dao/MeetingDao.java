@@ -18,6 +18,6 @@ public interface MeetingDao extends MongoRepository<MeetingEntity, String> {
     @Query("{ 'meetStartDateTime': { $lt: ?0 } }")
     void deleteByMeetStartDateTimeBefore(Instant cutoffTime);
 
-    @Query("{ 'meetStartDateTime': { $gt: ?0, $lt: ?1 } }")
+    @Query("{ 'meetStartDateTime': { $lt: ?0, $gt: ?1 } }")
     List<MeetingEntity> findMeetingsStartingInTimeRange(Instant now, Instant withinTwoHours);
 }
