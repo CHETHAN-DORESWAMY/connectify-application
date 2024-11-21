@@ -85,6 +85,8 @@ function MeetingList({ meet, selectDate }) {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          // to pass the reason.
+          body: JSON.stringify(reason),
         }
       );
       if (response.ok) {

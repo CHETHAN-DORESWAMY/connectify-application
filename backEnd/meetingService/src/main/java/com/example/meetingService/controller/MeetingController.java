@@ -150,10 +150,10 @@ public class MeetingController {
 
     // Delete meeting by ID
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<HashMap<String, Object>> deleteMeeting(@PathVariable String id) {
+    public ResponseEntity<HashMap<String, Object>> deleteMeeting(@PathVariable String id, @RequestBody String reason) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            meetingService.deleteMeeting(id);
+            meetingService.deleteMeeting(id, reason);
             response.put("message", "Meeting deleted successfully ||  mail sent to each participants");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -161,5 +161,14 @@ public class MeetingController {
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/find-meeting-starts-within-two-hours")
+    public ResponseEntity<List<MeetingEntity>> getMeetingsStartingSoon() {
+        List<MeetingEntity> meetings = meetingService.getMeetingsStartingSoon();
+        if (meetings.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(meetings);
     }
 }

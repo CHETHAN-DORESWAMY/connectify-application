@@ -12,6 +12,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,39 +43,39 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendDeleteEmail(String empId, String meetingId) throws MessagingException {
+    public void sendDeleteEmail(String empId, String meetingId, String reason) throws MessagingException {
         EmployeeEntity employeeEntity =  employeeClient.getEmployeeByIdForFeign(empId).getBody();
-        System.out.println(meetingId);
         MeetingEntity meetingDto =  meetingClient.getMeetingByIdForFeign(meetingId).getBody();
+        EmployeeEntity host = employeeClient.getEmployeeByIdForFeign(meetingDto.getMeetHostId()).getBody();
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom("rdchethan22@gmail.com");
-            System.out.println(employeeEntity.getEmpEmail());
+            helper.setFrom(host.getEmpEmail());
             helper.setTo(employeeEntity.getEmpEmail());
             helper.setSubject(meetingDto.getMeetName());
-            helper.setText("Since we are busy in other task meeting get canceled" + meetingDto.getMeetName() + " " + "scheduled on" + meetingDto.getMeetingDate());
+            helper.setText(reason);
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-
     @Override
-    public void sendEmail(MeetingDto meetingDto) throws MessagingException {
-        List<String> participants = meetingDto.getMeetParticipants();
+    public void sendEmail(MeetingEntity meeting, List<String> participants) throws MessagingException {
 
 
+        EmployeeEntity host = employeeClient.getEmployeeByIdForFeign(meeting.getMeetHostId()).getBody();
         employeeClient.getEmployeeByIds(participants).getBody().forEach((participant)->{
             try {
+                String startTime = meeting.getMeetStartDateTime().atZone(ZoneId.of(participant.getEmpTimezone())).format(DateTimeFormatter.ISO_DATE);
+                String endTime = meeting.getMeetEndDateTime().atZone(ZoneId.of(participant.getEmpTimezone())).format(DateTimeFormatter.ISO_DATE);
+                String information = "The meeting  " + meeting.getMeetName() + " scheduled on " + meeting.getMeetingDate() + " on the start time" + startTime+ " ends at " + endTime;
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
-                helper.setFrom("rdchethan22@gmail.com");
+                helper.setFrom(host.getEmpEmail());
                 helper.setTo(participant.getEmpEmail());
-                helper.setSubject(meetingDto.getMeetName());
-                helper.setText("This is the meeting link of the meeting" + meetingDto.getMeetName() + " " + "scheduled on" + meetingDto.getMeetDate());
+                helper.setSubject(meeting.getMeetName());
+                helper.setText(information);
                 mailSender.send(message);
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
@@ -81,6 +83,25 @@ public class EmailServiceImpl implements EmailService {
         });
 
 
+
+    }
+
+    @Override
+    public void sendEmail(String meetHostId, String subject, String emailBody) {
+        EmployeeEntity host = employeeClient.getEmployeeByIdForFeign(meetHostId).getBody();
+        try{
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom("rdchethan22@gmail.com");
+            helper.setTo(host.getEmpEmail());
+            helper.setSubject(subject);
+            helper.setText(emailBody);
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

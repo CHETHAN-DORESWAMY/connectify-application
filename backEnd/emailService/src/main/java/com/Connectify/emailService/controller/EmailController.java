@@ -1,16 +1,19 @@
 package com.Connectify.emailService.controller;
 
 
+import com.Connectify.emailService.client.DeleteMeeting;
+import com.Connectify.emailService.client.DeleteMeetingMail;
 import com.Connectify.emailService.client.MeetingDto;
-import com.Connectify.emailService.service.EmailService;
+import com.Connectify.emailService.client.MeetingEntity;
 import com.Connectify.emailService.service.EmailServiceImpl;
-import com.netflix.discovery.converters.Auto;
+
 import jakarta.mail.MessagingException;
-import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/emails")
@@ -30,10 +33,10 @@ public class EmailController {
     }
 
     @PostMapping("/send-meeting-mail")
-    public ResponseEntity<String> sendMeetingMail(@RequestBody MeetingDto meetingDto){
+    public ResponseEntity<String> sendMeetingMail(@RequestBody DeleteMeetingMail deleteMeetingMail){
         try{
 
-            emailService.sendEmail(meetingDto);
+            emailService.sendEmail(deleteMeetingMail.getMeeting(), deleteMeetingMail.getParticipants());
 
         } catch (MessagingException e) {
             return new ResponseEntity<>("error in sending mail", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -41,11 +44,11 @@ public class EmailController {
         return new ResponseEntity<>("Email sent successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/delete-meeting/{empId}/{meetingId}")
-    public ResponseEntity<String> sendCanceledMeetingMail(@PathVariable String empId, @PathVariable String meetingId){
+    @PostMapping("/delete-meeting")
+    public ResponseEntity<String> sendCanceledMeetingMail(@RequestBody DeleteMeeting deleteMeeting){
         try{
-            System.out.println("controller" + meetingId);
-            emailService.sendDeleteEmail(empId, meetingId);
+
+            emailService.sendDeleteEmail(deleteMeeting.empId, deleteMeeting.meetingId, deleteMeeting.reason);
         }
         catch(MessagingException e){
             return new ResponseEntity<>("error in sending mail", HttpStatus.INTERNAL_SERVER_ERROR);

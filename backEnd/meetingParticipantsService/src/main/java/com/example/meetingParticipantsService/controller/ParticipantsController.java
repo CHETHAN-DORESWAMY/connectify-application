@@ -120,14 +120,19 @@ public class ParticipantsController {
     }
 
     @DeleteMapping("/delete-by-meetingId/{meetId}")
-    public ResponseEntity<String> deleteByMeetId(@PathVariable String meetId){
+    public ResponseEntity<String> deleteByMeetId(@PathVariable String meetId, @RequestBody String reason){
         try{
-            participantsService.deleteParticiantsByMeetId(meetId);
+            participantsService.deleteParticiantsByMeetId(meetId, reason);
             return new ResponseEntity<>("delete success", HttpStatus.OK);
         }
         catch(Exception e){
             return new ResponseEntity<>("Deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/count-pending-participants/{meetId}")
+    public ResponseEntity<List<String>> countPendingParticipants(@PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.countPendingParticipants(meetId), HttpStatus.OK);
     }
 
 

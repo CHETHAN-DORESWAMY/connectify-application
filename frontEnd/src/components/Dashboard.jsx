@@ -31,7 +31,6 @@ function Dashboard() {
         }
 
         const data = await response.json();
-        console.log(data.meetings);
         setMeetings(data.meetings || []);
       } catch (error) {
         console.error("Error fetching meetings:", error);
@@ -71,7 +70,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-        {console.log(meetings)}
+      
         <MeetingList meet={meetings} selectDate={selectedDate} />
       </div>
     </div>
