@@ -1,5 +1,8 @@
 package com.example.meetingParticipantsService.controller;
 
+import com.example.meetingParticipantsService.client.Meeting;
+import com.example.meetingParticipantsService.dto.ParticipantsDto;
+import com.example.meetingParticipantsService.dto.ParticipantsStatusDto;
 import com.example.meetingParticipantsService.entity.ParticipantsEntity;
 import com.example.meetingParticipantsService.service.ParticipantsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -20,12 +24,11 @@ public class ParticipantsController {
 
     // Create a new participant
     @PostMapping("/add")
-    public ResponseEntity<HashMap<String, Object>> createParticipant(@RequestBody ParticipantsEntity participantsEntity) {
+    public ResponseEntity<HashMap<String, Object>> createParticipant(@RequestBody ParticipantsDto participants) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            ParticipantsEntity createdParticipant = participantsService.createParticipant(participantsEntity);
+            participantsService.createParticipant(participants);
             response.put("message", "Participant added successfully");
-            response.put("participant", createdParticipant);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             response.put("message", "Error adding participant");
@@ -50,12 +53,57 @@ public class ParticipantsController {
         }
     }
 
+    @GetMapping("/{empId}/meetings")
+    public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(
+            @PathVariable String empId,
+            @RequestParam String date) {
+
+        Map<String, Object> response = new HashMap<>();
+        List<Meeting> meetings = participantsService.getMeetingsForParticipantOnDate(empId, date);
+        if (meetings == null) {
+            response.put("message", "No meeting scheduled for that date");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.put("meetings", meetings);
+        response.put("message", "the meeting of the day");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{participantId}/meetings-of-id")
+    public ResponseEntity<Map<String, Object>> getMeetingsForParticipantOnDate(@PathVariable String participantId) {
+
+        System.out.println(participantId);
+        Map<String, Object> response = new HashMap<>();
+        List<Meeting> meetings = participantsService.getMeetingsForParticipant(participantId);
+        if (meetings == null) {
+            response.put("message", "No meeting scheduled for that date");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        response.put("meetings", meetings);
+        response.put("message", "the meeting of the day");
+        return ResponseEntity.ok(response);
+    }
+
+
+//    it is used to get the list of participants of a specific meeting id with their status
+    @GetMapping("/meeting-participants-details/{meetId}")
+    public ResponseEntity<List<ParticipantsStatusDto>> getParticipantsStatus(@PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.getParticipantsStatus(meetId), HttpStatus.OK);
+    }
+
+//    update the status of the meeting of particular person
+    @PutMapping("/update-status/{empId}/{meetId}")
+    public ResponseEntity<ParticipantsEntity> updateMeetingStatus(@PathVariable String empId, @PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.updateParticipantStatus(empId, meetId), HttpStatus.OK);
+    }
+
+
     // Get participant by ID
-    @GetMapping("/get/{id}")
-    public ResponseEntity<HashMap<String, Object>> getParticipantById(@PathVariable String id) {
+    @GetMapping("/get/{empId}")
+    public ResponseEntity<HashMap<String, Object>> getParticipantByEmpId(@PathVariable String id) {
         HashMap<String, Object> response = new HashMap<>();
         try {
-            Optional<ParticipantsEntity> participant = participantsService.getParticipantById(id);
+            Optional<ParticipantsEntity> participant = participantsService.getParticipantByEmpId(id);
             if (participant.isPresent()) {
                 response.put("message", "Participant found");
                 response.put("participant", participant.get());
@@ -71,39 +119,21 @@ public class ParticipantsController {
         }
     }
 
-    // Update participant by ID
-    @PutMapping("/update/{id}")
-    public ResponseEntity<HashMap<String, Object>> updateParticipant(@PathVariable String id, @RequestBody ParticipantsEntity updatedParticipant) {
-        HashMap<String, Object> response = new HashMap<>();
-        try {
-            ParticipantsEntity participant = participantsService.updateParticipant(id, updatedParticipant);
-            if (participant != null) {
-                response.put("message", "Participant updated successfully");
-                response.put("participant", participant);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                response.put("message", "Participant not found");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            response.put("message", "Error updating participant");
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    @DeleteMapping("/delete-by-meetingId/{meetId}")
+    public ResponseEntity<String> deleteByMeetId(@PathVariable String meetId, @RequestBody String reason){
+        try{
+            participantsService.deleteParticiantsByMeetId(meetId, reason);
+            return new ResponseEntity<>("delete success", HttpStatus.OK);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Delete participant by ID
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<HashMap<String, Object>> deleteParticipant(@PathVariable String id) {
-        HashMap<String, Object> response = new HashMap<>();
-        try {
-            participantsService.deleteParticipant(id);
-            response.put("message", "Participant deleted successfully");
-            return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            response.put("message", "Error deleting participant");
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping("/count-pending-participants/{meetId}")
+    public ResponseEntity<List<String>> countPendingParticipants(@PathVariable String meetId){
+        return new ResponseEntity<>(participantsService.countPendingParticipants(meetId), HttpStatus.OK);
     }
+
+
 }

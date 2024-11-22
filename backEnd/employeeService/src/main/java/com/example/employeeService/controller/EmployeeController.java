@@ -1,19 +1,18 @@
 package com.example.employeeService.controller;
 
-import com.example.employeeService.dto.EmployeeListDto;
+import com.example.employeeService.dto.*;
 import com.example.employeeService.entity.EmployeeEntity;
 import com.example.employeeService.entity.OverlapWindow;
 import com.example.employeeService.service.EmployeeService;
+import com.example.employeeService.service.OverLappingWindowAlgorithm;
 import com.example.employeeService.service.OverLappingWindowClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.Time;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -25,9 +24,12 @@ public class EmployeeController {
     @Autowired
     private OverLappingWindowClass overLappingWindowClass;
 
+    @Autowired
+    private OverLappingWindowAlgorithm overLappingWindowAlgorithm;
+
     // Create a new employee
     @PostMapping("/add")
-    public ResponseEntity<HashMap<String, Object>> createEmployee(@RequestBody EmployeeEntity employeeEntity) {
+    public ResponseEntity<HashMap<String, Object>> createEmployee(@RequestBody EmployeeDto employeeEntity) {
         HashMap<String, Object> response = new HashMap<>();
         try {
             EmployeeEntity createdEmployee = employeeService.createEmployee(employeeEntity);
@@ -65,7 +67,8 @@ public class EmployeeController {
             Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
             if (employee.isPresent()) {
                 response.put("message", "Employee found");
-                response.put("employee", employee.get());
+                EmployeeEntity emp = employee.get();
+                response.put("employee", emp);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("message", "Employee not found");
@@ -75,6 +78,24 @@ public class EmployeeController {
             response.put("message", "Error fetching employee");
             response.put("error", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get-emp/{empId}")
+    public ResponseEntity<EmployeeEntity> getEmployeeByIdForFeign(@PathVariable String empId) {
+        HashMap<String, Object> response = new HashMap<>();
+        try {
+            Optional<EmployeeEntity> employee = employeeService.getEmployeeById(empId);
+            if (employee.isPresent()) {
+
+                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+            } else {
+
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -90,7 +111,8 @@ public class EmployeeController {
             } else {
                 response.put("message", "Employee not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
+              }
+
         } catch (Exception e) {
             response.put("message", "Error fetching employee");
             response.put("error", e.getMessage());
@@ -98,15 +120,29 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping("/get-window-time")
-    public ResponseEntity<Map<String, Object>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
+    @PutMapping("/update-status")
+    public ResponseEntity<Void> updateStatus(@RequestBody UpdatedEmployeeDto updatedEmployeeDto){
 
-        Map<String, Object> window = overLappingWindowClass.computeWindow(employeeListDto);
-
-
-        return new ResponseEntity<>(window, HttpStatus.OK);
+        employeeService.updateStatus(updatedEmployeeDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/get-window-time")
+    public ResponseEntity<List<Interval>> computeWindowTime(@RequestBody EmployeeListDto employeeListDto){
+        List<Interval> list = new ArrayList<>();
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping("/get-red-window")
+    public ResponseEntity<List<Interval>>  computeRedWindowTime(@RequestBody EmployeeListDto employeeListDto){
+        List<Interval> list = overLappingWindowAlgorithm.computeWindow(employeeListDto);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping("/get-employee-by-ids")
+    public ResponseEntity<List<EmployeeEntity>> getEmployeeByIds(@RequestBody List<String> ids){
+        return new ResponseEntity<>(employeeService.getAllEmployeesByIds(ids), HttpStatus.OK);
+    }
 
     // Update employee by ID
     @PutMapping("/update/{empId}")

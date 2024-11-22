@@ -22,7 +22,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidToken(InvalidTokenException ex) {
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Invalid Access");
+        response.put("message", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }

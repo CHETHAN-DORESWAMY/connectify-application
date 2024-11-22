@@ -1,6 +1,8 @@
 package com.example.employeeService.service;
 
 import com.example.employeeService.dao.EmployeeDao;
+import com.example.employeeService.dto.EmployeeDto;
+import com.example.employeeService.dto.UpdatedEmployeeDto;
 import com.example.employeeService.entity.EmployeeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,17 @@ public class EmployeeService {
     private EmployeeDao employeeDao;
 
     // Create a new employee
-    public EmployeeEntity createEmployee(EmployeeEntity employeeEntity) {
-        return employeeDao.save(employeeEntity);
+    public EmployeeEntity createEmployee(EmployeeDto employeeDto) {
+        EmployeeEntity employee = new EmployeeEntity();
+        employee.setEmpId(employeeDto.getEmpId());
+        employee.setEmpCity(employeeDto.getEmpCity());
+        employee.setEmpDesignation(employeeDto.getEmpDesignation());
+        employee.setEmpEmail(employeeDto.getEmpEmail());
+        employee.setEmpName(employeeDto.getEmpName());
+        employee.setEmpPhone(employeeDto.getEmpPhone());
+        employee.setProfileStatus(false);
+
+        return employeeDao.save(employee);
     }
 
     // Get all employees
@@ -49,6 +60,8 @@ public class EmployeeService {
         return null;
     }
 
+
+
     // Delete an employee by ID
     public void deleteEmployee(String empId) {
         employeeDao.deleteById(empId);
@@ -59,6 +72,24 @@ public class EmployeeService {
     }
 
 
+    public List<EmployeeEntity> getAllEmployeesByIds(List<String> ids) {
+        return employeeDao.findByEmpIdIn(ids);
+    }
 
+    public void updateStatus(UpdatedEmployeeDto updatedEmployeeDto) {
+        Optional<EmployeeEntity> employeeEntity = getEmployeeById(updatedEmployeeDto.getEmpId());
+        EmployeeEntity employee = employeeEntity.get();
+        employee.setEmpTimezone(updatedEmployeeDto.getEmpTimezone());
+
+
+        ZonedDateTime startDateTime = ZonedDateTime.of(LocalDate.now(), updatedEmployeeDto.getEmpStartTime(), ZoneId.of(updatedEmployeeDto.getEmpTimezone()) );
+        employee.setEmpStartTime(startDateTime.toInstant());
+
+        ZonedDateTime endDateTime = ZonedDateTime.of(LocalDate.now(), updatedEmployeeDto.getEmpEndTime(), ZoneId.of(updatedEmployeeDto.getEmpTimezone()) );
+        employee.setEmpEndTime(endDateTime.toInstant());
+
+        employee.setProfileStatus(true);
+        employeeDao.save(employee);
+    }
 }
 
