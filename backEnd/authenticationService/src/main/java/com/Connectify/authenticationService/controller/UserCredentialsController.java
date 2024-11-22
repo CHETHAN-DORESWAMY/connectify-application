@@ -44,7 +44,6 @@ public class UserCredentialsController {
 
     @GetMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestParam String email) {
-
         try{
             String message = otpService.generateAndSendOTP(email);
             System.out.println(message);
@@ -53,9 +52,6 @@ public class UserCredentialsController {
         catch(FeignException e){
             return new ResponseEntity<>("problem in backend!! try again later", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
-
     }
 
     @GetMapping("/validate-otp")
