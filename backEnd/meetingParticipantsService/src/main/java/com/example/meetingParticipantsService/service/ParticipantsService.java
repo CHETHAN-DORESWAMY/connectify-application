@@ -33,6 +33,9 @@ public class ParticipantsService {
         int n = participants.getParticipantsIds().size();
         for(int i = 0; i < n; i++){
             ParticipantsEntity participantsEntity = new ParticipantsEntity(participants.getParticipantsIds().get(i), participants.getMeetingId(),false);
+            if(participants.getParticipantsIds().get(i).equals(participants.getHostId())){
+                participantsEntity.setStatus(true);
+            }
             participantsRepository.save(participantsEntity);
         }
     }
@@ -92,7 +95,7 @@ public class ParticipantsService {
 
     public ParticipantsEntity updateParticipantStatus(String empId, String meetId) {
         ParticipantsEntity participantsEntity = participantsRepository.findByEmpIdAndMeetId(empId, meetId);
-        participantsEntity.setStatus(!participantsEntity.getStatus());
+        participantsEntity.setStatus(true);
         System.out.println(participantsEntity.getStatus());
         return participantsRepository.save(participantsEntity);
     }

@@ -10,6 +10,7 @@ function Navbar({ isLoggedIn, employeeName }) {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const API_END_POINT = "http://localhost:8222/api/employees";
   const token = sessionStorage.getItem("authToken");
+  const userId = sessionStorage.getItem("userId");
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -44,13 +45,14 @@ function Navbar({ isLoggedIn, employeeName }) {
       setFilteredEmployees(
         employees.filter(
           (emp) =>
-            emp.empId.toLowerCase().includes(lowercasedTerm) ||
+            emp.empId !== userId &&
+            (emp.empId.toLowerCase().includes(lowercasedTerm) ||
             emp.empName.toLowerCase().includes(lowercasedTerm) ||
-            emp.empEmail.toLowerCase().includes(lowercasedTerm)
+            emp.empEmail.toLowerCase().includes(lowercasedTerm))
         )
       );
     }
-  }, [searchQuery, employees]);
+  }, [searchQuery, employees, userId]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -64,7 +66,8 @@ function Navbar({ isLoggedIn, employeeName }) {
           <img
             src="https://th.bing.com/th?id=OIP.OQPmorjMA98lRVYZXXHJYAHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
             alt="App Icon"
-            className="h-8 w-8 rounded-full shadow-md border-2 border-white transform hover:scale-110 transition-transform duration-300"
+            onClick={() => navigate("/")}
+            className="h-8 w-8 rounded-full shadow-md border-2 border-white transform hover:scale-110 transition-transform duration-300 cursor-pointer"
           />
           <h1
             onClick={() => navigate("/")}
@@ -80,13 +83,13 @@ function Navbar({ isLoggedIn, employeeName }) {
               to="/dashboard"
               className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
-              Dashboard
+              View Meetings
             </Link>
             <Link
-              to="/example-meeting"
+              to="/create-meeting"
               className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
             >
-              Schedule
+              New Meeting
             </Link>
             <Link
               to="/calendar"
@@ -94,19 +97,14 @@ function Navbar({ isLoggedIn, employeeName }) {
             >
               Calendar
             </Link>
-            <Link
-              to="/chat"
-              className="text-white font-medium hover:text-sky-200 transition-colors duration-200 text-sm transform hover:scale-110"
-            >
-              Chat
-            </Link>
+          
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
                 placeholder="Search People"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white bg-opacity-20 text-white placeholder-sky-200 pl-3 pr-8 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-300 transition-all duration-300 text-xs w-56"
+                className="bg-white bg-opacity-20 text-black placeholder-sky-200 pl-3 pr-8 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-300 transition-all duration-300 text-xs w-56"
               />
               <button
                 type="submit"

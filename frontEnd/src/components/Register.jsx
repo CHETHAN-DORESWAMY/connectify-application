@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import "../App.css";
@@ -10,15 +10,23 @@ function Register() {
     id: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const [serverMessage, setServerMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState(true);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (formData.password && formData.confirmPassword) {
+      setPasswordMatch(formData.password === formData.confirmPassword);
+    }
+  }, [formData.password, formData.confirmPassword]);
 
   const validate = () => {
     let errors = {};
@@ -30,6 +38,9 @@ function Register() {
     if (!formData.password) errors.password = "Password is required";
     else if (formData.password.length < 6)
       errors.password = "Password must be at least 6 characters";
+    if (!formData.confirmPassword) errors.confirmPassword = "Confirm Password is required";
+    else if (formData.password !== formData.confirmPassword)
+      errors.confirmPassword = "Passwords do not match";
     return errors;
   };
 
@@ -132,7 +143,7 @@ function Register() {
             </div>
 
             {/* Password */}
-            <div className="mb-4">
+            <div className="mb-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
@@ -149,13 +160,34 @@ function Register() {
               )}
             </div>
 
+            {/* Confirm Password */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-800 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              {formData.confirmPassword && !passwordMatch && (
+                <p className="text-red-600 text-xs mt-1">Passwords do not match</p>
+              )}
+              {errors.confirmPassword && (
+                <p className="text-red-600 text-xs mt-1">{errors.confirmPassword}</p>
+              )}
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !passwordMatch}
               className={`w-full bg-sky-800 text-white py-2 rounded-md transition duration-300 
                 ${
-                  isSubmitting
+                  (isSubmitting || !passwordMatch)
                     ? "opacity-70 cursor-not-allowed"
                     : "hover:bg-sky-900"
                 }`}

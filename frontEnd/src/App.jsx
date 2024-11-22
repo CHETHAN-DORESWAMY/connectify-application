@@ -39,7 +39,7 @@ function App() {
           <Route path="/search" element={<ParticipantSearch />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/example-meeting" element={<CreateMeeting />} />
+          <Route path="/create-meeting" element={<CreateMeeting />} />
         </Routes>
       </div>
     </Router>

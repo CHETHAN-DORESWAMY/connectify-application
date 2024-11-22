@@ -56,9 +56,9 @@ function Welcome() {
         email: employee.empEmail || "",
         contact: employee.empPhone || "",
         location: employee.empCity || "",
-        timezone: "",
-        workHoursStart: "",
-        workHoursEnd: "",
+        timezone: employee.empTimezone || "",
+        workHoursStart: employee.empStartTime || "",
+        workHoursEnd: employee.empEndTime || "",
       });
       setIsProfileIncomplete(true);
     } else {
@@ -150,7 +150,7 @@ function Welcome() {
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           required={["id", "name", "email"].includes(key)}
-                          readOnly={["id", "name", "role", "email", "contact", "location"].includes(key)}
+                          readOnly={["id", "email"].includes(key)}
                         />
                       )}
                     </div>
@@ -159,7 +159,7 @@ function Welcome() {
                     type="submit"
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
                   >
-                    Finalize Profile
+                    Update Profile
                   </button>
                 </form>
               ) : (
@@ -181,7 +181,7 @@ function Welcome() {
                     onClick={() => navigate("/dashboard")}
                     className="w-full bg-sky-800 text-white py-3 px-4 rounded-md hover:bg-sky-900 transition duration-300 transform hover:scale-105"
                   >
-                    Go to Dashboard
+                    Find your meetings
                   </button>
                 </div>
               )}

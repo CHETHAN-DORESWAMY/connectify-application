@@ -43,30 +43,49 @@ function ResetPassword() {
     setIsSubmitting(true);
     setServerMessage("");
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const response = await fetch(`${API_END_URL}/send-otp?email=${email}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      console.log("hello");
-      console.log(response);
-      const data = await response.json();
-
+      
+      const response = await fetch(
+        `http://localhost:8222/api/auth/get-user/${email}`,
+        {
+          method: "GET",
+        }
+      );
       if (response.ok) {
-        setShowOtpField(true);
-        setTimer(300);
-        setIsTimerRunning(true);
-        setServerMessage(data.message);
-        setErrorMessage("");
-      } else {
-        setErrorMessage(data.message);
-      }
-    } catch (error) {
-      setErrorMessage("Failed to send OTP. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          const response = await fetch(`${API_END_URL}/send-otp?email=${email}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+          console.log(response);
+          const data = await response.json();
+          console.log(data);
+          if (response.ok) {
+            setShowOtpField(true);
+            setTimer(300);
+            setIsTimerRunning(true);
+            setServerMessage(data.message);
+            setErrorMessage("");
+          } else {
+            setErrorMessage(data.message);
+          }
+        } catch (error) {
+          setErrorMessage("Failed to send OTP. Please try again.");
+        } finally {
+          setIsSubmitting(false);
+        }
+    }
+    else{
+      setErrorMessage("email doesn't exist");
+    }
+    }  
+    catch (error) {
+      console.error("Error fetching employee email", error);
     }
   };
+
+    
+  
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
@@ -87,7 +106,7 @@ function ResetPassword() {
         setShowOtpField(false);
         setShowPasswordFields(true);
         setIsTimerRunning(false);
-        setServerMessage(data);
+        setServerMessage(data.message);
         setErrorMessage("");
       } else {
         setErrorMessage(data);
@@ -120,12 +139,12 @@ function ResetPassword() {
 
       const data = await response.json();
       if (response.ok) {
-        setServerMessage(data);
+        setServerMessage(data.message);
         setTimeout(() => {
           navigate("/signin");
         }, 2000);
       } else {
-        setErrorMessage(data);
+        setErrorMessage(data.message);
       }
     } catch (error) {
       setErrorMessage("Failed to reset password. Please try again.");

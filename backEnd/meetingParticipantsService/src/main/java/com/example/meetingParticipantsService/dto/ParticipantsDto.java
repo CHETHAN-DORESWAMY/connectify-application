@@ -5,10 +5,12 @@ import java.util.List;
 public class ParticipantsDto {
     private List<String> participantsIds;
     private String meetingId;
+    private String hostId;
 
-    public ParticipantsDto(List<String> participantsIds, String meetingId) {
+    public ParticipantsDto(List<String> participantsIds, String meetingId, String  hostId) {
         this.participantsIds = participantsIds;
         this.meetingId = meetingId;
+        this.hostId = hostId;
     }
 
     public List<String> getParticipantsIds() {
@@ -25,5 +27,13 @@ public class ParticipantsDto {
 
     public void setMeetingId(String meetingId) {
         this.meetingId = meetingId;
+    }
+
+    public String getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
     }
 }
