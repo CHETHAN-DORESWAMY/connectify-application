@@ -9,6 +9,7 @@ import com.Connectify.emailService.feign.ParticipantClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -28,28 +29,28 @@ public class MeetingCoordinatorService {
     public void notifyHostAboutUnconfirmedParticipants() {
         List<MeetingEntity> upcomingMeetings = meetingService.getMeetingsStartingSoon().getBody();
 
-        if(upcomingMeetings == null){
-            return;
-        }
-        for (MeetingEntity meeting : upcomingMeetings) {
-            List<String> unconfirmedParticipants =
-                    participantsService.countPendingParticipants(meeting.getMeetId()).getBody();
+        if(upcomingMeetings != null) {
+            for (MeetingEntity meeting : upcomingMeetings) {
+                EmployeeEntity host = employeeClient.getEmployeeByIdForFeign(meeting.getMeetHostId()).getBody();
+                List<String> unconfirmedParticipants =
+                        participantsService.countPendingParticipants(meeting.getMeetId()).getBody();
 
-            List<EmployeeEntity> participants = employeeClient.getEmployeeByIds(unconfirmedParticipants).getBody();
-            if (!participants.isEmpty()) {
-                String participantNames = participants.stream()
-                        .map(EmployeeEntity::getEmpName)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("No participants");
+                List<EmployeeEntity> participants = employeeClient.getEmployeeByIds(unconfirmedParticipants).getBody();
+                if (!participants.isEmpty()) {
+                    String participantNames = participants.stream()
+                            .map(EmployeeEntity::getEmpName)
+                            .reduce((a, b) -> a + "/n" + b)
+                            .orElse("No participants");
 
-                String emailBody = String.format(
-                        "The following participants have not confirmed their attendance for the meeting '%s' starting at %s: %s",
-                        meeting.getMeetName(),
-                        meeting.getMeetStartDateTime(),
-                        participantNames
-                );
+                    String emailBody = String.format(
+                            "The following participants have not confirmed their attendance for the meeting '%s' starting at %s: %s ",
+                            meeting.getMeetName(),
+                            meeting.getMeetStartDateTime().atZone(ZoneId.of(host.getEmpTimezone())),
+                            participantNames
+                    );
 
-                emailService.sendEmail(meeting.getMeetHostId(), "Unconfirmed Participants Alert", emailBody);
+                    emailService.sendEmail(meeting.getMeetHostId(), "Unconfirmed Participants Alert", emailBody);
+                }
             }
         }
     }

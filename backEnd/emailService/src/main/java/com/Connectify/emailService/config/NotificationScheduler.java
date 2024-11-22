@@ -10,9 +10,9 @@ public class NotificationScheduler {
     @Autowired
     private MeetingCoordinatorService coordinatorService;
 
-    @Scheduled(fixedRate = 6000) // Every 15 minutes
+    @Scheduled(fixedRate = 60000) // Every 15 minutes
     public void scheduleParticipantNotification() {
-        System.out.println("participants schedue");
+        System.out.println("participants schedule");
         coordinatorService.notifyHostAboutUnconfirmedParticipants();
     }
 }

@@ -105,7 +105,9 @@ public class MeetingService {
 
     public List<MeetingEntity> getMeetingsStartingSoon() {
         Instant now = Instant.now();
+        System.out.println(now.toString());
         Instant withinTwoHours = now.minus(Duration.ofHours(2));
+        System.out.println(withinTwoHours.toString());
         return meetingDao.findMeetingsStartingInTimeRange(now, withinTwoHours);
     }
 

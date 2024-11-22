@@ -166,9 +166,11 @@ public class MeetingController {
     @GetMapping("/find-meeting-starts-within-two-hours")
     public ResponseEntity<List<MeetingEntity>> getMeetingsStartingSoon() {
         List<MeetingEntity> meetings = meetingService.getMeetingsStartingSoon();
+
         if (meetings.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+        System.out.println(meetings.get(0).getMeetName());
         return ResponseEntity.ok(meetings);
     }
 }
