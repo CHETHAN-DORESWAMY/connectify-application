@@ -140,7 +140,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 For questions or support, please reach out to the development team:
 
-- **Backend Lead**: Your Name (rdchethan22@gmail.com)
-- **Frontend Lead**: Collaborator Name (rdevananda27@gmail.com)
+- **Backend Lead**: Chethan R D (rdchethan22@gmail.com)
+- **Frontend Lead**: Deva Nanda RadhaKrishna (rdevananda27@gmail.com)
 
 
